@@ -103,5 +103,5 @@ function eliminar(req, res) {
 module.exports = {
     create,
     update,
-    eliminar,
+    eliminar
   };
