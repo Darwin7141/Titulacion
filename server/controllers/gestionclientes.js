@@ -99,9 +99,26 @@ function eliminar(req, res) {
     });
 }
 
+function getAll(req, res) {
+  modelos.clientes.findAll({
+    order: [['codigocliente', 'ASC']] // Ordenar por codigocliente en orden ascendente
+  })
+    .then(clientes => {
+      if (clientes.length === 0) {
+        return res.status(404).send({ message: 'No se encontraron clientes.' });
+      }
+      res.status(200).send(clientes); // Enviar el listado de clientes ordenado
+    })
+    .catch(err => {
+      console.error("Error al obtener los clientes:", err);
+      res.status(500).send({ message: "Ocurrió un error al obtener los clientes.", error: err.message });
+    });
+}
+
 
 module.exports = {
     create,
     update,
-    eliminar
+    eliminar,
+    getAll
   };

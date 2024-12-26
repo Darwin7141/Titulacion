@@ -5,4 +5,5 @@ module.exports = (app) => {
     app.post('/api/cliente',  clientesController.create);
     app.put('/api/cliente/:codigocliente',  clientesController.update);
     app.delete('/api/cliente/:codigocliente',  clientesController.eliminar);
+    app.get('/api/cliente',  clientesController.getAll);
 };
