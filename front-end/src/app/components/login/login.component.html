@@ -1,0 +1,16 @@
+<div class="container-fluid">
+    <div class="content-login col-lg-3 col-md-4 col-sm-6 col-xs-12">
+      <h2>LOGIN</h2>
+      <form #loginForm="ngForm" (ngSubmit)="login()" autocomplete="on">
+        <mat-form-field class="col-xs-12">
+          <input matInput type="text" #usuario="ngModel" name="usuario" [(ngModel)]="usuario.usuario" required placeholder="Usuario">
+          <mat-error *ngIf="usuario.invalid">El Usuario es requerido</mat-error>
+        </mat-form-field>
+        <mat-form-field class="col-xs-12">
+          <input matInput type="password" #password="ngModel" name="password" [(ngModel)]="usuario.password" required placeholder="Password">
+          <mat-error *ngIf="password.invalid">El Password es requerido</mat-error>
+        </mat-form-field>
+        <button mat-raised-button class="btn-ingreso" type="submit" [disabled]="!loginForm.form.valid">INGRESAR</button>
+      </form>
+    </div>
+  </div>
