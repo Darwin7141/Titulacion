@@ -20,6 +20,8 @@ app.use((req, res, next) => {
 
 require('./server/routes/usuarios')(app);
 require('./server/routes/gestionclientes')(app);
+require('./server/routes/cargoempleados')(app);
+require('./server/routes/empleados')(app);
 
 app.get('*', (req, res) => {
     res.status(200).send({ message: "Bienvenido al servidor NodeJS" });

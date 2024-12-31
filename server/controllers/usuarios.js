@@ -45,7 +45,28 @@ async function login(req, res) {
     }
 }
 
+function getAll(req, res) {
+    modelos.cuentasusuarios.findAll({
+      order: [['idcuenta', 'ASC']] // Ordenar por codigocliente en orden ascendente
+    })
+      .then(usuario => {
+        if (usuario.length === 0) {
+          return res.status(404).send({ message: 'No se encontraron los usuarios.' });
+        }
+        res.status(200).send(usuario); // Enviar el listado de clientes ordenado
+      })
+      .catch(err => {
+        console.error("Error al obtener los usuarios:", err);
+        res.status(500).send({ message: "Ocurrió un error al obtener los usuarios.", error: err.message });
+      });
+  }
+
+ 
+
+
 module.exports = {
   create,
-  login
+  login,
+  getAll
+  
 };
