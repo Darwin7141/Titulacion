@@ -14,7 +14,7 @@ export class ClientesService {
   }
   
   getClientes(): Observable<any[]> {
-    return this._http.get<any[]>(this.url)
+    return this._http.get<any[]>(this.url +"cliente")
     
     }
 }
