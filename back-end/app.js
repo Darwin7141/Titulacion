@@ -4,7 +4,9 @@ const bodyParser = require('body-parser');
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
 
 // Cabeceras
 app.use((req, res, next) => {
@@ -22,6 +24,12 @@ require('./server/routes/usuarios')(app);
 require('./server/routes/gestionclientes')(app);
 require('./server/routes/cargoempleados')(app);
 require('./server/routes/empleados')(app);
+require('./server/routes/administrador')(app);
+require('./server/routes/proveedor')(app);
+require('./server/routes/productos')(app);
+require('./server/routes/tipocatering')(app);
+require('./server/routes/serviciocatering')(app);
+require('./server/routes/menus')(app);
 
 app.get('*', (req, res) => {
     res.status(200).send({ message: "Bienvenido al servidor NodeJS" });

@@ -23,7 +23,5 @@ export class LoginService {
     return this.http.post<any>(this.url +"login", usuario, httpOptions);
   }
 
-  solicitarRecuperacion(data: any): Observable<any> {
-    return this.http.post<any>(`${this.url}solicitar-recuperacion`, data);
-  }
+ 
 }

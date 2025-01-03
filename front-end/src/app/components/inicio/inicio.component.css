@@ -1,0 +1,97 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.left-panel {
+  width: 25%;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px;
+}
+
+.left-panel img {
+  width: 100px;
+  margin-bottom: 20px;
+}
+
+.content-login {
+  width: 100%;
+}
+
+.content-login h2 {
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.btn-ingreso {
+  background-color: #1976d2;
+  color: white;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.right-panel {
+  flex: 1;
+  background: url('https://via.placeholder.com/1200x800') no-repeat center center;
+  background-size: cover;
+  position: relative;
+  color: white;
+}
+
+.top-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 15px;
+  padding: 10px 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.top-menu a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+.center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.center-text h1 {
+  font-size: 36px;
+  margin: 10px 0;
+}
+
+.center-text p {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.center-text button {
+  background-color: #ff9800;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}

@@ -12,7 +12,9 @@ import { ClientesService } from '../../services/clientes.service';
 export class HomeComponent implements OnInit {
   clientes: any[] = [];
 
-  constructor(private clientesService: ClientesService) {}
+  constructor(
+    
+    private clientesService: ClientesService) {}
 
   ngOnInit(): void {
     this.clientesService.getClientes().subscribe({

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Inicio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@angular/material/prebuilt-themes/indigo-pink.css">
+  
+</head>
+<body>
+  <div class="container">
+    <!-- Panel Izquierdo -->
+    <div class="left-panel">
+      <img src="https://via.placeholder.com/100" alt="Logo">
+      <div class="content-login">
+        <h2>LOGIN</h2>
+        <form #loginForm="ngForm" (ngSubmit)="login()" autocomplete="on">
+          <mat-form-field class="full-width">
+            <input matInput type="text" #correoField="ngModel" name="correo" [(ngModel)]="usuario.correo" required placeholder="Correo">
+            <mat-error *ngIf="correoField.invalid">El Usuario es requerido</mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width">
+            <input matInput type="password" #contraseniaField="ngModel" name="contrasenia" [(ngModel)]="usuario.contrasenia" required placeholder="Contraseña">
+            <mat-error *ngIf="contraseniaField.invalid">El Password es requerido</mat-error>
+          </mat-form-field>
+          <button mat-raised-button class="btn-ingreso" type="submit" [disabled]="!loginForm.form.valid">INGRESAR</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Panel Derecho -->
+    <div class="right-panel">
+      <div class="top-menu">
+        <a href="#nosotros">Nosotros</a>
+        <a href="#catering">Catering</a>
+        <a href="#eventos">Eventos</a>
+        <a href="#contactanos">Contáctanos</a>
+      </div>
+      <div class="center-text">
+        <h1>Rápido, fácil y avanzado</h1>
+        <p>El software para pequeñas, medianas y grandes empresas</p>
+        <button>Ver más</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.angularjs.org/1.8.2/angular.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@angular/material@13.3.9/bundles/material.umd.js"></script>
+</body>
+</html>
