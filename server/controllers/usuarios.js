@@ -1,20 +1,116 @@
 const modelos = require('../models');
-
 const bcrypt = require('bcrypt');
 
-function create(req, res) {
-    bcrypt.hash(req.body.contrasenia, 10)
-        .then(hashedPassword => {
-            req.body.contrasenia = hashedPassword;
+async function create(req, res) {
+  try {
+      // Obtener el último ID de usuario con el formato de 'CU001', 'CU002', etc.
+      const lastUser = await modelos.cuentasusuarios.findOne({
+          order: [['idcuenta', 'DESC']],
+      });
 
-            return modelos.cuentasusuarios.create(req.body);
-        })
-        .then(usuario => {
-            res.status(200).send({ usuario });
-        })
-        .catch(err => {
-            res.status(500).send({ err });
-        })
+      // Generar el siguiente ID
+      let nextCodigo = 'CU001'; // Valor inicial por defecto
+      if (lastUser && lastUser.idcuenta) {
+          const lastNumber = parseInt(lastUser.idcuenta.slice(2), 10); // Extraer el número después de 'CU'
+          nextCodigo = `CU${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
+      }
+
+      // Hash de la contraseña
+      const hashedPassword = await bcrypt.hash(req.body.contrasenia, 10);
+      req.body.contrasenia = hashedPassword;
+
+      // Incluir el ID generado en la creación del usuario
+      req.body.idcuenta = nextCodigo;
+
+      // Crear el nuevo usuario
+      const usuario = await modelos.cuentasusuarios.create(req.body);
+
+      // Respuesta exitosa
+      res.status(200).send({ usuario });
+  } catch (err) {
+      // Manejo de errores
+      res.status(500).send({ err });
+  }
+}
+
+async function update(req, res) {
+  const { idcuenta } = req.params; // Código del usuario desde los parámetros de la URL
+  const { correo, contrasenia } = req.body; // Datos a actualizar
+
+  try {
+      // Buscar al usuario por ID
+      const usuario = await modelos.cuentasusuarios.findOne({ where: { idcuenta } });
+
+      if (!usuario) {
+          return res.status(404).send({ message: 'Usuario no encontrado.' });
+      }
+
+      // Si la contraseña es proporcionada, la encriptamos antes de actualizar
+      if (contrasenia) {
+          const hashedPassword = await bcrypt.hash(contrasenia, 10);
+          req.body.contrasenia = hashedPassword;
+      }
+
+      // Actualizar los datos del usuario, pero no modificar el idcuenta
+      await usuario.update({
+          correo: correo || usuario.correo,
+          contrasenia: req.body.contrasenia || usuario.contrasenia,
+          
+      });
+
+      res.status(200).send({ message: 'Usuario actualizado exitosamente.', usuario });
+  } catch (err) {
+      console.error('Error al actualizar el usuario:', err);
+      res.status(500).send({ message: 'Ocurrió un error al actualizar el usuario.', error: err.message });
+  }
+}
+
+function eliminar(req, res) {
+  const { idcuenta } = req.params;
+
+  // Buscar si el empleado existe
+  modelos.cuentasusuarios.findOne({
+      where: { idcuenta },
+  })
+      .then((cuenta) => {
+          if (!cuenta) {
+              // Si no existe el empleado, devolver un mensaje de error
+              return res.status(404).send({ message: 'Usuario no encontrado.' });
+          }
+
+          // Eliminar el empleado
+          modelos.cuentasusuarios
+              .destroy({
+                  where: { idcuenta },
+              })
+              .then(() => {
+                  // Asegurarse de restablecer la secuencia con el valor máximo actual de codigoempleado
+                  modelos.sequelize.query(`
+                      SELECT setval('cuentasusuarios_id_seq', COALESCE((SELECT MAX(CAST(SUBSTRING(idcuenta FROM 3) AS INT)) FROM public.cuentasusuarios), 0), false)
+                  `)
+                      .then(([result]) => {
+                          // Revisar si la consulta tuvo éxito
+                          if (result) {
+                              return res.status(200).send({ message: 'Usuario eliminado correctamente y secuencia restablecida.' });
+                          } else {
+                              console.error('No se pudo restablecer la secuencia.');
+                              return res.status(500).send({ message: 'Error al restablecer la secuencia del usuario.' });
+                          }
+                      })
+                      .catch((err) => {
+                          console.error('Error al restablecer la secuencia:', err);
+                          return res.status(500).send({ message: 'Error al restablecer la secuencia del usuario.' });
+                      });
+              })
+              .catch((err) => {
+                  console.error('Error al eliminar el usuario:', err);
+                  return res.status(500).send({ message: 'Ocurrió un error al eliminar el usuario.' });
+              });
+      })
+      .catch((err) => {
+          console.error('Error al buscar el usuario:', err);
+          return res.status(500).send({ message: 'Ocurrió un error al buscar el usuario.' });
+      });
 }
 
 
@@ -66,6 +162,8 @@ function getAll(req, res) {
 
 module.exports = {
   create,
+  update,
+  eliminar,
   login,
   getAll
   

@@ -8,6 +8,7 @@ const productos = require('./productos');
 const tipocatering = require('./tipocatering');
 const serviciocatering = require('./serviciocatering');
 const menucatering = require('./menu');
+const estadocatering = require('./estadocatering');
 
 module.exports={
     usuarios,
@@ -19,7 +20,8 @@ module.exports={
     productos,
     tipocatering,
     serviciocatering,
-    menucatering
+    menucatering,
+    estadocatering
 
 
     

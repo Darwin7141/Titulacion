@@ -30,6 +30,7 @@ require('./server/routes/productos')(app);
 require('./server/routes/tipocatering')(app);
 require('./server/routes/serviciocatering')(app);
 require('./server/routes/menus')(app);
+require('./server/routes/estadocatering')(app);
 
 app.get('*', (req, res) => {
     res.status(200).send({ message: "Bienvenido al servidor NodeJS" });

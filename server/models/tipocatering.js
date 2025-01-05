@@ -8,8 +8,11 @@ module.exports = (sequelize, DataTypes) => {
         nombre: {
             type: DataTypes.STRING
         },
-        estado: {
-            type: DataTypes.STRING
+        descripcion: {
+            type: DataTypes.TEXT
+        },
+        idestado: {
+            type: DataTypes.INTEGER
         }
     }, {
         tableName: 'tipocatering',  // Especificar el nombre de la tabla como 'cargo'
