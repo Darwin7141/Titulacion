@@ -1,0 +1,28 @@
+<div class="content">
+    <h2>AGREGAR PRODUCTO</h2>
+    <form #prodForm="ngForm" (ngSubmit)="agregar()">
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="productos.nombre" required placeholder="Nombre" autofocus>
+        <mat-error *ngIf="nombreField.invalid">Su nombre es requerido</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="number" #stockField="ngModel" name="stock" [(ngModel)]="productos.stock" required placeholder="Stock" autofocus>
+        <mat-error *ngIf="stockField.invalid">La cantidad es requerida</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <mat-select #codigoProveedorField="ngModel" name="codigoproveedor" [(ngModel)]="productos.codigoproveedor" required placeholder="Seleccione un proveedor">
+          <mat-option *ngFor="let proveedor of prov" [value]="proveedor.codigoproveedor">
+            {{ proveedor.nombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="codigoProveedorField.invalid">Debe seleccionar un proveedor</mat-error>
+      </mat-form-field>
+  
+      <button [routerLink]="['/listaProductos']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
+      <button  [disabled]="!prodForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit" >Agregar</button>
+    </form>
+  </div>
+  

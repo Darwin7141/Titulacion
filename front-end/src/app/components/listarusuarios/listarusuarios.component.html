@@ -1,0 +1,117 @@
+<div class="clientes-container">
+    <h2>Usuarios</h2>
+  
+    <!-- Campo de búsqueda -->
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Usuario"
+        [(ngModel)]="searchTerm"
+      />
+      <button class="search-button" (click)="buscarUsuario()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button class="reload-button" (click)="recargarLista()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  
+    <div *ngIf="usuario.length === 0 && searchTerm" class="not-found">
+      <p>No se encontró ningún usuario con el nombre proporcionado.</p>
+    </div>
+  
+  
+    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
+  
+    <!-- Tabla de empleados -->
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>correo</th>
+          <th>Fecha creación</th>
+          <th>Fecha actualización</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuarioFiltrados">
+          <td>{{ usuario.idcuenta }}</td>
+          <td>{{ usuario.correo }}</td>
+          <td>{{ usuario.createdAt }}</td>
+          <td>{{ usuario.updatedAt }}</td>
+          
+          <td>
+            <button mat-icon-button color="primary" (click)="editarUsuario(usuario)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <!-- Ícono de eliminar -->
+            <button mat-icon-button color="warn" (click)="eliminarUsuario(usuario.idcuenta)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Formulario de edición -->
+    <div *ngIf="isEditMode" class="edit-form">
+      <h3>Editar Usuario</h3>
+      <form (ngSubmit)="guardarEdicion()">
+        <div class="form-group">
+          <label>Código</label>
+          <input
+            type="text"
+            [(ngModel)]="usuarioSeleccionado.idcuenta"
+            name="idcuenta"
+            disabled
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Correo</label>
+          <input
+            type="text"
+            [(ngModel)]="usuarioSeleccionado.correo"
+            name="correo"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Fecha creación</label>
+          <input
+            type="date"
+            [(ngModel)]="usuarioSeleccionado.createdAt"
+            name="fechacreacion"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Fecha actualización</label>
+          <input
+            type="date"
+            [(ngModel)]="usuarioSeleccionado.updatedAt"
+            name="fechaactualización"
+            required
+          />
+        </div>
+        
+        
+  
+        <div class="form-actions">
+          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Botón para agregar empleado -->
+    <div class="add-icon">
+      <button mat-fab color="primary" [routerLink]="['/usuarios']">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  
+

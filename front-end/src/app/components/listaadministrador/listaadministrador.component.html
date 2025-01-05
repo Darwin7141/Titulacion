@@ -1,0 +1,136 @@
+<div class="clientes-container">
+    <h2>ADMINISTRADORES</h2>
+  
+    <!-- Campo de búsqueda -->
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Nombre de administrador"
+        [(ngModel)]="searchTerm"
+      />
+      <button class="search-button" (click)="buscarAdmin()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button class="reload-button" (click)="recargarLista()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  
+    <div *ngIf="adminFiltrados.length === 0 && searchTerm" class="not-found">
+      <p>No se encontró ningún adminstrador con el nombre proporcionado.</p>
+    </div>
+  
+  
+    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
+  
+    <!-- Tabla de empleados -->
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>CI</th>
+          <th>Nombre</th>
+          <th>Dirección</th>
+          <th>Correo Electrónico</th>
+          <th>Teléfono</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let admin of adminFiltrados">
+          <td>{{ admin.codigoadmin }}</td>
+          <td>{{ admin.ci }}</td>
+          <td>{{ admin.nombre }}</td>
+          <td>{{ admin.direccion }}</td>
+          <td>{{ admin.e_mail }}</td>
+          <td>{{ admin.telefono }}</td>
+          
+          <td>
+            <button mat-icon-button color="primary" (click)="editarAdmin(admin)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <!-- Ícono de eliminar -->
+            <button mat-icon-button color="warn" (click)="eliminarAdmin(admin.codigoadmin)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Formulario de edición -->
+    <div *ngIf="isEditMode" class="edit-form">
+      <h3>Editar Administrador</h3>
+      <form (ngSubmit)="guardarEdicion()">
+        <div class="form-group">
+          <label>Código</label>
+          <input
+            type="text"
+            [(ngModel)]="adminSeleccionado.codigoadmin"
+            name="codigoadmin"
+            disabled
+          />
+        </div>
+        <div class="form-group">
+          <label>Cédula</label>
+          <input
+            type="text"
+            [(ngModel)]="adminSeleccionado.ci"
+            name="ci"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Nombre</label>
+          <input
+            type="text"
+            [(ngModel)]="adminSeleccionado.nombre"
+            name="nombre"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Dirección</label>
+          <input
+            type="text"
+            [(ngModel)]="adminSeleccionado.direccion"
+            name="direccion"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input
+            type="email"
+            [(ngModel)]="adminSeleccionado.e_mail"
+            name="e_mail"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input
+            type="text"
+            [(ngModel)]="adminSeleccionado.telefono"
+            name="telefono"
+            required
+          />
+        </div>
+        
+  
+        <div class="form-actions">
+          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Botón para agregar empleado -->
+    <div class="add-icon">
+      <button mat-fab color="primary" [routerLink]="['/administrador']">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  

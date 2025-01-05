@@ -1,12 +1,43 @@
-<div class="banner">
-    <div class="opciones-usuario">
-      <div class="datos">
-      </div>
-      <div class="logout" (click)="logout()">
-        cerrar sesión
-      </div>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Inicio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@angular/material/prebuilt-themes/indigo-pink.css">
+</head>
+
+<body>
+  <ul>
+    <li><a href="#home">Administrador</a></li>
+    <li style="float:right"><a class="logout" (click)="logout()">Cerrar Sesión</a></li>
+  </ul>
+  
+  <div class="sidenav">
+    <a [routerLink]="['/listaAdministrador']">Administrador</a>
+    <a [routerLink]="['/listaUsuarios']">Cuentas Usuarios</a>
+    <a href="#">Clientes </a>
+    <a href="#">Cargos Empleados </a>
+    <a [routerLink]="['/listaEmpleados']">Empleados</a>
+    <a [routerLink]="['/listaProveedor']">Proveedores</a>
+    <a [routerLink]="['/listaProductos']">Productos</a>
+    <a href="#">Servicios</a>
+    <a href="#">Reservas</a>
   </div>
+  
+  <div class="content">
+    <h2></h2>
+    <p></p>
+  </div>
+
+  <script src="https://code.angularjs.org/1.8.2/angular.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@angular/material/bundles/material.umd.js"></script>
+  
   <div class="content-admin">
     <router-outlet></router-outlet>
   </div>
+
+</body>
+</html>

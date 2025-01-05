@@ -1,37 +1,84 @@
-.banner {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 50px;
-    background: #222;
-    color: #eee;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-  }
+body {
+  margin: 0;
+  padding: 0;
+  background-color: white; /* Cambia "white" por cualquier color que desees */
+  font-family: 'Roboto', sans-serif; /* Opcional, para asegurar consistencia con tu fuente */
+}
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
 
-.opciones-usuario {
-    margin: auto 18px;
-    display: flex;
-    flex-direction: row;
-  }
-  
-  .opciones-usuario div {
-    margin: auto 15px;
-  }
-  
-  .logout {
-    cursor: pointer;
-    font-size: 11px;
-  }
-  
-  .content-admin {
-    position: absolute;
-    top: 50px;
-    left: 0px;
-    bottom: 0px;
-    right: 0px;
-    overflow: hidden;
-    background: #444;
-  }
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+  background-color: #111;
+}
+
+
+
+ul {
+  border: 1px solid #e7e7e7;
+  background-color: #f3f3f3;
+}
+
+li a {
+  color: #666;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Style the side navigation */
+.sidenav {
+  height: 100%;
+  width: 200px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+}
+
+
+/* Side navigation links */
+.sidenav a {
+  color: white;
+  padding: 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color on hover */
+.sidenav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Style the content */
+.content {
+  margin-left: 200px;
+  padding-left: 20px;
+}
+

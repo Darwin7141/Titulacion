@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
       next: (response) => {
        
           localStorage.setItem('identity_user', JSON.stringify(response.usuario));
-          this._router.navigate(['/inicio/']);
+          this._router.navigate(['/admin/list/']);
         
         // Aquí puedes manejar la respuesta, como guardar un token o redirigir al usuario
       },

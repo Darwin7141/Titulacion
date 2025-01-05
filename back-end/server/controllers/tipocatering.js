@@ -2,14 +2,14 @@
 const modelos = require('../models'); // Importar los modelos
 
 async function create(req, res) {
-  const { nombre, estado } = req.body;
+  const { nombre, descripcion, idestado } = req.body;
   console.log(req.body);
 
   try {
       // Validar datos antes de la inserción
     // Obtener el último valor de codigoempleado
       const lastTipo = await modelos.tipocatering.findOne({
-          order: [['idtipo', 'DESC']],
+          order: [['idtipo', 'ASC']],
       });
 
       // Generar el siguiente código
@@ -22,8 +22,9 @@ async function create(req, res) {
       // Crear el nuevo empleado con el código generado
       const tipo = await modelos.tipocatering.create({
           idtipo: nextCodigo,
+          descripcion,
           nombre,
-          estado
+          idestado
           
           
       });
@@ -37,7 +38,7 @@ async function create(req, res) {
 
 async function update(req, res) {
   const { idtipo } = req.params; // Código del empleado desde los parámetros de la URL
-  const { nombre, estado } = req.body; // Datos a actualizar
+  const { nombre, descripcion, idestado } = req.body; // Datos a actualizar
 
   try {
      
@@ -52,7 +53,8 @@ async function update(req, res) {
       await tipo.update({
           
           nombre: nombre || tipo.nombre,
-          estado: estado || tipo.estado,
+          descripcion: descripcion || tipo.descripcion,
+          idestado: idestado || tipo.idestado,
           
       });
 

@@ -1,21 +1,40 @@
 //const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); // Importar la función de validación
 const modelos = require('../models');
 
-function create(req, res) {
-  const { idcargo, nombrecargo,descripcion } = req.body;
+async function create(req, res) {
+  const {  nombrecargo, descripcion } = req.body;
+  console.log(req.body);
 
-  modelos.cargo.create({
-    idcargo, nombrecargo,descripcion
-  })
-    .then(cargos => {
-      res.status(201).send(cargos); // Enviar el cliente creado
-    })
-    .catch(err => {
-      console.error("Error al crear cargo:", err); // Imprime el error en la consola
-      res.status(500).send({ message: "Ocurrió un error al ingresar el cargo.", error: err.message });
-    });
+  try {
+      // Validar datos antes de la inserción
+    // Obtener el último valor de codigoempleado
+      const lastCargo = await modelos.cargo.findOne({
+          order: [['idcargo', 'DESC']],
+      });
+
+      // Generar el siguiente código
+      let nextCodigo = 'C001'; // Valor inicial por defecto
+      if (lastCargo && lastCargo.idcargo) {
+          const lastNumber = parseInt(lastCargo.idcargo.slice(1), 10); // Extraer número
+          nextCodigo = `C${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
+      }
+
+      // Crear el nuevo empleado con el código generado
+      const cargos = await modelos.cargo.create({
+          idcargo: nextCodigo,
+          
+          nombrecargo, 
+          descripcion 
+          
+          
+      });
+
+      res.status(201).send(cargos); // Enviar el empleado creado
+  } catch (err) {
+      console.error('Error al crear cargos:', err);
+      res.status(500).send({ message: 'Ocurrió un error al ingresar el cargo.', error: err.message });
+  }
 }
-
 function update(req, res) {
   const { idcargo } = req.params; // Obtener el código del cliente de los parámetros
   const { nombrecargo,descripcion } = req.body; // Obtener los nuevos datos

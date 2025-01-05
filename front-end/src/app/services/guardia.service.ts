@@ -13,7 +13,7 @@ export class GuardiaService implements CanActivate {
     if (identity) {
       return true;
     } else {
-      this._router.navigate(['/inicio']);
+      this._router.navigate(['/login']);
       return false;
     }
   }

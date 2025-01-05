@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+//import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { LoginService } from '../../services/login.service';
+import { InicioService } from '../../services/inicio.service';
 
 @Component({
   selector: 'app-inicio',
@@ -19,20 +19,20 @@ export class InicioComponent implements OnInit{
 
 
   constructor(
-    private _auth:AuthService,
-    private _serviceLogin: LoginService,
+    //private _auth:AuthService,
+    private _serviceLogin: InicioService,
     private _router:Router){}
-    logout(){
-      this._auth.logOut();
-      this._router.navigate(['/inicio']);
+    //logout(){
+     // this._auth.logOut();
+     // this._router.navigate(['/admin/list']);
 
-    }
+  //  }
 
     ngOnInit() {
       
     }
-    login() {
-      this._serviceLogin.login(this.usuario).subscribe({
+    inicio() {
+      this._serviceLogin.inicio(this.usuario).subscribe({
         next: (response) => {
          
             localStorage.setItem('identity_user', JSON.stringify(response.usuario));

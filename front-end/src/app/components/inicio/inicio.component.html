@@ -16,7 +16,7 @@
       <img src="https://via.placeholder.com/100" alt="Logo">
       <div class="content-login">
         <h2>LOGIN</h2>
-        <form #loginForm="ngForm" (ngSubmit)="login()" autocomplete="on">
+        <form #loginForm="ngForm" (ngSubmit)="inicio()" autocomplete="on">
           <mat-form-field class="full-width">
             <input matInput type="text" #correoField="ngModel" name="correo" [(ngModel)]="usuario.correo" required placeholder="Correo">
             <mat-error *ngIf="correoField.invalid">El Usuario es requerido</mat-error>
@@ -44,6 +44,7 @@
         <button>Ver más</button>
       </div>
     </div>
+    
   </div>
 
   <script src="https://code.angularjs.org/1.8.2/angular.min.js"></script>

@@ -1,0 +1,22 @@
+<div class="content">
+    <h2>AGREGAR USUARIO</h2>
+    <form #usuarioForm="ngForm" (ngSubmit)="agregar()">
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #correoField="ngModel" name="ci" [(ngModel)]="usuarios.correo" required placeholder="Usuario" autofocus>
+        <mat-error *ngIf="correoField.invalid">Su correo es requerido</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #contraseniaField="ngModel" name="nombre" [(ngModel)]="usuarios.contrasenia" required placeholder="Contraseña" autofocus>
+        <mat-error *ngIf="contraseniaField.invalid">Su Contraseña es requerida</mat-error>
+      </mat-form-field>
+  
+    
+  
+      <button [routerLink]="['/listaUsuarios']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
+      <button [disabled]="!usuarioForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit">Agregar</button>
+    </form>
+  </div>
+  
+

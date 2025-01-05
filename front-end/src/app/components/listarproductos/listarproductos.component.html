@@ -1,0 +1,113 @@
+<div class="clientes-container">
+    <h2>Listado de Productos</h2>
+  
+    <!-- Campo de búsqueda -->
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Nombre del producto"
+        [(ngModel)]="searchTerm"
+      />
+      <button class="search-button" (click)="buscarProducto()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button class="reload-button" (click)="recargarLista()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  
+    <div *ngIf="prodFiltrados.length === 0 && searchTerm" class="not-found">
+      <p>No se encontró ningún producto con el nombre proporcionado.</p>
+    </div>
+  
+  
+    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
+  
+    <!-- Tabla de empleados -->
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Stock</th>
+          <th>Proveedor</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let prod of prodFiltrados">
+          <td>{{ prod.idproducto }}</td>
+          <td>{{ prod.nombre }}</td>
+          <td>{{ prod.stock }}</td>
+          <td>{{ prod.codigoproveedor }}</td>
+    
+          <td>
+            <button mat-icon-button color="primary" (click)="editarProducto(prod)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="eliminarProducto(prod.idproducto)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Formulario de edición -->
+    <div *ngIf="isEditMode" class="edit-form">
+      <h3>Editar Productos</h3>
+      <form (ngSubmit)="guardarEdicion()">
+        <div class="form-group">
+          <label>Código</label>
+          <input
+            type="text"
+            [(ngModel)]="prodSeleccionado.idproducto"
+            name="idproducto"
+            disabled
+          />
+        </div>
+        <div class="form-group">
+          <label>Nombre</label>
+          <input
+            type="text"
+            [(ngModel)]="prodSeleccionado.nombre"
+            name="nombre"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Stock</label>
+          <input
+            type="number"
+            [(ngModel)]="prodSeleccionado.stock"
+            name="stock"
+            required
+          />
+        </div>
+        
+        <div class="form-group">
+          <mat-form-field class="col-xs-12">
+            <mat-select #codigoProveedorField="ngModel" name="codigoproveedor" [(ngModel)]="prodSeleccionado.codigoproveedor" required placeholder="Seleccione un proveedor">
+              <mat-option *ngFor="let proveedor of prov" [value]="proveedor.codigoproveedor">
+                {{proveedor.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="codigoProveedorField.invalid">Debe seleccionar un proveedor</mat-error>
+          </mat-form-field>
+        </div>
+  
+        <div class="form-actions">
+          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Botón para agregar empleado -->
+    <div class="add-icon">
+      <button mat-fab color="primary" [routerLink]="['/productos']">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
