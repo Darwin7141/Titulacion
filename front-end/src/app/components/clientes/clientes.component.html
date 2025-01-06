@@ -1,0 +1,35 @@
+<div class="content">
+    <h2>AGREGAR CLIENTE</h2>
+    <form #cliForm="ngForm" (ngSubmit)="agregar()">
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #ciField="ngModel" name="ci" [(ngModel)]="clientes.ci" required placeholder="Cédula" autofocus>
+        <mat-error *ngIf="ciField.invalid">Su cédula es requerida</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="clientes.nombre" required placeholder="Nombre" autofocus>
+        <mat-error *ngIf="nombreField.invalid">Su nombre es requerido</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #direccionField="ngModel" name="direccion" [(ngModel)]="clientes.direccion" required placeholder="Dirección" autofocus>
+        <mat-error *ngIf="direccionField.invalid">Su dirección es requerida</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #emailField="ngModel" name="e_mail" [(ngModel)]="clientes.e_mail" required placeholder="E_mail" autofocus>
+        <mat-error *ngIf="emailField.invalid">Su e_mail es requerido</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #telefonoField="ngModel" name="telefono" [(ngModel)]="clientes.telefono" required placeholder="Teléfono" autofocus>
+        <mat-error *ngIf="telefonoField.invalid">Su teléfono es requerido</mat-error>
+      </mat-form-field>
+  
+  
+      <button [routerLink]="['/listaClientes']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
+      <button [disabled]="!cliForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit">Agregar</button>
+    </form>
+  </div>
+  

@@ -16,6 +16,8 @@ import { ProductosComponent } from '../components/productos/productos.component'
 import { ListarproductosComponent } from '../components/listarproductos/listarproductos.component';
 import { ListarusuariosComponent } from '../components/listarusuarios/listarusuarios.component';
 import { UsuariosComponent } from '../components/usuarios/usuarios.component';
+import { ListarclientesComponent } from '../components/listarclientes/listarclientes.component';
+import { ClientesComponent } from '../components/clientes/clientes.component';
 
 
 const app_routes:Routes=[
@@ -32,6 +34,7 @@ const app_routes:Routes=[
     {path:'proveedores', component:ProveedoresComponent},
     {path:'productos', component:ProductosComponent},
     {path:'usuarios', component:UsuariosComponent},   
+    {path:'clientes', component:ClientesComponent},  
    
 
 
@@ -40,6 +43,7 @@ const app_routes:Routes=[
     {path:'listaProveedor', component:ListarproveedorComponent},
     {path:'listaProductos', component:ListarproductosComponent},
     {path:'listaUsuarios', component:ListarusuariosComponent},
+    {path:'listaClientes', component:ListarclientesComponent},
     
     {path:'**', pathMatch:'full',redirectTo:''}
 ]

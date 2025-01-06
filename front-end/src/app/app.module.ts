@@ -32,6 +32,8 @@ import { ProductosComponent } from './components/productos/productos.component';
 import { ListarproductosComponent } from './components/listarproductos/listarproductos.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { ListarusuariosComponent } from './components/listarusuarios/listarusuarios.component';
+import { ClientesComponent } from './components/clientes/clientes.component';
+import { ListarclientesComponent } from './components/listarclientes/listarclientes.component';
 
 
 
@@ -52,7 +54,9 @@ import { ListarusuariosComponent } from './components/listarusuarios/listarusuar
     ProductosComponent,
     ListarproductosComponent,
     UsuariosComponent,
-    ListarusuariosComponent
+    ListarusuariosComponent,
+    ClientesComponent,
+    ListarclientesComponent
   
     
     
