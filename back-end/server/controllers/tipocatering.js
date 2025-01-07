@@ -9,7 +9,7 @@ async function create(req, res) {
       // Validar datos antes de la inserción
     // Obtener el último valor de codigoempleado
       const lastTipo = await modelos.tipocatering.findOne({
-          order: [['idtipo', 'ASC']],
+          order: [['idtipo', 'DESC']],
       });
 
       // Generar el siguiente código
@@ -114,21 +114,27 @@ function eliminar(req, res) {
 }
 
 function getAll(req, res) {
-  modelos.tipocatering.findAll({
-    order: [['idtipo', 'ASC']] // Ordenar por codigocliente en orden ascendente
-  })
-    .then(tipo => {
-      if (tipo.length === 0) {
-        return res.status(404).send({ message: 'No se encontraron tipos.' });
-      }
-      res.status(200).send(tipo); // Enviar el listado de clientes ordenado
+    modelos.tipocatering.findAll({
+      include: [
+        {
+          model: modelos.estadocatering,
+          as: 'estado', // Este alias debe coincidir con el definido en el modelo
+          attributes: ['estado'], // Seleccionar solo el campo necesario
+        },
+      ],
+      order: [['idtipo', 'ASC']], // Ordenar por idtipo en orden ascendente
     })
-    .catch(err => {
-      console.error("Error al obtener los tipos:", err);
-      res.status(500).send({ message: "Ocurrió un error al obtener los tipos.", error: err.message });
-    });
-}
-
+      .then(tipo => {
+        if (tipo.length === 0) {
+          return res.status(404).send({ message: 'No se encontraron tipos.' });
+        }
+        res.status(200).send(tipo); // Enviar el listado de tipos con el estado
+      })
+      .catch(err => {
+        console.error('Error al obtener los tipos:', err);
+        res.status(500).send({ message: 'Ocurrió un error al obtener los tipos.', error: err.message });
+      });
+  }
 
 module.exports = {
     create,

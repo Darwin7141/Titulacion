@@ -46,7 +46,7 @@ export class ListarclientesComponent implements OnInit {
     }
   }
 
-  editarCliente(cliente: any): void {
+  editarClientes(cliente: any): void {
     this.isEditMode = true;
     this.cliSeleccionado = { ...cliente }; // Copia para evitar modificar el original
   }
@@ -60,11 +60,12 @@ export class ListarclientesComponent implements OnInit {
           this.obtenerClientes();
         },
         error: (err) => {
-          console.error('Error al actualizar cliente:', err);
+          console.error('Error al actualizar empleado:', err);
         },
       });
     }
   }
+  
 
   eliminarCliente(codigocliente: string): void {
     if (confirm('¿Está seguro de que desea eliminar este cliente?')) {

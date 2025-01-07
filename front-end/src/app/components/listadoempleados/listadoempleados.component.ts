@@ -43,11 +43,13 @@ export class ListadoempleadosComponent implements OnInit {
   }
 
   buscarEmpleado(): void {
-    if (this.searchTerm.trim() === '') {
-      this.empleadosFiltrados = this.empleado;
+    const searchTermLower = this.searchTerm.trim().toLowerCase(); // Normalizamos el término de búsqueda
+    if (searchTermLower === '') {
+      this.empleadosFiltrados = this.empleado; // Si no hay búsqueda, mostramos todos los productos
     } else {
       this.empleadosFiltrados = this.empleado.filter((empleado) =>
-        empleado.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
+        empleado.nombre.toLowerCase().includes(searchTermLower) ||
+        empleado.ci.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
   }

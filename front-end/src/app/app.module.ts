@@ -34,6 +34,10 @@ import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { ListarusuariosComponent } from './components/listarusuarios/listarusuarios.component';
 import { ClientesComponent } from './components/clientes/clientes.component';
 import { ListarclientesComponent } from './components/listarclientes/listarclientes.component';
+import { CargosComponent } from './components/cargos/cargos.component';
+import { ListarcargosComponent } from './components/listarcargos/listarcargos.component';
+import { TipocateringComponent } from './components/tipocatering/tipocatering.component';
+import { ListacateringComponent } from './components/listacatering/listacatering.component';
 
 
 
@@ -56,7 +60,11 @@ import { ListarclientesComponent } from './components/listarclientes/listarclien
     UsuariosComponent,
     ListarusuariosComponent,
     ClientesComponent,
-    ListarclientesComponent
+    ListarclientesComponent,
+    CargosComponent,
+    ListarcargosComponent,
+    TipocateringComponent,
+    ListacateringComponent
   
     
     

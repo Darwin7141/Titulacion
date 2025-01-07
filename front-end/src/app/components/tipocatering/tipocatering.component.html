@@ -1,0 +1,33 @@
+<div class="content">
+    <h2>AGREGAR TIPO CATERING</h2>
+    <form #tipoForm="ngForm" (ngSubmit)="agregar()">
+  
+      
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="tipo.nombre" required placeholder="Nombre" autofocus>
+        <mat-error *ngIf="nombreField.invalid">El nombre del tipo es requerido</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #desField="ngModel" name="descripcion" [(ngModel)]="tipo.descripcion" required placeholder="Descripción" autofocus>
+        <mat-error *ngIf="desField.invalid">La descripción es requerida</mat-error>
+      </mat-form-field>
+  
+      
+      <mat-form-field class="col-xs-12">
+        <mat-select #idCargoField="ngModel" name="idestado" [(ngModel)]="tipo.idestado" required placeholder="Seleccione un estado">
+          <mat-option *ngFor="let est of estados" [value]="est.idestado">
+            {{ est.estado }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un estado</mat-error>
+      </mat-form-field>
+      
+
+
+      <button [routerLink]="['/listaTipos']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
+      <button  [disabled]="!tipoForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit" >Agregar</button>
+    </form>
+  </div>
+  

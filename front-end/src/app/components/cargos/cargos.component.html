@@ -1,0 +1,24 @@
+<div class="content">
+    <h2>AGREGAR CARGO</h2>
+    <form #cargoForm="ngForm" (ngSubmit)="agregar()">
+  
+      
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="cargos.nombrecargo" required placeholder="Nombre" autofocus>
+        <mat-error *ngIf="nombreField.invalid">El nombre del acrgo es requerido</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #descripcionField="ngModel" name="descripcion" [(ngModel)]="cargos.descripcion" required placeholder="Descripción" autofocus>
+        <mat-error *ngIf="descripcionField.invalid">La descripción del cargo es requerida</mat-error>
+      </mat-form-field>
+  
+      
+  
+  
+      <button [routerLink]="['/listaCargos']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
+      <button [disabled]="!cargoForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit">Agregar</button>
+    </form>
+  </div>
+  

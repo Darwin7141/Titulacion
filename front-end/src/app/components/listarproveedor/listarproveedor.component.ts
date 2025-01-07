@@ -36,11 +36,13 @@ export class ListarproveedorComponent implements OnInit {
   }
 
   buscarProv(): void {
-    if (this.searchTerm.trim() === '') {
-      this.provFiltrados = this.prov;
+    const searchTermLower = this.searchTerm.trim().toLowerCase(); // Normalizamos el término de búsqueda
+    if (searchTermLower === '') {
+      this.provFiltrados = this.prov; // Si no hay búsqueda, mostramos todos los productos
     } else {
       this.provFiltrados = this.prov.filter((prov) =>
-        prov.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
+        prov.nombre.toLowerCase().includes(searchTermLower) ||
+        prov.ci.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
   }

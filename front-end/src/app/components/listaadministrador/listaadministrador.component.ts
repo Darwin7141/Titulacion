@@ -36,11 +36,13 @@ export class ListaadministradorComponent implements OnInit {
   }
 
   buscarAdmin(): void {
-    if (this.searchTerm.trim() === '') {
-      this.adminFiltrados = this.admin;
+    const searchTermLower = this.searchTerm.trim().toLowerCase(); // Normalizamos el término de búsqueda
+    if (searchTermLower === '') {
+      this.adminFiltrados = this.admin; // Si no hay búsqueda, mostramos todos los productos
     } else {
       this.adminFiltrados = this.admin.filter((admin) =>
-        admin.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
+        admin.nombre.toLowerCase().includes(searchTermLower) ||
+        admin.ci.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
   }

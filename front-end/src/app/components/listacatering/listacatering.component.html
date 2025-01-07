@@ -1,0 +1,136 @@
+<div class="clientes-container">
+    <h2>Listado de Tipos de Catering</h2>
+  
+    <!-- Campo de búsqueda -->
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Nombre o código "
+        [(ngModel)]="searchTerm"
+      />
+      <button class="search-button" (click)="buscarTipos()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button class="reload-button" (click)="recargarLista()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  
+    <div *ngIf="tipoFiltrados.length === 0 && searchTerm" class="not-found">
+      <p>No se encontró ningún tipo de catering con la información proporcionada.</p>
+    </div>
+  
+  
+    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
+  
+    <!-- Tabla de empleados -->
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+       <!--   <th>CodEstado</th> -->
+           <th>Estado</th> 
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tipo of tipoFiltrados">
+          <td>{{ tipo.idtipo }}</td>
+          <td>{{ tipo.nombre }}</td>
+          <td>{{ tipo.descripcion }}</td>
+          <td>{{ tipo.estado.estado }}</td>
+      <!--    <td>{{ tipo.estado.estado }}</td> -->
+         
+          
+          <td>
+            <button mat-icon-button color="primary" (click)="editarTipos(tipo)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <!-- Ícono de eliminar -->
+            <button mat-icon-button color="warn" (click)="eliminarTipos(tipo.idtipo)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Formulario de edición -->
+    <div *ngIf="isEditMode" class="edit-form">
+      <h3>Editar Tipo</h3>
+      <form (ngSubmit)="guardarEdicion()">
+        <div class="form-group">
+          <label>Código</label>
+          <input
+            type="text"
+            [(ngModel)]="tipoSeleccionado.idtipo"
+            name="idtipo"
+            disabled
+          />
+        </div>
+        
+        <div class="form-group">
+          <label>Nombre</label>
+          <input
+            type="text"
+            [(ngModel)]="tipoSeleccionado.nombre"
+            name="nombre"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <input
+            type="text"
+            [(ngModel)]="tipoSeleccionado.descripcion"
+            name="descripcion"
+            required
+          />
+        </div>
+
+     <!--   <div class="form-group">
+          <label>CodEstado</label>
+          <input
+            type="text"
+            [(ngModel)]="tipoSeleccionado.idestado"
+            name="idtipo"
+            disabled
+          />
+        </div> -->
+        
+        <div class="form-group">
+          <mat-form-field class="col-xs-12">
+            <mat-select 
+              #idEstadoField="ngModel" 
+              name="idestado" 
+              [(ngModel)]="tipoSeleccionado.idestado" 
+              required 
+              placeholder="Seleccione un estado">
+              
+              <mat-option *ngFor="let est of estados" [value]="est.idestado">
+                {{ est.estado }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="idEstadoField.invalid">Debe seleccionar un estado</mat-error>
+          </mat-form-field>
+        </div> 
+       
+  
+        <div class="form-actions">
+          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Botón para agregar empleado -->
+    <div class="add-icon">
+      <button mat-fab color="primary" [routerLink]="['/tipocatering']">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  

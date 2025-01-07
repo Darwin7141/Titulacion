@@ -3,49 +3,47 @@ import { GLOBAL } from './global';
 import { HttpClient, HttpHeaders} from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+
 @Injectable({
   providedIn: 'root'
 })
-export class ClientesService {
+export class CargosService {
   private url:string;
 
   constructor(private http: HttpClient) { 
     this.url=GLOBAL.url;
   }
   
-  getClientes(): Observable<any[]> {
-    return this.http.get<any[]>(this.url +"cliente")
+  getCargos(): Observable<any[]> {
+    return this.http.get<any[]>(this.url +"empleados")
     
     }
 
-    agregar(cliente: any): Observable<any> {
+    agregar(cargo: any): Observable<any> {
       const httpOptions = {
         headers: new HttpHeaders({
           'Content-Type':  'application/json'
         })
       };
   
-      return this.http.post<any>(this.url +"cliente", cliente, httpOptions);
+      return this.http.post<any>(this.url +"empleados", cargo, httpOptions);
     }
 
-    editarCliente(cliente: any): Observable<any> {
+    editarCargo(cargo: any): Observable<any> {
       return this.http.put<any>(
-        `${this.url}cliente/${cliente.codigocliente}`,
-        cliente,
+        `${this.url}empleados/${cargo.idcargo}`,
+        cargo,
         {
           headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
         }
       );
     }
     
-    eliminarCliente(codigocliente: string): Observable<any> {
-      return this.http.delete<any>(`${this.url}cliente/${codigocliente}`);
+    eliminarCargo(idcargo: string): Observable<any> {
+      return this.http.delete<any>(`${this.url}empleados/${idcargo}`);
     }
 
     
 
     
 }
-
-
-

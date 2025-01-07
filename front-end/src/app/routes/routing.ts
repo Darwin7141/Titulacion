@@ -18,6 +18,11 @@ import { ListarusuariosComponent } from '../components/listarusuarios/listarusua
 import { UsuariosComponent } from '../components/usuarios/usuarios.component';
 import { ListarclientesComponent } from '../components/listarclientes/listarclientes.component';
 import { ClientesComponent } from '../components/clientes/clientes.component';
+import { CargosComponent } from '../components/cargos/cargos.component';
+import { ListarcargosComponent } from '../components/listarcargos/listarcargos.component';
+import { ListacateringComponent } from '../components/listacatering/listacatering.component';
+import { TipocateringComponent } from '../components/tipocatering/tipocatering.component';
+
 
 
 const app_routes:Routes=[
@@ -35,6 +40,8 @@ const app_routes:Routes=[
     {path:'productos', component:ProductosComponent},
     {path:'usuarios', component:UsuariosComponent},   
     {path:'clientes', component:ClientesComponent},  
+    {path:'cargos', component:CargosComponent},  
+    {path:'tipocatering', component:TipocateringComponent},  
    
 
 
@@ -44,6 +51,8 @@ const app_routes:Routes=[
     {path:'listaProductos', component:ListarproductosComponent},
     {path:'listaUsuarios', component:ListarusuariosComponent},
     {path:'listaClientes', component:ListarclientesComponent},
+    {path:'listaCargos', component:ListarcargosComponent},
+    {path:'listaTipos', component:ListacateringComponent},
     
     {path:'**', pathMatch:'full',redirectTo:''}
 ]

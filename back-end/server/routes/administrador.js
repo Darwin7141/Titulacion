@@ -7,3 +7,4 @@ module.exports = (app) => {
     app.delete('/api/administrador/:codigoadmin',  adminController.eliminar);
     app.get('/api/administrador',  adminController.getAll);
 };
+

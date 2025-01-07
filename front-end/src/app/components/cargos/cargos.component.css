@@ -1,0 +1,12 @@
+.content {
+    background: #eee; /* Establece el fondo del elemento con el color gris claro #eee */
+    position: absolute; /* Posiciona el elemento en relación a sus ancestros */
+    left: 50%; /* Ubica el elemento al 50% del ancho de su contenedor padre */
+    top: 50%; /* Ubica el elemento al 50% de la altura de su contenedor padre */
+    transform: translate(-50%, -50%); /* Desplaza el elemento hacia la izquierda y hacia arriba en un 50% de su propio ancho y alto, centrándolo así */
+    padding: 50px; /* Añade un relleno interno de 50 píxeles en todos los lados del elemento */
+  }
+  
+  .btn {
+    margin: 30px 5px; /* Establece los márgenes del elemento: 30 píxeles arriba y abajo, 5 píxeles a la izquierda y a la derecha */
+  }

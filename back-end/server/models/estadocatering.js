@@ -15,5 +15,12 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    estados.associate = (models) => {
+        estados.hasMany(models.tipocatering, {
+          foreignKey: 'idestado',
+          as: 'tiposCatering',
+        });
+      };
+
     return estados;
 };

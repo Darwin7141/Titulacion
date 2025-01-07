@@ -19,5 +19,13 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    tipo.associate = (models) => {
+        tipo.belongsTo(models.estadocatering, {
+          foreignKey: 'idestado',
+          as: 'estado',
+        });
+      };
+    
+
     return tipo;
 };

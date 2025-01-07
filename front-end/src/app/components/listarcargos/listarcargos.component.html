@@ -1,0 +1,104 @@
+<div class="clientes-container">
+    <h2>Listado de Clientes</h2>
+  
+    <!-- Campo de búsqueda -->
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Nombre"
+        [(ngModel)]="searchTerm"
+      />
+      <button class="search-button" (click)="buscarCargos()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button class="reload-button" (click)="recargarLista()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  
+    <div *ngIf="cargoFiltrados.length === 0 && searchTerm" class="not-found">
+      <p>No se encontró ningún cargo con el nombre proporcionado.</p>
+    </div>
+  
+  
+    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
+  
+    <!-- Tabla de empleados -->
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cargo of cargoFiltrados">
+          <td>{{ cargo.idcargo }}</td>
+          <td>{{ cargo.nombrecargo }}</td>
+          <td>{{ cargo.descripcion }}</td>
+          
+          
+          <td>
+            <button mat-icon-button color="primary" (click)="editarCargos(cargo)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <!-- Ícono de eliminar -->
+            <button mat-icon-button color="warn" (click)="eliminarCargos(cargo.idcargo)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Formulario de edición -->
+    <div *ngIf="isEditMode" class="edit-form">
+      <h3>Editar Cargo</h3>
+      <form (ngSubmit)="guardarEdicion()">
+        <div class="form-group">
+          <label>Código</label>
+          <input
+            type="text"
+            [(ngModel)]="cargoSeleccionado.idcargo"
+            name="idcargo"
+            disabled
+          />
+        </div>
+        <div class="form-group">
+          <label>Nombre</label>
+          <input
+            type="text"
+            [(ngModel)]="cargoSeleccionado.nombrecargo"
+            name="nombre"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <input
+            type="text"
+            [(ngModel)]="cargoSeleccionado.descripcion"
+            name="descripción"
+            required
+          />
+        </div>
+        
+  
+        <div class="form-actions">
+          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Botón para agregar empleado -->
+    <div class="add-icon">
+      <button mat-fab color="primary" [routerLink]="['/cargos']">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  
