@@ -1,16 +1,19 @@
-<div class="container-fluid"> 
+<div class="container-fluid">
   <div class="content-login col-lg-3 col-md-4 col-sm-6 col-xs-12">
     <h2>LOGIN</h2>
     <form #loginForm="ngForm" (ngSubmit)="login()" autocomplete="on">
       <mat-form-field class="col-xs-12">
-        <input matInput type="text" #correoField="ngModel" name="correo" [(ngModel)]="usuario.correo" required placeholder="Correo">
+        <input matInput type="text" #correoField="ngModel" name="correo" [(ngModel)]="usuario.correo" required placeholder="Correo" [disabled]="bloquearCampos">
         <mat-error *ngIf="correoField.invalid">El Usuario es requerido</mat-error>
       </mat-form-field>
       <mat-form-field class="col-xs-12">
-        <input matInput type="password" #contraseniaField="ngModel" name="contrasenia" [(ngModel)]="usuario.contrasenia" required placeholder="Contraseña">
+        <input matInput type="password" #contraseniaField="ngModel" name="contrasenia" [(ngModel)]="usuario.contrasenia" required placeholder="Contraseña" [disabled]="bloquearCampos">
         <mat-error *ngIf="contraseniaField.invalid">El Password es requerido</mat-error>
       </mat-form-field>
-      <button mat-raised-button class="btn-ingreso" type="submit" [disabled]="!loginForm.form.valid">INGRESAR</button>
+      <button mat-raised-button class="btn-ingreso" type="submit" [disabled]="!loginForm.form.valid || bloquearCampos">INGRESAR</button>
     </form>
+    <p><a routerLink="/recuperar-contrasena">¿Olvidaste tu contraseña?</a></p>
+    <p *ngIf="bloquearCampos">Intenta nuevamente en {{ tiempoBloqueo }} segundos.</p> <!-- Muestra el tiempo de bloqueo -->
   </div>
 </div>
+

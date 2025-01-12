@@ -1,0 +1,39 @@
+<div class="content">
+    <h2>AGREGAR MENÚ</h2>
+    <form #tipoForm="ngForm" (ngSubmit)="agregar()">
+  
+      
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="menu.nombre" required placeholder="Nombre" autofocus>
+        <mat-error *ngIf="nombreField.invalid">El nombre del menú es requerido</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #desField="ngModel" name="descripcion" [(ngModel)]="menu.descripcion" required placeholder="Descripción" autofocus>
+        <mat-error *ngIf="desField.invalid">La descripción del menú es requerida</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #desField="ngModel" name="precio" [(ngModel)]="menu.precio" required placeholder="Costo" autofocus>
+        <mat-error *ngIf="desField.invalid">El precio del menú es requerido</mat-error>
+      </mat-form-field>
+  
+      
+      <mat-form-field class="col-xs-12">
+        <mat-select #idCargoField="ngModel" name="idtipo" [(ngModel)]="menu.idtipo" required placeholder="Seleccione un tipo">
+          <mat-option *ngFor="let tipo of tipo" [value]="tipo.idtipo">
+            {{ tipo.nombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un tipo de servicio</mat-error>
+      </mat-form-field>
+      
+
+
+      <button [routerLink]="['/listaMenus']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
+      <button  [disabled]="!tipoForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit" >Agregar</button>
+    </form>
+  </div>
+  
+

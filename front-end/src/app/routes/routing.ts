@@ -22,37 +22,49 @@ import { CargosComponent } from '../components/cargos/cargos.component';
 import { ListarcargosComponent } from '../components/listarcargos/listarcargos.component';
 import { ListacateringComponent } from '../components/listacatering/listacatering.component';
 import { TipocateringComponent } from '../components/tipocatering/tipocatering.component';
-
+import { ListarservicioComponent } from '../components/listarservicio/listarservicio.component';
+import { ServiciocateringComponent } from '../components/serviciocatering/serviciocatering.component';
+import { MenusComponent } from '../components/menus/menus.component';
+import { ListarmenusComponent } from '../components/listarmenus/listarmenus.component';
+import { RecuperarContrasenaComponent } from '../components/recuperar-contrasena/recuperar-contrasena.component';
+import { RestablecerContrasenaComponent } from '../components/restablecer-contrasena/restablecer-contrasena.component';
 
 
 const app_routes:Routes=[
-    {path:'home', component:HomeComponent},
-    {path:'inicio', component:InicioComponent},   
+    {path:'home', component:HomeComponent, canActivate:[GuardiaService]},
+    {path:'inicio', component:InicioComponent, canActivate:[GuardiaService]},   
     {path:'login', component:LoginComponent},
     {path:'admin', component:AdminComponent, canActivate:[GuardiaService],
         children:[
             {path:'list', component:ListComponent},
            // {path:'empleados', component:EmpleadosComponent},
         ]},
-    {path:'administrador', component:AdministradorComponent},
-    {path:'empleados', component:EmpleadosComponent},
-    {path:'proveedores', component:ProveedoresComponent},
-    {path:'productos', component:ProductosComponent},
-    {path:'usuarios', component:UsuariosComponent},   
-    {path:'clientes', component:ClientesComponent},  
-    {path:'cargos', component:CargosComponent},  
-    {path:'tipocatering', component:TipocateringComponent},  
-   
+    {path:'administrador', component:AdministradorComponent, canActivate:[GuardiaService]},
+    {path:'empleados', component:EmpleadosComponent, canActivate:[GuardiaService]},
+    {path:'proveedores', component:ProveedoresComponent, canActivate:[GuardiaService]},
+    {path:'productos', component:ProductosComponent, canActivate:[GuardiaService]},
+    {path:'usuarios', component:UsuariosComponent, canActivate:[GuardiaService]},   
+    {path:'clientes', component:ClientesComponent, canActivate:[GuardiaService]},  
+    {path:'cargos', component:CargosComponent, canActivate:[GuardiaService]},  
+    {path:'tipocatering', component:TipocateringComponent, canActivate:[GuardiaService]},  
+    {path:'servicios', component:ServiciocateringComponent, canActivate:[GuardiaService]},  
+    {path:'menus', component:MenusComponent, canActivate:[GuardiaService]},
+    {path:'recuperar-contrasena', component:RecuperarContrasenaComponent},
+    {path:'restablecer-contrasena/:token', component:RestablecerContrasenaComponent},
+        
 
 
-    {path:'listaEmpleados', component:ListadoempleadosComponent},
-    {path:'listaAdministrador', component:ListaadministradorComponent},
-    {path:'listaProveedor', component:ListarproveedorComponent},
-    {path:'listaProductos', component:ListarproductosComponent},
-    {path:'listaUsuarios', component:ListarusuariosComponent},
-    {path:'listaClientes', component:ListarclientesComponent},
-    {path:'listaCargos', component:ListarcargosComponent},
-    {path:'listaTipos', component:ListacateringComponent},
+    {path:'listaEmpleados', component:ListadoempleadosComponent, canActivate:[GuardiaService]},
+    {path:'listaAdministrador', component:ListaadministradorComponent, canActivate:[GuardiaService]},
+    {path:'listaProveedor', component:ListarproveedorComponent, canActivate:[GuardiaService]},
+    {path:'listaProductos', component:ListarproductosComponent, canActivate:[GuardiaService]},
+    {path:'listaUsuarios', component:ListarusuariosComponent, canActivate:[GuardiaService]},
+    {path:'listaClientes', component:ListarclientesComponent, canActivate:[GuardiaService]},
+    {path:'listaCargos', component:ListarcargosComponent, canActivate:[GuardiaService]},
+    {path:'listaTipos', component:ListacateringComponent, canActivate:[GuardiaService]},
+    {path:'listaServicios', component:ListarservicioComponent, canActivate:[GuardiaService]},
+    {path:'listaMenus', component:ListarmenusComponent, canActivate:[GuardiaService]},
+
     
     {path:'**', pathMatch:'full',redirectTo:''}
 ]

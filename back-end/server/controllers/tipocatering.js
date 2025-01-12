@@ -122,6 +122,7 @@ function getAll(req, res) {
           attributes: ['estado'], // Seleccionar solo el campo necesario
         },
       ],
+      
       order: [['idtipo', 'ASC']], // Ordenar por idtipo en orden ascendente
     })
       .then(tipo => {

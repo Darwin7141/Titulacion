@@ -38,6 +38,12 @@ import { CargosComponent } from './components/cargos/cargos.component';
 import { ListarcargosComponent } from './components/listarcargos/listarcargos.component';
 import { TipocateringComponent } from './components/tipocatering/tipocatering.component';
 import { ListacateringComponent } from './components/listacatering/listacatering.component';
+import { ServiciocateringComponent } from './components/serviciocatering/serviciocatering.component';
+import { ListarservicioComponent } from './components/listarservicio/listarservicio.component';
+import { ListarmenusComponent } from './components/listarmenus/listarmenus.component';
+import { MenusComponent } from './components/menus/menus.component';
+import { RecuperarContrasenaComponent } from './components/recuperar-contrasena/recuperar-contrasena.component';
+import { RestablecerContrasenaComponent } from './components/restablecer-contrasena/restablecer-contrasena.component';
 
 
 
@@ -64,7 +70,13 @@ import { ListacateringComponent } from './components/listacatering/listacatering
     CargosComponent,
     ListarcargosComponent,
     TipocateringComponent,
-    ListacateringComponent
+    ListacateringComponent,
+    ServiciocateringComponent,
+    ListarservicioComponent,
+    ListarmenusComponent,
+    MenusComponent,
+    RecuperarContrasenaComponent,
+    RestablecerContrasenaComponent
   
     
     

@@ -1,0 +1,13 @@
+<div class="container-fluid">
+    <div class="content-login col-lg-3 col-md-4 col-sm-6 col-xs-12">
+      <h2>Recuperar Contraseña</h2>
+      <form (ngSubmit)="solicitarRecuperacion()" autocomplete="on">
+        <mat-form-field class="col-xs-12">
+          <input matInput type="email" [(ngModel)]="correo" required placeholder="Correo Electrónico" name="correo" #correoField="ngModel">
+          <mat-error *ngIf="correoField.invalid">El correo es requerido</mat-error>
+        </mat-form-field>
+        <button mat-raised-button class="btn-ingreso" type="submit" [disabled]="!correoField.valid">Solicitar Recuperación</button>
+      </form>
+    </div>
+  </div>
+  

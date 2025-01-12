@@ -1,0 +1,127 @@
+<div class="clientes-container">
+    <h2>Lista de Menús</h2>
+  
+    <!-- Campo de búsqueda -->
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Nombre de Menú"
+        [(ngModel)]="searchTerm"
+      />
+      <button class="search-button" (click)="buscarMenus()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button class="reload-button" (click)="recargarLista()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  
+    <div *ngIf="menuFiltrados.length === 0 && searchTerm" class="not-found">
+      <p>No se encontró ningún menú con el nombre proporcionado.</p>
+    </div>
+  
+  
+    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
+  
+    <!-- Tabla de empleados -->
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Tipo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let menu of menuFiltrados">
+          <td>{{ menu.idmenu }}</td>
+          <td>{{ menu.nombre }}</td>
+          <td>{{ menu.descripcion }}</td>
+          <td>{{ menu.precio }}</td>
+          <td>{{ menu.tipo.nombre }}</td>
+          
+          <td>
+            <button mat-icon-button color="primary" (click)="editarMenus(menu)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <!-- Ícono de eliminar -->
+            <button mat-icon-button color="warn" (click)="eliminarMenus(menu.idmenu)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Formulario de edición -->
+    <div *ngIf="isEditMode" class="edit-form">
+      <h3>Editar Menú</h3>
+      <form (ngSubmit)="guardarEdicion()">
+        <div class="form-group">
+          <label>Código</label>
+          <input
+            type="text"
+            [(ngModel)]="menuSeleccionado.idmenu"
+            name="idmenu"
+            disabled
+          />
+        </div>
+        
+        <div class="form-group">
+          <label>Nombre</label>
+          <input
+            type="text"
+            [(ngModel)]="menuSeleccionado.nombre"
+            name="nombre"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <input
+            type="text"
+            [(ngModel)]="menuSeleccionado.descripcion"
+            name="descripcion"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+            <label>Precio</label>
+            <input
+              type="text"
+              [(ngModel)]="menuSeleccionado.precio"
+              name="precio"
+              required
+            />
+          </div>
+        
+        <div class="form-group">
+          <mat-form-field class="col-xs-12">
+            <mat-select #idCargoField="ngModel" name="idtipo" [(ngModel)]="menuSeleccionado.idtipo" required placeholder="Seleccione un tipo">
+              <mat-option *ngFor="let tipo of tipo" [value]="tipo.idtipo">
+                {{ tipo.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un tipo</mat-error>
+          </mat-form-field>
+        </div>
+  
+        <div class="form-actions">
+          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Botón para agregar empleado -->
+    <div class="add-icon">
+      <button mat-fab color="primary" [routerLink]="['/menus']">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>

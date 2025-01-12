@@ -20,5 +20,14 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    servicio.associate = (models) => {
+        servicio.belongsTo(models.tipocatering, {
+          foreignKey: 'idtipo',
+          as: 'tipo',
+        });
+      };
+
+    
+    
     return servicio;
 };

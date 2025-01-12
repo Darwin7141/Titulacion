@@ -144,6 +144,14 @@ function eliminar(req, res) {
 
 function getAll(req, res) {
   modelos.empleado.findAll({
+    include: [
+        {
+          model: modelos.cargo,
+          as: 'cargo', // Este alias debe coincidir con el definido en el modelo
+          attributes: ['nombrecargo'], // Seleccionar solo el campo necesario
+        },
+      ],
+
     order: [['codigoempleado', 'ASC']] // Ordenar por codigocliente en orden ascendente
   })
     .then(empleados => {
