@@ -23,5 +23,12 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    menu.associate = (models) => {
+        menu.belongsTo(models.tipocatering, {
+          foreignKey: 'idtipo',
+          as: 'tipo',
+        });
+      };
+
     return menu;
 };

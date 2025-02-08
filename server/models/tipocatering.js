@@ -19,5 +19,23 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    tipo.associate = (models) => {
+        tipo.belongsTo(models.estadocatering, {
+            foreignKey: 'idestado',
+            as: 'estado',
+        });
+    
+        tipo.hasMany(models.servicios, {
+            foreignKey: 'idtipo',
+            as: 'servCatering',
+        });
+
+        tipo.hasMany(models.menu, {
+            foreignKey: 'idtipo',
+            as: 'menuCatering',
+        });
+    };
+
+    
     return tipo;
 };

@@ -115,6 +115,13 @@ function eliminar(req, res) {
 
 function getAll(req, res) {
   modelos.servicios.findAll({
+    include: [
+        {
+          model: modelos.tipocatering,
+          as: 'tipo', // Este alias debe coincidir con el definido en el modelo
+          attributes: ['nombre'], // Seleccionar solo el campo necesario
+        },
+      ],
     order: [['idservicio', 'ASC']] // Ordenar por codigocliente en orden ascendente
   })
     .then(servicio => {

@@ -9,6 +9,9 @@ const tipocatering = require('./tipocatering');
 const serviciocatering = require('./serviciocatering');
 const menucatering = require('./menu');
 const estadocatering = require('./estadocatering');
+const TokensRecuperacion = require('./TokensRecuperacion');
+
+
 
 module.exports={
     usuarios,
@@ -21,7 +24,9 @@ module.exports={
     tipocatering,
     serviciocatering,
     menucatering,
-    estadocatering
+    estadocatering,
+    TokensRecuperacion
+    
 
 
     

@@ -127,6 +127,14 @@ function eliminar(req, res) {
 
 function getAll(req, res) {
   modelos.productos.findAll({
+    include: [
+        {
+          model: modelos.proveedor,
+          as: 'proveedor', // Este alias debe coincidir con el definido en el modelo
+          attributes: ['nombre'], // Seleccionar solo el campo necesario
+        },
+      ],
+
     order: [['idproducto', 'ASC']] // Ordenar por codigocliente en orden ascendente
   })
     .then(productos => {

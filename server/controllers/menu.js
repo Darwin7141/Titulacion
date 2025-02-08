@@ -117,6 +117,14 @@ function eliminar(req, res) {
 
 function getAll(req, res) {
   modelos.menu.findAll({
+    include: [
+        {
+          model: modelos.tipocatering,
+          as: 'tipo', // Este alias debe coincidir con el definido en el modelo
+          attributes: ['nombre'], // Seleccionar solo el campo necesario
+        },
+      ],
+
     order: [['idmenu', 'ASC']] // Ordenar por codigocliente en orden ascendente
   })
     .then(menu => {

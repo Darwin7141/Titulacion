@@ -16,5 +16,11 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    cargoempleados.associate = (models) => {
+        cargoempleados.hasMany(models.empleado, {
+          foreignKey: 'idcargo',
+          as: 'empleados',
+        });
+      };
     return cargoempleados;
 };

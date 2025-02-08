@@ -19,5 +19,11 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    productos.associate = (models) => {
+        productos.belongsTo(models.proveedor, {
+            foreignKey: 'codigoproveedor',
+            as: 'proveedor',
+        });
+    }
     return productos;
 };
