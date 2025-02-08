@@ -4,9 +4,7 @@ const { enviarCorreoEmpresa } = require('../utils/emailService');
 const twilio = require('twilio');
 
 
-const accountSid = 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';  // <- Real Account SID de la consola
-const authToken = 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';  // <- El Auth Token correspondiente
-const client = twilio(accountSid, authToken);
+
 
 // El número de WhatsApp “from” se obtiene de Twilio
 const TWILIO_WHATSAPP_FROM = 'whatsapp:+14155238886';  
