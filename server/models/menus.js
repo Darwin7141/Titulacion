@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true
         },
-        idtipo: {
+        idservicio: {
             type: DataTypes.STRING
         },
         nombre: {
@@ -16,7 +16,10 @@ module.exports = (sequelize, DataTypes) => {
         },
         precio: {
             type: DataTypes.DOUBLE
-        }
+        },
+        imagen: {
+            type: DataTypes.STRING
+        },
 
     }, {
         tableName: 'menu',  // Especificar el nombre de la tabla como 'cargo'
@@ -24,10 +27,17 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     menu.associate = (models) => {
-        menu.belongsTo(models.tipocatering, {
-          foreignKey: 'idtipo',
-          as: 'tipo',
+        menu.belongsTo(models.servicios, {
+          foreignKey: 'idservicio',
+          as: 'servicio',
         });
+
+        menu.hasMany(models.detalle_reserva, {
+            foreignKey: 'idmenu',
+            as: 'detalles'
+          });
+
+        
       };
 
     return menu;

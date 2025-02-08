@@ -27,11 +27,16 @@ require('./server/routes/empleados')(app);
 require('./server/routes/administrador')(app);
 require('./server/routes/proveedor')(app);
 require('./server/routes/productos')(app);
-require('./server/routes/tipocatering')(app);
+require('./server/routes/tipocatering')(app); 
 require('./server/routes/serviciocatering')(app);
 require('./server/routes/menus')(app);
 require('./server/routes/estadocatering')(app);
 require('./server/routes/recuperacion')(app);
+require('./server/routes/preclientes')(app);
+require('./server/routes/categoriaProductos')(app);
+require('./server/routes/reservas')(app);
+require('./server/routes/detalle_reserva')(app);
+require('./server/routes/contacto')(app);
 
 app.get('*', (req, res) => {
     res.status(200).send({ message: "Bienvenido al servidor NodeJS" });

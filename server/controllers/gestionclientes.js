@@ -2,7 +2,7 @@ const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../util
 const modelos = require('../models'); // Importar los modelos
 
 async function create(req, res) {
-  const { ci, nombre, direccion, e_mail, telefono } = req.body;
+  const { ci, nombre, direccion, e_mail, telefono, idprecliente } = req.body;
 
   try {
       // Validar datos antes de la inserción
@@ -37,7 +37,8 @@ async function create(req, res) {
           nombre,
           direccion,
           e_mail,
-          telefono
+          telefono,
+          idprecliente
           
       });
 
@@ -50,7 +51,7 @@ async function create(req, res) {
 
 async function update(req, res) {
   const { codigocliente } = req.params; // Código del empleado desde los parámetros de la URL
-  const { ci, nombre, direccion, e_mail, telefono } = req.body; // Datos a actualizar
+  const { ci, nombre, direccion, e_mail, telefono, idprecliente} = req.body; // Datos a actualizar
 
   try {
       // Validar los campos antes de la actualización
@@ -79,7 +80,8 @@ async function update(req, res) {
           nombre: nombre || proveedor.nombre,
           direccion: direccion || proveedor.direccion,
           e_mail: e_mail || proveedor.e_mail,
-          telefono: telefono || proveedor.telefono
+          telefono: telefono || proveedor.telefono,
+          idprecliente: idprecliente || proveedor.idprecliente
       });
 
       res.status(200).send({ message: 'Cliente actualizado exitosamente.', proveedor });
@@ -153,9 +155,100 @@ function getAll(req, res) {
     });
 }
 
+async function verificarCedula(req, res) {
+    const { ci } = req.params;
+    try {
+        const cliente = await modelos.clientes.findOne({ where: { ci } });
+        if (cliente) {
+            return res.status(200).send({ existe: true });
+        }
+        res.status(200).send({ existe: false });
+    } catch (err) {
+        console.error("Error al verificar cédula:", err);
+        res.status(500).send({ message: "Error al verificar la cédula.", error: err.message });
+    }
+}
+
+async function verificarEmail(req, res) {
+    const { email } = req.params;
+    try {
+        const cliente = await modelos.clientes.findOne({ where: { e_mail: email } });
+        if (cliente) {
+            return res.status(200).send({ existe: true });
+        }
+        res.status(200).send({ existe: false });
+    } catch (err) {
+        console.error("Error al verificar email:", err);
+        res.status(500).send({ message: "Error al verificar el email.", error: err.message });
+    }
+}
+
+async function verificarTelefono(req, res) {
+    const { telefono } = req.params;
+    try {
+        const cliente = await modelos.clientes.findOne({ where: { telefono } });
+        if (cliente) {
+            return res.status(200).send({ existe: true });
+        }
+        res.status(200).send({ existe: false });
+    } catch (err) {
+        console.error("Error al verificar teléfono:", err);
+        res.status(500).send({ message: "Error al verificar el teléfono.", error: err.message });
+    }
+}
+
+async function getClientePorCedula(req, res) {
+    const { ci } = req.params;
+    try {
+      const cliente = await modelos.clientes.findOne({ where: { ci } });
+      if (!cliente) {
+        return res.status(404).send({ message: 'No se encontró un cliente con esa cédula.' });
+      }
+      // Enviamos todo el objeto cliente (o filtra lo que quieras)
+      return res.status(200).send(cliente);
+    } catch (err) {
+      console.error("Error al obtener cliente por cédula:", err);
+      return res.status(500).send({ message: "Error al obtener cliente por cédula.", error: err.message });
+    }
+  }
+
+  async function getClientePorEmail(req, res) {
+    const { email } = req.params;
+    try {
+      const cliente = await modelos.clientes.findOne({ where: { e_mail: email } });
+      if (!cliente) {
+        return res.status(404).send({ message: 'No se encontró un cliente con ese e-mail.' });
+      }
+      return res.status(200).send(cliente);
+    } catch (err) {
+      // ...
+    }
+  }
+
+  async function getClientePorTelefono(req, res) {
+    const { telefono } = req.params;
+    try {
+      const cliente = await modelos.clientes.findOne({ where: { telefono } });
+      if (!cliente) {
+        return res.status(404).send({ message: 'No se encontró un cliente con ese e-mail.' });
+      }
+      return res.status(200).send(cliente);
+    } catch (err) {
+      // ...
+    }
+  }
+
+  
+
 module.exports = {
     create,
     update,
     eliminar,
-    getAll
-  };
+    getAll,
+    verificarCedula,
+    verificarEmail,
+    verificarTelefono,
+    getClientePorCedula,
+    getClientePorEmail,
+    getClientePorTelefono
+};

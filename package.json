@@ -13,11 +13,14 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
+    "connect-multiparty": "^2.2.0",
     "express": "^4.21.2",
+    "node-thumbnail": "^0.15.0",
     "nodemailer": "^6.9.16",
     "nodemon": "^3.1.9",
     "pg": "^8.13.1",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "twilio": "^5.4.3"
   }
 }

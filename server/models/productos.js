@@ -13,7 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         },
         codigoproveedor: {
             type: DataTypes.STRING
-        }
+        },
+        idcategoria: {
+            type: DataTypes.INTEGER
+        },
     }, {
         tableName: 'productos',// Especificar el nombre de la tabla como 'cargo'
         timestamps: false
@@ -23,6 +26,11 @@ module.exports = (sequelize, DataTypes) => {
         productos.belongsTo(models.proveedor, {
             foreignKey: 'codigoproveedor',
             as: 'proveedor',
+        });
+
+        productos.belongsTo(models.categoria_productos, {
+            foreignKey: 'idcategoria',
+            as: 'categorias',
         });
     }
     return productos;

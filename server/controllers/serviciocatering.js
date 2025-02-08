@@ -1,8 +1,11 @@
 
 const modelos = require('../models'); // Importar los modelos
+const fs= require ('fs');
+const thumb= require ('node-thumbnail').thumb;
+const path=require('path');
 
 async function create(req, res) {
-  const { idtipo, nombre, descripcion } = req.body;
+  const { idtipo, nombre, descripcion, idestado } = req.body;
   console.log(req.body);
 
   try {
@@ -24,7 +27,8 @@ async function create(req, res) {
           idservicio: nextCodigo,
           idtipo, 
           nombre, 
-          descripcion 
+          descripcion,
+          idestado
           
           
       });
@@ -38,7 +42,7 @@ async function create(req, res) {
 
 async function update(req, res) {
   const { idservicio } = req.params; // Código del empleado desde los parámetros de la URL
-  const { idtipo, nombre, descripcion  } = req.body; // Datos a actualizar
+  const { idtipo, nombre, descripcion, idestado } = req.body; // Datos a actualizar
 
   try {
      
@@ -54,7 +58,8 @@ async function update(req, res) {
           
           idtipo: idtipo || servicio.id,
           nombre: nombre || servicio.nombre,
-          descripcion: descripcion || servicio.descripcion
+          descripcion: descripcion || servicio.descripcion,
+          idestado: idestado || servicio.idestado
           
       });
 
@@ -117,11 +122,19 @@ function getAll(req, res) {
   modelos.servicios.findAll({
     include: [
         {
-          model: modelos.tipocatering,
-          as: 'tipo', // Este alias debe coincidir con el definido en el modelo
-          attributes: ['nombre'], // Seleccionar solo el campo necesario
+          model: modelos.estadocatering,
+          as: 'estado', // Este alias debe coincidir con el definido en el modelo
+          attributes: ['estado'], // Seleccionar solo el campo necesario
         },
+
+        {
+            model: modelos.tipocatering,
+            as: 'tipo', // Este alias debe coincidir con el definido en el modelo
+            attributes: ['nombre'], // Seleccionar solo el campo necesario
+          },
       ],
+
+      
     order: [['idservicio', 'ASC']] // Ordenar por codigocliente en orden ascendente
   })
     .then(servicio => {
@@ -136,10 +149,108 @@ function getAll(req, res) {
     });
 }
 
+function uploadFotografia(req, res) {
+    const id = req.params.idservicio;
+  
+    if (req.files) {
+      const file_path = req.files.foto.path;
+      const file_split = file_path.split('\\');
+      const file_name = file_split[3];
+      
+      const ext_split = file_name.split('.');
+      let file_ext = ext_split[ext_split.length - 1]; // toma la última parte como extensión
+      file_ext = file_ext.toLowerCase();             // para normalizar mayúsculas/minúsculas
+  
+      // Lista de extensiones permitidas
+      const validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+  
+      // Verificamos si la extensión está permitida
+      if (validExtensions.includes(file_ext)) {
+        const foto = { imagen: file_name };
+  
+        modelos.servicios
+          .findByPk(id)
+          .then((fotografia) => {
+            if (!fotografia) {
+              // Si no se encuentra el servicio, eliminamos el archivo subido y retornamos error
+              fs.unlink(file_path, () => {});
+              return res.status(404).send({ message: 'Servicio no encontrado.' });
+            }
+  
+            // Actualizamos en la BD el campo 'imagen' con el nombre del archivo
+            fotografia
+              .update(foto)
+              .then(() => {
+                const newPath = './server/uploads/fotografias/' + file_name;
+                const thumbPath = './server/uploads/fotografias/thumbs';
+  
+                thumb({
+                  source: path.resolve(newPath),
+                  destination: path.resolve(thumbPath),
+                  width: 200,
+                  suffix: '',
+                })
+                  .then(() => {
+                    return res.status(200).send({ fotografia });
+                  })
+                  .catch((err) => {
+                    return res
+                      .status(500)
+                      .send({ message: 'Ocurrió un error al crear el thumbnail. ' + err });
+                  });
+              })
+              .catch((err) => {
+                // Si algo falla en la actualización de la BD, eliminamos el archivo subido
+                fs.unlink(file_path, () => {});
+                return res
+                  .status(500)
+                  .send({ message: 'Ocurrió un error al actualizar la fotografía.' });
+              });
+          })
+          .catch((err) => {
+            fs.unlink(file_path, () => {});
+            return res
+              .status(500)
+              .send({ message: 'Error al buscar el servicio.', error: err });
+          });
+      } else {
+        // Extensión no válida, eliminamos el archivo subido
+        fs.unlink(file_path, (err) => {});
+        return res
+          .status(400)
+          .send({ message: 'La extensión no es válida. Solo se permiten jpg, jpeg, png, gif.' });
+      }
+    } else {
+      return res.status(400).send({ message: 'Debe seleccionar una fotografía.' });
+    }
+  }
+  
+ 
+function getFotografia(req, res) {
+    var fotografia = req.params.fotografia;
+    var thumb = req.params.thumb;
+  
+    if (thumb=="false") 
+      var path_foto = "./server/uploads/fotografias/" + fotografia;
+     else if (thumb=="true")
+      var path_foto = "./server/uploads/fotografias/thumbs/" + fotografia;
+    
+  
+    fs.access(path_foto, fs.constants.F_OK, (err) => {
+        if (!err) {
+            res.sendFile(path.resolve(path_foto));
+        } else {
+            res.status(404).send({ message: "No se encuentra la fotografía." });
+        }
+    });
+  }
+
 
 module.exports = {
     create,
     update,
     eliminar,
     getAll,
+    uploadFotografia,
+    getFotografia
   };

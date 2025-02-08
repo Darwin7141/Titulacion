@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         contrasenia: {
             type: DataTypes.STRING
         },
+
+        rol: {
+            type: DataTypes.STRING
+        },
     
         createdAt: {
             type: DataTypes.DATE

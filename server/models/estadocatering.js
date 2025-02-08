@@ -16,11 +16,11 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     estados.associate = (models) => {
-        estados.hasMany(models.tipocatering, {
-          foreignKey: 'idestado',
-          as: 'tiposCatering',
+        estados.hasMany(models.servicios, {
+            foreignKey: 'idestado',
+            as: 'estados',
         });
-      };
+    }
 
     return estados;
 };

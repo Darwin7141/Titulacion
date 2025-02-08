@@ -2,13 +2,15 @@ const nodemailer = require('nodemailer');
 
 // Configuración del transportador de Nodemailer
 const transportador = nodemailer.createTransport({
-  service: 'Gmail', // Cambiar según el proveedor de correo (Gmail, Outlook, etc.)
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // STARTTLS
   auth: {
-    user: 'd.morales1305@gmail.com', // Reemplazar con tu correo
-    pass: 'yxaw fkvg bhmv kcke',       // Reemplazar con tu contraseña o contraseña de aplicación
+    user: 'd.morales1305@gmail.com',
+    pass: 'yxaw fkvg bhmv kcke',
   },
-  logger: true, // Activa los logs
-  debug: true,  // Activa los mensajes de depuración
+  logger: true, // Habilita el registro detallado
+  debug: true,  // Habilita la depuración
 });
 
 // Función para enviar correos de recuperación
@@ -34,4 +36,36 @@ async function enviarCorreoRecuperacion(correo, token) {
   }
 }
 
-module.exports = { enviarCorreoRecuperacion };
+async function enviarCorreoEmpresa({ nombre, email, celular, serviciosSeleccionados }) {
+  // Contenido del mensaje al equipo
+  const cuerpoHtml = `
+    <h3>Solicitud de contacto</h3>
+    <p>Un usuario ha enviado sus datos para más información:</p>
+    <ul>
+      <li><strong>Nombre:</strong> ${nombre}</li>
+      <li><strong>Email:</strong> ${email}</li>
+      <li><strong>Celular:</strong> ${celular}</li>
+      <li><strong>Servicios elegidos:</strong> ${serviciosSeleccionados.join(', ')}</li>
+    </ul>
+  `;
+
+  const mailOptions = {
+    from: 'TU_CORREO@gmail.com',
+    to: 'd.morales1305@gmail.com', // <-- correo de la empresa
+    subject: 'Nueva solicitud de contacto',
+    html: cuerpoHtml,
+  };
+
+  try {
+    await transportador.sendMail(mailOptions);
+    console.log('Correo enviado al equipo de la empresa');
+  } catch (error) {
+    console.error('Error al enviar el correo a la empresa:', error);
+    throw new Error('No se pudo enviar el correo a la empresa');
+  }
+}
+
+module.exports = {
+  enviarCorreoRecuperacion,
+  enviarCorreoEmpresa, // exporta la nueva función
+};

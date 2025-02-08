@@ -1,8 +1,9 @@
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); // Importar la función de validación
 const modelos = require('../models'); // Importar los modelos
+const bcrypt = require('bcrypt');
 
 async function create(req, res) {
-  const { ci, nombre, direccion, e_mail, telefono } = req.body;
+  const { ci, nombre, direccion, e_mail, telefono, contrasenia } = req.body;
   console.log(req.body);
 
   try {
@@ -31,6 +32,9 @@ async function create(req, res) {
           nextCodigo = `A${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
       }
 
+       const hashedPassword = await bcrypt.hash(contrasenia, 10);
+      
+
       // Crear el nuevo empleado con el código generado
       const admin = await modelos.administrador.create({
           codigoadmin: nextCodigo,
@@ -38,9 +42,28 @@ async function create(req, res) {
           nombre,
           direccion,
           e_mail,
-          telefono
+          telefono, 
+          contrasenia
           
       });
+
+      const lastUser = await modelos.cuentasusuarios.findOne({
+                  order: [['idcuenta', 'DESC']],
+              });
+      
+              let nextIdCuenta = 'CU001'; // Valor inicial por defecto
+              if (lastUser && lastUser.idcuenta) {
+                  const lastNumber = parseInt(lastUser.idcuenta.slice(2), 10); // Extraer número
+                  nextIdCuenta = `CU${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
+              }
+      
+              // Ahora, insertamos el usuario en la tabla cuentasusuarios
+              await modelos.cuentasusuarios.create({
+                  idcuenta: nextIdCuenta, // Usamos el id generado
+                  correo: admin.e_mail,
+                  contrasenia: hashedPassword, // La contraseña ya encriptada
+                  rol: admin.codigoadmin // Asignamos el 'idprecliente' como 'rol' en cuentasusuarios
+              });
 
       res.status(201).send(admin); // Enviar el empleado creado
   } catch (err) {
@@ -154,9 +177,55 @@ function getAll(req, res) {
     });
 }
 
+async function verificarCedula(req, res) {
+    const { ci } = req.params;
+    try {
+        const administrador = await modelos.administrador.findOne({ where: { ci } });
+        if (administrador) {
+            return res.status(200).send({ existe: true });
+        }
+        res.status(200).send({ existe: false });
+    } catch (err) {
+        console.error("Error al verificar cédula:", err);
+        res.status(500).send({ message: "Error al verificar la cédula.", error: err.message });
+    }
+}
+
+async function verificarEmail(req, res) {
+    const { email } = req.params;
+    try {
+        const administrador = await modelos.administrador.findOne({ where: { e_mail: email } });
+        if (administrador) {
+            return res.status(200).send({ existe: true });
+        }
+        res.status(200).send({ existe: false });
+    } catch (err) {
+        console.error("Error al verificar email:", err);
+        res.status(500).send({ message: "Error al verificar el email.", error: err.message });
+    }
+}
+
+async function verificarTelefono(req, res) {
+    const { telefono } = req.params;
+    try {
+        const administrador = await modelos.administrador.findOne({ where: { telefono } });
+        if (administrador) {
+            return res.status(200).send({ existe: true });
+        }
+        res.status(200).send({ existe: false });
+    } catch (err) {
+        console.error("Error al verificar teléfono:", err);
+        res.status(500).send({ message: "Error al verificar el teléfono.", error: err.message });
+    }
+}
+
 module.exports = {
     create,
     update,
     eliminar,
-    getAll
-  };
+    getAll,
+    verificarCedula,
+    verificarEmail,
+    verificarTelefono,
+};
+
