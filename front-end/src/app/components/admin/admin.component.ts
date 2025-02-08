@@ -11,6 +11,10 @@ import { Router } from '@angular/router';
 })
 export class AdminComponent implements OnInit{
 
+  showGestionUsuarios = false;
+  showProductos = false;
+  showCatering = false;
+
   constructor(
     private _auth:AuthService,
     private _router:Router){}
@@ -22,6 +26,18 @@ export class AdminComponent implements OnInit{
 
     ngOnInit() {
       
+    }
+
+    toggleGestionUsuarios() {
+      this.showGestionUsuarios = !this.showGestionUsuarios;
+    }
+  
+    toggleProductos() {
+      this.showProductos = !this.showProductos;
+    }
+  
+    toggleCatering() {
+      this.showCatering = !this.showCatering;
     }
   
 

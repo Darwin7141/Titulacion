@@ -40,7 +40,22 @@ async function update(req, res) {
   try {
       // Buscar al usuario por ID
       const usuario = await modelos.cuentasusuarios.findOne({ where: { idcuenta } });
-
+      if (usuario.rol.startsWith('CL')) {
+        const cliente = await modelos.clientes.findOne({
+          where: { codigocliente: usuario.rol }
+        });
+        // Añadirlo a la respuesta
+        return res.status(200).json({
+          usuario: {
+            idcuenta: usuario.idcuenta,
+            correo: usuario.correo,
+            rol: usuario.rol,
+            codigocliente: cliente.codigocliente,
+            
+            // etcétera si deseas
+          }
+        });
+      }
       if (!usuario) {
           return res.status(404).send({ message: 'Usuario no encontrado.' });
       }
@@ -116,31 +131,82 @@ function eliminar(req, res) {
 
 async function login(req, res) {
     try {
-        // Buscar el usuario por correo
-        const usuario = await modelos.cuentasusuarios.findOne({
-            where: { correo: req.body.correo }
+      // 1. Buscar el usuario (cuentasusuarios) por correo
+      const usuario = await modelos.cuentasusuarios.findOne({
+        where: { correo: req.body.correo }
+      });
+  
+      // 2. Validar si el usuario existe
+      if (!usuario) {
+        return res.status(401).json({ message: "Correo no encontrado" });
+      }
+  
+      // 3. Comparar la contraseña
+      const isMatch = await bcrypt.compare(req.body.contrasenia, usuario.contrasenia);
+      if (!isMatch) {
+        return res.status(400).json({ error: "Contraseña incorrecta" });
+      }
+  
+      // 4. Si el rol comienza con "PRE" (ej. "PRE001"), buscar datos en la tabla preclientes
+      let datosPrecliente = {};
+      if (usuario.rol.startsWith('P')) {
+        const precliente = await modelos.preclientes.findOne({
+          where: { idprecliente: usuario.rol }  // Asumiendo que "rol" = "PRE001" coincide con "idprecliente"
         });
-
-        // Validar si el usuario existe
-        if (!usuario) {
-            return res.status(401).json({ message: "Correo no encontrado" });
+  
+        if (precliente) {
+          datosPrecliente = {
+            ci: precliente.ci,
+            nombre: precliente.nombre,
+            telefono: precliente.telefono,
+            direccion: precliente.direccion,
+            // Y todo lo que necesites:
+            // correo: precliente.correo, // si hace falta
+            idprecliente: precliente.idprecliente
+          };
         }
+      }
 
-        // Comparar la contraseña ingresada con la almacenada
-        const isMatch = await bcrypt.compare(req.body.contrasenia, usuario.contrasenia);
-
-        if (!isMatch) {
-            return res.status(400).json({ error: "Contraseña incorrecta" });
+      let datosCliente = {};
+      if (usuario.rol.startsWith('CL')) {
+        const cliente = await modelos.clientes.findOne({
+          where: { codigocliente: usuario.rol }  // Asumiendo que "rol" = "PRE001" coincide con "idprecliente"
+        });
+  
+        if (cliente) {
+          datosCliente = {
+            ci: cliente.ci,
+            nombre: cliente.nombre,
+            telefono: cliente.telefono,
+            direccion: cliente.direccion,
+            // Y todo lo que necesites:
+            // correo: precliente.correo, // si hace falta
+            codigocliente: cliente.codigocliente
+          };
         }
+      }
+  
+      // 5. Respuesta exitosa, adjuntando campos del precliente si existe
+      //    Observa que "usuario" es de la tabla cuentasusuarios, y "datosPrecliente" son los datos personales
+      return res.status(200).send({
+        message: "Login exitoso",
+        usuario: {
+          idcuenta: usuario.idcuenta,
+          correo: usuario.correo,
+          rol: usuario.rol,
+          // OPCIONAL: contrasenia (quizá no lo quieras devolver)
+          // Añade los campos del precliente, si existen
+          ...datosPrecliente,
+          ...datosCliente
+        }
+      });
 
-        // Respuesta exitosa
-        res.status(200).send({ message: "Login exitoso", usuario });
+      
     } catch (err) {
-        // Manejo de errores
-        res.status(500).json({ error: "Error en el servidor", details: err.message });
+      // Manejo de errores
+      res.status(500).json({ error: "Error en el servidor", details: err.message });
     }
-}
-
+  }
 function getAll(req, res) {
     modelos.cuentasusuarios.findAll({
       order: [['idcuenta', 'ASC']] // Ordenar por codigocliente en orden ascendente

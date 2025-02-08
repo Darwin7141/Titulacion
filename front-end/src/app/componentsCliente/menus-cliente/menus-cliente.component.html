@@ -1,0 +1,39 @@
+<div class="menus-cliente-container">
+    <!-- Mensaje si no hay menús -->
+    <div *ngIf="mensajeSinMenus">
+      <p>{{ mensajeSinMenus }}</p>
+    </div>
+  
+    <!-- Grid de menús -->
+    <div class="menus-grid">
+      <div
+        class="menu-card"
+        *ngFor="let m of menusFiltrados"
+        (click)="verDetalleMenu(m)"
+      >
+        <img
+          [src]="m.fotografiaUrl"
+          alt="Menú: {{ m.nombre }}"
+          class="menu-img"
+        />
+        <h3>{{ m.nombre }}</h3>
+      </div>
+    </div>
+  
+    <!-- Modal (detalle) -->
+    <div class="modal-backdrop" *ngIf="menuSeleccionado">
+      <div class="modal-content">
+        <button class="close-button" (click)="cerrarDetalleMenu()">×</button>
+        <h3>{{ menuSeleccionado.nombre }}</h3>
+        <img
+          [src]="menuSeleccionado.fotografiaUrl"
+          alt="Menú: {{ menuSeleccionado.nombre }}"
+          class="modal-img"
+        />
+        <p>{{ menuSeleccionado.descripcion }}</p>
+  
+        
+      </div>
+    </div>
+  </div>
+  

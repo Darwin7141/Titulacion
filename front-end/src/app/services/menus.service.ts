@@ -45,4 +45,13 @@ export class MenusService {
     return this.http.delete<any>(`${this.url}menu/${idmenu}`);
   }
   
+  subirImagenServicio(file: File, idmenu: string) {
+    const formData = new FormData();
+    // El nombre 'foto' es fundamental para que el backend lo reciba en req.files.foto
+    formData.append('foto', file);
+  
+    const url = `http://localhost:8010/api/uploadMenu/${idmenu}`;
+    return this.http.post<any>(url, formData);
+  }
+
 }

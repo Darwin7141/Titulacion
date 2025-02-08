@@ -26,6 +26,11 @@
         <input matInput type="text" #telefonoField="ngModel" name="telefono" [(ngModel)]="administrador.telefono" required placeholder="Teléfono" autofocus>
         <mat-error *ngIf="telefonoField.invalid">Su teléfono es requerido</mat-error>
       </mat-form-field>
+
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #contraseniaField="ngModel" name="contrasenia" [(ngModel)]="administrador.contrasenia" required placeholder="Contraseña" autofocus>
+        <mat-error *ngIf="contraseniaField.invalid">Su contrasenia</mat-error>
+      </mat-form-field>
   
   
       <button [routerLink]="['//listaAdministrador']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>

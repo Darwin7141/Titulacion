@@ -1,39 +1,110 @@
-<div class="content">
-    <h2>AGREGAR MENÚ</h2>
-    <form #tipoForm="ngForm" (ngSubmit)="agregar()">
-  
-      
-  
+<div class="agregar-menu-container">
+  <h2>AGREGAR MENÚ</h2>
+
+  <!-- Formulario para crear el menú -->
+  <form #tipoForm="ngForm" (ngSubmit)="agregar()">
+    <!-- Primera fila: Nombre y Descripción -->
+    <div class="form-row">
       <mat-form-field class="col-xs-12">
-        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="menu.nombre" required placeholder="Nombre" autofocus>
-        <mat-error *ngIf="nombreField.invalid">El nombre del menú es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #desField="ngModel" name="descripcion" [(ngModel)]="menu.descripcion" required placeholder="Descripción" autofocus>
-        <mat-error *ngIf="desField.invalid">La descripción del menú es requerida</mat-error>
+        <input
+          matInput
+          type="text"
+          #nombreField="ngModel"
+          name="nombre"
+          [(ngModel)]="menu.nombre"
+          required
+          placeholder="Nombre"
+          autofocus
+        />
+        <mat-error *ngIf="nombreField.invalid"
+          >El nombre del menú es requerido</mat-error
+        >
       </mat-form-field>
 
       <mat-form-field class="col-xs-12">
-        <input matInput type="text" #desField="ngModel" name="precio" [(ngModel)]="menu.precio" required placeholder="Costo" autofocus>
-        <mat-error *ngIf="desField.invalid">El precio del menú es requerido</mat-error>
+        <input
+          matInput
+          type="text"
+          #desField="ngModel"
+          name="descripcion"
+          [(ngModel)]="menu.descripcion"
+          required
+          placeholder="Descripción"
+        />
+        <mat-error *ngIf="desField.invalid"
+          >La descripción del menú es requerida</mat-error
+        >
       </mat-form-field>
-  
-      
+    </div>
+
+    <!-- Segunda fila: Precio y Servicio -->
+    <div class="form-row">
       <mat-form-field class="col-xs-12">
-        <mat-select #idCargoField="ngModel" name="idtipo" [(ngModel)]="menu.idtipo" required placeholder="Seleccione un tipo">
-          <mat-option *ngFor="let tipo of tipo" [value]="tipo.idtipo">
-            {{ tipo.nombre }}
+        <input
+          matInput
+          type="text"
+          #precioField="ngModel"
+          name="precio"
+          [(ngModel)]="menu.precio"
+          required
+          placeholder="Costo"
+        />
+        <mat-error *ngIf="precioField.invalid"
+          >El precio del menú es requerido</mat-error
+        >
+      </mat-form-field>
+
+      <mat-form-field class="col-xs-12">
+        <mat-select
+          #idServicioField="ngModel"
+          name="idservicio"
+          [(ngModel)]="menu.idservicio"
+          required
+          placeholder="Seleccione un servicio"
+        >
+          <mat-option *ngFor="let t of tipo" [value]="t.idservicio">
+            {{ t.nombre }}
           </mat-option>
         </mat-select>
-        <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un tipo de servicio</mat-error>
+        <mat-error *ngIf="idServicioField.invalid"
+          >Debe seleccionar un servicio</mat-error
+        >
       </mat-form-field>
-      
+    </div>
 
+    <!-- Tercera fila: Campo para subir la imagen -->
+    <div class="form-row">
+      <div class="form-group file-group">
+        <label for="imagen">Seleccione la imagen:</label>
+        <input
+          id="imagen"
+          type="file"
+          (change)="onNewImageSelected($event)"
+        />
+      </div>
+    </div>
 
-      <button [routerLink]="['/listaMenus']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
-      <button  [disabled]="!tipoForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit" >Agregar</button>
-    </form>
-  </div>
-  
+    <!-- Fila de botones -->
+    <div class="button-row">
+      <button
+        [routerLink]="['/listaMenus']"
+        mat-raised-button
+        color="default"
+        type="button"
+        class="cancel-button"
+      >
+        Cancelar
+      </button>
 
+      <button
+        [disabled]="!tipoForm.form.valid"
+        mat-raised-button
+        color="primary"
+        type="submit"
+        class="submit-button"
+      >
+        Agregar
+      </button>
+    </div>
+  </form>
+</div>

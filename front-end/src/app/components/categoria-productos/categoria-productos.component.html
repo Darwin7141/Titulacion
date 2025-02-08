@@ -1,0 +1,22 @@
+<div class="content">
+    <h2>AGREGAR CATEGORÍA</h2>
+    <form #categoriaForm="ngForm" (ngSubmit)="agregar()">
+  
+      
+  
+      <mat-form-field class="col-xs-12">
+        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="cat.categoria" required placeholder="Nombre" autofocus>
+        <mat-error *ngIf="nombreField.invalid">El nombre de la categoría es requerido</mat-error>
+      </mat-form-field>
+  
+      
+  
+      
+  
+  
+      <button [routerLink]="['/listaCategorias']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
+      <button [disabled]="!categoriaForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit">Agregar</button>
+    </form>
+  </div>
+  
+

@@ -32,6 +32,7 @@
           <th>Nombre</th>
           <th>Stock</th>
           <th>Proveedor</th>
+          <th>Categoria</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -41,6 +42,7 @@
           <td>{{ prod.nombre }}</td>
           <td>{{ prod.stock }}</td>
           <td>{{ prod.proveedor.nombre }}</td>
+          <td>{{ prod.categorias.categoria }}</td>
     
           <td>
             <button mat-icon-button color="primary" (click)="editarProducto(prod)">
@@ -98,16 +100,14 @@
         </div>
   
         <div class="form-actions">
-          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="button"  (click)="cancelarEdicion()">Cancelar</button>
           <button type="submit">Guardar</button>
         </div>
       </form>
     </div>
   
     <!-- Botón para agregar empleado -->
-    <div class="add-icon">
-      <button mat-fab color="primary" [routerLink]="['/productos']">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
+    <button mat-fab color="primary" [routerLink]="['/productos/categoria', idCatParam]">
+      <mat-icon>add</mat-icon>
+    </button>
   </div>

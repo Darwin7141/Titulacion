@@ -1,33 +1,115 @@
-<div class="content">
-    <h2>AGREGAR SERVICIO</h2>
-    <form #tipoForm="ngForm" (ngSubmit)="agregar()">
-  
-      
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="servicio.nombre" required placeholder="Nombre" autofocus>
-        <mat-error *ngIf="nombreField.invalid">El nombre del servicio es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #desField="ngModel" name="descripcion" [(ngModel)]="servicio.descripcion" required placeholder="Descripción" autofocus>
-        <mat-error *ngIf="desField.invalid">La descripción es requerida</mat-error>
-      </mat-form-field>
-  
-      
-      <mat-form-field class="col-xs-12">
-        <mat-select #idCargoField="ngModel" name="idtipo" [(ngModel)]="servicio.idtipo" required placeholder="Seleccione un tipo">
-          <mat-option *ngFor="let tipo of tipo" [value]="tipo.idtipo">
-            {{ tipo.nombre }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un tipo de servicio</mat-error>
-      </mat-form-field>
-      
-
-
-      <button [routerLink]="['/listaServicios']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
-      <button  [disabled]="!tipoForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit" >Agregar</button>
-    </form>
+<div class="agregar-servicio-container">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <mat-progress-spinner
+      mode="indeterminate"
+      color="accent"
+      diameter="50">
+    </mat-progress-spinner>
+    <p>Procesando...</p>
   </div>
   
+  <h2>AGREGAR SERVICIO</h2>
+  <form #tipoForm="ngForm" (ngSubmit)="agregar()">
+    <div class="form-row">
+      <mat-form-field class="col-xs-12">
+        <input
+          matInput
+          type="text"
+          #nombreField="ngModel"
+          name="nombre"
+          [(ngModel)]="servicio.nombre"
+          required
+          placeholder="Nombre"
+          autofocus
+        />
+        <mat-error *ngIf="nombreField.invalid"
+          >El nombre del servicio es requerido</mat-error
+        >
+      </mat-form-field>
+
+      <mat-form-field class="col-xs-12">
+        <input
+          matInput
+          type="text"
+          #desField="ngModel"
+          name="descripcion"
+          [(ngModel)]="servicio.descripcion"
+          required
+          placeholder="Descripción"
+        />
+        <mat-error *ngIf="desField.invalid"
+          >La descripción es requerida</mat-error
+        >
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field class="col-xs-12">
+        <mat-select
+          #idTipoField="ngModel"
+          name="idtipo"
+          [(ngModel)]="servicio.idtipo"
+          required
+          placeholder="Seleccione un tipo"
+        >
+          <mat-option *ngFor="let t of tipo" [value]="t.idtipo">
+            {{ t.nombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="idTipoField.invalid"
+          >Debe seleccionar un tipo de servicio</mat-error
+        >
+      </mat-form-field>
+
+      <mat-form-field class="col-xs-12">
+        <mat-select
+          #idEstadoField="ngModel"
+          name="idestado"
+          [(ngModel)]="servicio.idestado"
+          required
+          placeholder="Seleccione un estado"
+        >
+          <mat-option *ngFor="let est of estados" [value]="est.idestado">
+            {{ est.estado }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="idEstadoField.invalid"
+          >Debe seleccionar un estado</mat-error
+        >
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group file-group">
+        <label for="imagen">Seleccione la imagen:</label>
+        <input
+          id="imagen"
+          type="file"
+          (change)="onNewImageSelected($event)"
+        />
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button
+        [routerLink]="['/listaServicios']"
+        mat-raised-button
+        color="default"
+        type="button"
+        class="cancel-button"
+      >
+        Cancelar
+      </button>
+
+      <button
+        [disabled]="!tipoForm.form.valid"
+        mat-raised-button
+        color="primary"
+        type="submit"
+        class="submit-button"
+      >
+        Agregar
+      </button>
+    </div>
+  </form>
+</div>

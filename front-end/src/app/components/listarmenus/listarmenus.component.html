@@ -1,5 +1,13 @@
 <div class="clientes-container">
     <h2>Lista de Menús</h2>
+    <div *ngIf="isLoading" class="loading-overlay">
+      <mat-progress-spinner
+        mode="indeterminate"
+        color="accent"
+        diameter="50">
+      </mat-progress-spinner>
+      <p>Procesando...</p>
+    </div>
   
     <!-- Campo de búsqueda -->
     <div class="search-bar">
@@ -32,7 +40,8 @@
           <th>Nombre</th>
           <th>Descripción</th>
           <th>Precio</th>
-          <th>Tipo</th>
+          <th>Servicio</th>
+          <th>Muestra</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -42,7 +51,16 @@
           <td>{{ menu.nombre }}</td>
           <td>{{ menu.descripcion }}</td>
           <td>{{ menu.precio }}</td>
-          <td>{{ menu.tipo.nombre }}</td>
+          <td>{{ menu.servicio.nombre }}</td>
+          <td>
+            <img
+              *ngIf="menu.fotografiaUrl"
+              [src]="menu.fotografiaUrl"
+              alt="Imagen de {{ menu.nombre }}"
+              width="100"
+              height="100"
+            />
+          </td>
           
           <td>
             <button mat-icon-button color="primary" (click)="editarMenus(menu)">
@@ -102,13 +120,33 @@
         
         <div class="form-group">
           <mat-form-field class="col-xs-12">
-            <mat-select #idCargoField="ngModel" name="idtipo" [(ngModel)]="menuSeleccionado.idtipo" required placeholder="Seleccione un tipo">
-              <mat-option *ngFor="let tipo of tipo" [value]="tipo.idtipo">
+            <mat-select #idCargoField="ngModel" name="idservicio" [(ngModel)]="menuSeleccionado.idservicio" required placeholder="Seleccione un servicio">
+              <mat-option *ngFor="let tipo of tipo" [value]="tipo.idservicio">
                 {{ tipo.nombre }}
               </mat-option>
             </mat-select>
-            <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un tipo</mat-error>
+            <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un servicio</mat-error>
           </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <label>Muestra (imagen actual)</label>
+          <div *ngIf="menuSeleccionado.fotografiaUrl">
+            <img
+              [src]="menuSeleccionado.fotografiaUrl"
+              alt="Imagen de {{ menuSeleccionado.nombre }}"
+              width="120"
+              height="80"
+            />
+          </div>
+
+          <!-- Campo para seleccionar una nueva imagen -->
+          <label for="nuevaImagen">Cambiar imagen:</label>
+          <input
+            id="nuevaImagen"
+            type="file"
+            (change)="onNewImageSelected($event)"
+          />
         </div>
   
         <div class="form-actions">

@@ -1,0 +1,35 @@
+
+<div class="registro-container">
+    <h1>Registro de Precliente</h1>
+    <form (ngSubmit)="agregar()" class="formulario-registro">
+      <div class="form-group">
+        <label for="ci">Cédula</label>
+        <input type="text" id="ci" [(ngModel)]="registro.ci" name="ci" placeholder="Ingrese su cédula" required />
+      </div>
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" [(ngModel)]="registro.nombre" name="nombre" placeholder="Ingrese su nombre" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="text" id="telefono" [(ngModel)]="registro.telefono" name="telefono" placeholder="Ingrese su teléfono" required />
+      </div>
+      <div class="form-group">
+        <label for="direccion">Dirección</label>
+        <input type="text" id="direccion" [(ngModel)]="registro.direccion" name="direccion" placeholder="Ingrese su dirección" required />
+      </div>
+      <div class="form-group">
+        <label for="correo">Correo Electrónico</label>
+        <input type="email" id="correo" [(ngModel)]="registro.correo" name="correo" placeholder="Ingrese su correo electrónico" required />
+      </div>
+      <div class="form-group">
+        <label for="contrasenia">Contraseña</label>
+        <input type="password" id="contrasenia" [(ngModel)]="registro.contrasenia" name="contrasenia" placeholder="Ingrese su contraseña" required />
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn-submit">Registrar</button>
+      </div>
+    </form>
+  </div>
+  

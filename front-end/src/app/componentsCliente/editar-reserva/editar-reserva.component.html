@@ -1,0 +1,93 @@
+<div class="container-editar">
+  <h2>Editar Reserva</h2> <!-- Mostrar el número de la reserva, basado en el índice -->
+
+  <!-- Formulario de cabecera -->
+  <div>
+    <label>Fecha del evento:</label>
+    <input 
+      type="date"
+      [(ngModel)]="reserva.fechaevento"
+      (change)="recalcularCabecera()" 
+    />
+  </div>
+  <div>
+    <label>Dirección del evento:</label>
+    <input 
+      type="text"
+      [(ngModel)]="reserva.direccionevento"
+      (input)="recalcularCabecera()"
+    />
+  </div>
+
+  <hr>
+
+  <!-- Tabla de detalles -->
+  <h3></h3>
+  <button (click)="agregarDetalle()" class="add-button">
+    <i class="fa fa-plus"></i> Agregar Menú
+  </button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Menú</th>
+        <th>Cantidad</th>
+        <th>PrecioUnit</th>
+        <th>Subtotal</th>
+      
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let d of reserva.detalles; let i = index">
+        <td>
+          <select 
+            [(ngModel)]="d.idmenu"
+            (change)="onMenuSelectChange(i, d.idmenu)"
+            [ngModelOptions]="{standalone: true}"
+          >
+            <option value="">-- Seleccione --</option>
+            <option *ngFor="let m of menusDisponibles" [value]="m.idmenu">
+              {{ m.nombre }}
+            </option>
+          </select>
+        </td>
+        <td>
+          <input 
+            type="number" 
+            [(ngModel)]="d.cantpersonas" 
+            (input)="onCantidadChange(i, d.cantpersonas)"
+            [ngModelOptions]="{standalone: true}"
+          />
+        </td>
+        <td>
+          {{ d.preciounitario }}
+        </td>
+        <td>
+          {{ d.subtotal }}
+        </td>
+        <td>
+          <!-- Botón de eliminar menú -->
+          <button type="button" class="delete-button" (click)="quitarDetalle(i)">
+            <i class="fa fa-trash"></i> 
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Total: {{ reserva.total }}</strong></p>
+  <p><strong>Cant.Pers: {{ reserva.cantpersonas }}</strong></p>
+
+  <hr>
+
+  <!-- Botón para guardar -->
+  <div class="action-buttons">
+    <button (click)="guardarEdicion()" class="save-button">
+      <i class="fa fa-save"></i> Guardar
+    </button>
+    <button (click)="cancelarEdicion()" class="cancel-button">
+      <i class="fa fa-times"></i> Cancelar
+    </button>
+  </div>
+</div>
+

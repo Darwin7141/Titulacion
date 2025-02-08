@@ -2,7 +2,7 @@
 const modelos = require('../models'); // Importar los modelos
 
 async function create(req, res) {
-  const { nombre, stock, codigoproveedor} = req.body;
+  const { nombre, stock, codigoproveedor, idcategoria} = req.body;
   if (stock == null || isNaN(stock)) {
     return res.status(400).send({ message: 'El campo "stock" es requerido y debe ser un número.' });
 
@@ -34,7 +34,8 @@ if (!regex.test(nextCodigo)) {
           idproducto: nextCodigo,
           nombre,
           stock,
-          codigoproveedor
+          codigoproveedor,
+          idcategoria
          
       });
 
@@ -49,7 +50,7 @@ if (!regex.test(nextCodigo)) {
 
 async function update(req, res) {
   const { idproducto } = req.params; // Código del empleado desde los parámetros de la URL
-  const { nombre, stock, codigoproveedor } = req.body; // Datos a actualizar
+  const { nombre, stock, codigoproveedor, idcategoria} = req.body; // Datos a actualizar
 
   try {
       
@@ -64,6 +65,7 @@ async function update(req, res) {
           nombre: nombre || productos.nombre,
           stock : stock || productos. stock,
           codigoproveedor : codigoproveedor || productos.codigoproveedor,
+          idcategoria : idcategoria || productos. idcategoria,
           
       });
 
@@ -133,6 +135,12 @@ function getAll(req, res) {
           as: 'proveedor', // Este alias debe coincidir con el definido en el modelo
           attributes: ['nombre'], // Seleccionar solo el campo necesario
         },
+
+        {
+            model: modelos.categoria_productos,
+            as: 'categorias', // Este alias debe coincidir con el definido en el modelo
+            attributes: ['categoria'], // Seleccionar solo el campo necesario
+          },
       ],
 
     order: [['idproducto', 'ASC']] // Ordenar por codigocliente en orden ascendente
@@ -149,9 +157,46 @@ function getAll(req, res) {
     });
 }
 
+async function getByCategoria(req, res) {
+    const { idcategoria } = req.params;
+  
+    try {
+      const productos = await modelos.productos.findAll({
+        where: { idcategoria: idcategoria },
+        include: [
+          {
+            model: modelos.proveedor,
+            as: 'proveedor',
+            attributes: ['nombre'],
+          },
+          {
+            model: modelos.categoria_productos,
+            as: 'categorias',
+            attributes: ['categoria'],
+          }
+        ],
+        order: [['idproducto', 'ASC']]
+      });
+  
+      if (productos.length === 0) {
+        return res.status(404).send({ message: 'No se encontraron productos en esta categoría.' });
+      }
+  
+      res.status(200).send(productos);
+    } catch (err) {
+      console.error('Error al obtener productos por categoría:', err);
+      res.status(500).send({
+        message: 'Ocurrió un error al obtener productos por categoría.',
+        error: err.message
+      });
+    }
+  }
+  
+
 module.exports = {
     create,
     update,
     eliminar,
-    getAll
+    getAll,
+    getByCategoria
   };

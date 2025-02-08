@@ -47,7 +47,7 @@ function update(req, res) {
 
       // Actualizar los datos del cliente
       cargos.update({
-        idcargo: idcargo || cargos.ci,
+        idcargo: idcargo || cargos.idcargo,
         nombrecargo: nombrecargo|| cargos.nombrecargo,
         descripcion: descripcion || cargos.descripcion,
       

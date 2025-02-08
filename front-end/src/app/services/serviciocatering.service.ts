@@ -45,4 +45,12 @@ export class ServiciocateringService {
     return this.http.delete<any>(`${this.url}servicio/${idservicio}`);
   }
   
-}
+  subirImagenServicio(file: File, idServicio: string) {
+    const formData = new FormData();
+    // El nombre 'foto' es fundamental para que el backend lo reciba en req.files.foto
+    formData.append('foto', file);
+  
+    const url = `http://localhost:8010/api/upload-fotografia/${idServicio}`;
+    return this.http.post<any>(url, formData);
+  }
+}  

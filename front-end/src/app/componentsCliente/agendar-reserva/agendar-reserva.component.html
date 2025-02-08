@@ -1,0 +1,122 @@
+<div class="container-agendar">
+  <h2>Agendar Reserva</h2>
+
+  <form #reservaForm="ngForm" (ngSubmit)="generarReserva()">
+    <!-- === CAMPOS DE DATOS PERSONALES Y PRECLIENTE === -->
+    <div>
+      <label>Cédula:</label>
+      <input type="text" [(ngModel)]="formReserva.ci" name="ci" disabled />
+    </div>
+    <div>
+      <label>Nombre:</label>
+      <input type="text" [(ngModel)]="formReserva.nombre" name="nombre" disabled />
+    </div>
+    <div>
+      <label>Teléfono:</label>
+      <input type="text" [(ngModel)]="formReserva.telefono" name="telefono" disabled />
+    </div>
+    <div>
+      <label>Dirección:</label>
+      <input type="text" [(ngModel)]="formReserva.direccion" name="direccion" disabled />
+    </div>
+    <div>
+      <label>Correo:</label>
+      <input type="text" [(ngModel)]="formReserva.e_mail" name="e_mail" disabled />
+    </div>
+
+    <!-- === CAMPOS DE LA RESERVA (fecha, direccionevento, etc.) === -->
+    <div>
+      <label>Fecha del Evento:</label>
+      <input
+        type="datetime-local"
+        [(ngModel)]="formReserva.fechaevento"
+        name="fechaevento"
+        required
+      />
+    </div>
+    <div>
+      <label>Dirección del Evento:</label>
+      <input
+        type="text"
+        [(ngModel)]="formReserva.direccionevento"
+        name="direccionevento"
+        required
+      />
+    </div>
+
+    <hr />
+
+    <!-- === SELECCIONAR MENÚ E INGRESAR CANTIDAD === -->
+    <h3>Seleccionar Menú</h3>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <label>Menú:</label>
+      <select #selectMenu>
+        <option value="">-- Seleccione --</option>
+        <option *ngFor="let m of menus" [value]="m.idmenu">
+          {{ m.nombre }}
+        </option>
+      </select>
+
+      <label>Cantidad:</label>
+      <input type="number" #cantRef style="width: 4rem;" />
+
+      <!-- Ícono para Agregar -->
+      <button
+        type="button"
+        (click)="agregarMenuDesdeSelect(selectMenu.value, cantRef.value)"
+        class="icon-button"
+      >
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+
+    <hr />
+
+    <!-- === TABLA DE MENÚS SELECCIONADOS === -->
+    <h3>Menús Seleccionados</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Menú</th>
+          <th>Servicio</th>
+          <th>Precio Unit.</th>
+          <th>Cant.Personas</th>
+          <th>Subtotal</th>
+          <!-- Sin columna "Quitar" -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sel of menusSeleccionados; let i = index">
+          <td>{{ sel.nombre }}</td>
+          <td>{{ sel.servicioName }}</td>
+          <td>{{ sel.precioUnitario }}</td>
+          <td>{{ sel.cantpersonas }}</td>
+          <td>{{ sel.subtotal }}</td>
+          <!-- Ícono Quitar dentro de la última celda -->
+          <td>
+            <button
+              type="button"
+              class="icon-button danger"
+              (click)="quitarMenuSeleccionado(i)"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Total General: {{ formReserva.total }}</strong></p>
+
+    <hr />
+
+    <!-- === BOTÓN PARA GENERAR RESERVA === -->
+    <button
+      type="submit"
+      [disabled]="!reservaForm.form.valid"
+      class="generate-button"
+    >
+      Generar Reserva
+    </button>
+  </form>
+</div>

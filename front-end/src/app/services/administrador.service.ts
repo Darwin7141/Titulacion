@@ -43,4 +43,17 @@ export class AdministradorService {
     return this.http.delete<any>(`${this.url}administrador/${codigoadmin}`);
   }
   
+  verificarCedula(ci: string): Observable<any> {
+    return this.http.get(`${this.url}admin/verificarCedula/${ci}`);
+  }
+  
+  verificarEmail(email: string): Observable<any> {
+    return this.http.get(`${this.url}admin/verificarEmail/${email}`);
+  }
+  
+  verificarTelefono(telefono: string): Observable<any> {
+    return this.http.get(`${this.url}admin/verificarTelefono/${telefono}`);
+  }
+
 }
+

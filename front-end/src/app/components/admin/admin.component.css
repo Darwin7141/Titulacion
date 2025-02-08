@@ -4,6 +4,7 @@ body {
   background-color: white; /* Cambia "white" por cualquier color que desees */
   font-family: 'Roboto', sans-serif; /* Opcional, para asegurar consistencia con tu fuente */
 }
+
 ul {
   list-style-type: none;
   margin: 0;
@@ -29,8 +30,6 @@ li a:hover {
   background-color: #111;
 }
 
-
-
 ul {
   border: 1px solid #e7e7e7;
   background-color: #f3f3f3;
@@ -44,6 +43,7 @@ li a {
   box-sizing: border-box;
 }
 
+/* Asegúrate de que no haya reglas duplicadas para 'body' */
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -60,7 +60,6 @@ body {
   background-color: #111;
   overflow-x: hidden;
 }
-
 
 /* Side navigation links */
 .sidenav a {
@@ -82,3 +81,7 @@ body {
   padding-left: 20px;
 }
 
+/* Nueva clase para submenús */
+.submenu {
+  margin-left: 15px; 
+}

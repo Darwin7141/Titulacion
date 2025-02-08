@@ -1,0 +1,170 @@
+/* ==========================
+   CONTENEDOR PRINCIPAL
+========================== */
+.container-agendar {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+}
+
+.container-agendar h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.container-agendar h3 {
+  margin: 25px 0 15px;
+  color: #333;
+  font-weight: normal;
+}
+
+/* ==========================
+   FORMULARIO
+========================== */
+.container-agendar form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Espaciado entre grupos de campos */
+}
+
+.container-agendar label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.container-agendar input,
+.container-agendar select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  background-color: #f8f8f8;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.container-agendar input:focus,
+.container-agendar select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.container-agendar hr {
+  border: none;
+  height: 1px;
+  background-color: #ddd;
+  margin: 20px 0;
+}
+
+/* Ajuste al contenedor donde están "Menú" y "Cantidad" */
+.container-agendar .menu-select-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap; /* Para pantallas pequeñas */
+}
+
+.container-agendar .menu-select-row select {
+  width: 180px; /* Ajusta según tu gusto */
+}
+
+/* Ajuste para el campo de cantidad */
+.container-agendar .menu-select-row input[type="number"] {
+  width: 80px; /* Más elegante que estilo inline */
+}
+
+/* ==========================
+   BOTONES E ÍCONOS
+========================== */
+/* Botón general de ícono */
+.icon-button {
+  padding: 8px 14px;
+  background-color: #007bff; 
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-flex; 
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.icon-button:hover {
+  background-color: #0056b3;
+}
+
+/* Versión "danger" (rojo) para el botón de Quitar */
+.icon-button.danger {
+  background-color: #dc3545;
+}
+.icon-button.danger:hover {
+  background-color: #c82333;
+}
+
+/* Generar Reserva - tamaño auto, no ocupa todo el ancho */
+
+
+.generate-button {
+  display: inline-block; /* Cambiar display a inline-block para que se ajuste al contenido */
+  width: auto;  /* Ancho automático para que el botón no ocupe todo el espacio */
+  max-width: 250px; /* Limitar el ancho máximo */
+  padding: 10px 20px;
+  margin: 15px auto; /* Centra el botón horizontalmente */
+  background-color: #28a745;
+  color: #fff;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+.generate-button:hover {
+  background-color: #218838;
+}
+
+/* ==========================
+   TABLA DE MENÚS SELECCIONADOS
+========================== */
+.container-agendar table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.container-agendar th,
+.container-agendar td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.container-agendar th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+/* Opcional: Para centrar las celdas si gustas */
+.container-agendar tbody td {
+  background-color: #fafafa;
+}
+
+.container-agendar p {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}

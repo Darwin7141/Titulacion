@@ -6,4 +6,5 @@ module.exports = (app) => {
     app.put('/api/productos/:idproducto',  productosController.update);
     app.delete('/api/productos/:idproducto', productosController.eliminar);
     app.get('/api/productos',  productosController.getAll);
+    app.get('/api/productos/categoria/:idcategoria', productosController.getByCategoria);
 };

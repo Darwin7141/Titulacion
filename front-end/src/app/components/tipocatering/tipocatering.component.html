@@ -15,14 +15,7 @@
       </mat-form-field>
   
       
-      <mat-form-field class="col-xs-12">
-        <mat-select #idCargoField="ngModel" name="idestado" [(ngModel)]="tipo.idestado" required placeholder="Seleccione un estado">
-          <mat-option *ngFor="let est of estados" [value]="est.idestado">
-            {{ est.estado }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un estado</mat-error>
-      </mat-form-field>
+      
       
 
 

@@ -32,8 +32,18 @@ module.exports = (sequelize, DataTypes) => {
         },
         updatedAt: {
             type: DataTypes.DATE
-        }
+        },
+        idprecliente: {
+            type: DataTypes.STRING
+        },
     });
+
+    cliente.associate = (models) => {
+        cliente.hasMany(models.reservas, {
+          foreignKey: 'codigocliente',
+          as: 'clientes',
+        });
+    }
 
     return cliente;
 };

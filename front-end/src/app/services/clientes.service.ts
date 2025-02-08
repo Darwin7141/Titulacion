@@ -42,10 +42,37 @@ export class ClientesService {
       return this.http.delete<any>(`${this.url}cliente/${codigocliente}`);
     }
 
+    verificarCedula(ci: string): Observable<any> {
+      return this.http.get(`${this.url}verificarCedula/${ci}`);
+    }
     
+    verificarEmail(email: string): Observable<any> {
+      return this.http.get(`${this.url}verificarEmail/${email}`);
+    }
+    
+    verificarTelefono(telefono: string): Observable<any> {
+      return this.http.get(`${this.url}verificarTelefono/${telefono}`);
+    }
+
+    buscarPorCedula(ci: string): Observable<any> {
+      return this.http.get<any>(`${this.url}cliente/porcedula/${ci}`);
+
+    }
+
+    buscarPorEmail(email: string): Observable<any> {
+      return this.http.get<any>(`${this.url}cliente/poremail/${email}`);
+
+    }
+
+    buscarPorTelefono(telefono: string): Observable<any> {
+      return this.http.get<any>(`${this.url}cliente/portelefono/${telefono}`);
+    }
+  
+  }
+  
 
     
-}
+
 
 
 

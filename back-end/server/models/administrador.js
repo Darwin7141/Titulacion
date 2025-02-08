@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         telefono: {
             type: DataTypes.CHAR
         },
+
+        contrasenia: {
+            type: DataTypes.STRING
+        },
     
     }, {
         tableName: 'administrador',  // Especificar el nombre de la tabla como 'cargo'

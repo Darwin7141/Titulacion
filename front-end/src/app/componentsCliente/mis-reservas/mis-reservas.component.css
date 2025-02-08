@@ -1,0 +1,115 @@
+/* Contenedor de las reservas */
+.container-mis-reservas {
+  max-width: 900px; /* No ocupará todo el ancho de la página */
+  margin: 20px auto; /* Centrado horizontalmente */
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Card de cada reserva */
+.reserva-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 30px;
+}
+
+h3 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* Tabla de detalles */
+table {
+  width: 100%;
+  margin-bottom: 20px;
+  border-collapse: collapse;
+}
+
+table th, table td {
+  text-align: center;
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f1f1f1;
+  font-weight: bold;
+}
+
+/* Botones de acción */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button i {
+  margin-right: 5px;
+}
+
+/* Botones de editar y eliminar */
+.edit-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #0056b3;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+/* Estilos para íconos */
+button i {
+  font-size: 18px; /* Tamaño adecuado para los íconos */
+}
+
+/* Responsividad para pantallas pequeñas */
+@media screen and (max-width: 768px) {
+  .container-mis-reservas {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .reserva-card {
+    padding: 15px;
+  }
+
+  table th, table td {
+    padding: 5px;
+    font-size: 14px;
+  }
+
+  button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}

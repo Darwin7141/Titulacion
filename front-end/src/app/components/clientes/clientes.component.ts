@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ClientesService } from '../../services/clientes.service';
+import { ValidacionesService } from '../../services/validaciones.service';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-clientes',
@@ -21,25 +23,109 @@ export class ClientesComponent implements OnInit {
     constructor(
       
       private clienteService: ClientesService,
+      private validaciones: ValidacionesService,
         private _router:Router) {}
   
     ngOnInit():void {
       
     }
-    agregar() {
-      this.clienteService.agregar(this.clientes).subscribe({
-        next: (response) => {
-         
-            localStorage.setItem('identity_user', JSON.stringify(response.usuario));
-            this._router.navigate(['/listaClientes']);
-          
-          // Aquí puedes manejar la respuesta, como guardar un token o redirigir al usuario
-        },
-        error: (err) => {
-          console.error('Error en enviar datos del cliente:', err);
-          // Aquí puedes manejar el error, como mostrar un mensaje al usuario
-        },
-      });
-    }
-  }
-
+   agregar() {
+       if (!this.validaciones.validarCedulaEcuador(this.clientes.ci)) {
+         Swal.fire({
+           icon: 'error',
+           title: 'Cédula no válida',
+           text: 'La cédula ingresada no es válida.',
+         });
+         return;
+       }
+     
+       if (!this.clientes.nombre.trim()) {
+         Swal.fire({
+           icon: 'error',
+           title: 'Nombre obligatorio',
+           text: 'El nombre es obligatorio.',
+         });
+         return;
+       }
+     
+       if (!this.clientes.direccion.trim()) {
+         Swal.fire({
+           icon: 'error',
+           title: 'Dirección obligatoria',
+           text: 'La dirección es obligatoria.',
+         });
+         return;
+       }
+     
+       if (!this.validaciones.validarEmail(this.clientes.e_mail)) {
+         Swal.fire({
+           icon: 'error',
+           title: 'Correo no válido',
+           text: 'El correo electrónico no es válido.',
+         });
+         return;
+       }
+     
+       if (!this.validaciones.validarTelefono(this.clientes.telefono)) {
+         Swal.fire({
+           icon: 'error',
+           title: 'Teléfono no válido',
+           text: 'El número de teléfono debe tener 10 dígitos y comenzar con 0.',
+         });
+         return;
+       }
+     
+       // Lógica de verificación y envío
+       this.clienteService.verificarCedula(this.clientes.ci).subscribe((resp) => {
+         if (resp.existe) {
+           Swal.fire({
+             icon: 'warning',
+             title: 'Cédula duplicada',
+             text: 'La cédula ingresada ya existe en la base de datos.',
+           });
+           return;
+         }
+         this.clienteService.verificarEmail(this.clientes.e_mail).subscribe((resp) => {
+           if (resp.existe) {
+             Swal.fire({
+               icon: 'warning',
+               title: 'Correo duplicado',
+               text: 'El correo ingresado ya existe en la base de datos.',
+             });
+             return;
+           }
+           this.clienteService.verificarTelefono(this.clientes.telefono).subscribe((resp) => {
+             if (resp.existe) {
+               Swal.fire({
+                 icon: 'warning',
+                 title: 'Teléfono duplicado',
+                 text: 'El número de teléfono ingresado ya existe en la base de datos.',
+               });
+               return;
+             }
+     
+             // Si todo es válido, agregar el administrador
+             this.clienteService.agregar(this.clientes).subscribe({
+               next: (response) => {
+                 Swal.fire({
+                   icon: 'success',
+                   title: 'Éxito',
+                   text: 'Cliente agregado correctamente.',
+                 }).then(() => {
+                   this._router.navigate(['/listaClientes']);
+                 });
+               },
+               error: (err) => {
+                 console.error('Error en enviar datos del administrador:', err);
+                 Swal.fire({
+                   icon: 'error',
+                   title: 'Error',
+                   text: 'Ocurrió un error al agregar el administrador.',
+                 });
+               },
+             });
+           });
+         });
+       });
+     }
+   }

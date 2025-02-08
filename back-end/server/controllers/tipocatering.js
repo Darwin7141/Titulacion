@@ -2,7 +2,7 @@
 const modelos = require('../models'); // Importar los modelos
 
 async function create(req, res) {
-  const { nombre, descripcion, idestado } = req.body;
+  const { nombre, descripcion } = req.body;
   console.log(req.body);
 
   try {
@@ -24,7 +24,7 @@ async function create(req, res) {
           idtipo: nextCodigo,
           descripcion,
           nombre,
-          idestado
+          
           
           
       });
@@ -54,7 +54,7 @@ async function update(req, res) {
           
           nombre: nombre || tipo.nombre,
           descripcion: descripcion || tipo.descripcion,
-          idestado: idestado || tipo.idestado,
+          
           
       });
 
@@ -115,13 +115,7 @@ function eliminar(req, res) {
 
 function getAll(req, res) {
     modelos.tipocatering.findAll({
-      include: [
-        {
-          model: modelos.estadocatering,
-          as: 'estado', // Este alias debe coincidir con el definido en el modelo
-          attributes: ['estado'], // Seleccionar solo el campo necesario
-        },
-      ],
+      
       
       order: [['idtipo', 'ASC']], // Ordenar por idtipo en orden ascendente
     })

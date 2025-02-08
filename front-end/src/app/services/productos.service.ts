@@ -41,6 +41,11 @@ export class ProductosService {
   
   eliminarProducto(idproducto: string): Observable<any> {
     return this.http.delete<any>(`${this.url}productos/${idproducto}`);
+    
+  }
+
+  getProductoByCategoria(idcategoria: number | string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}productos/categoria/${idcategoria}`);
   }
   
 }

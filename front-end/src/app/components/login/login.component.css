@@ -1,47 +1,422 @@
+/* 1) IMPORTAR FUENTE OPEN SANS */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 
-.container-fluid {
-  height: 100vh;
+/* 2) Quitar márgenes globales y aplicar la fuente */
+.login-page-bg {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+  color: #fff; /* Texto blanco base (lo iremos ajustando por secciones) */
+
+  /* 3) Fondo global para toda la página */
+  background: url('https://images.pexels.com/photos/612790/pexels-photo-612790.jpeg?auto=compress&cs=tinysrgb&w=600') 
+              no-repeat center center fixed;
+  background-size: cover;
+  /* Podrías usar “background-attachment: fixed;” para efecto parallax */
+}
+
+/* 4) Barra de navegación */
+.navbar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 10); /* Un negro semitransparente */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  z-index: 999;
+}
+
+.nav-menu ul {
+  display: flex;
+  list-style: none;
+  margin: 0; padding: 0;
+}
+.nav-menu li {
+  margin-right: 20px;
+}
+.nav-menu a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+.nav-menu a:hover {
+  color: #ffd700; /* Un dorado al hover, por ejemplo */
+}
+
+.nav-logo img {
+  max-height: 50px;
+  border-radius: 40px;
+}
+
+.logo-sesion img {
+  max-height: 90px;
+  border-radius: 50px;
+}
+
+/* Deja espacio para que el contenido no quede bajo la navbar */
+body > header + * {
+  margin-top: 70px;
+}
+
+/* 5) HERO CONTAINER (sin fondo local, usa el global) */
+.hero-container {
+  display: flex;
+  min-height: 100vh;
+  padding: 40px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* hero-content: contenedor para tu texto */
+.hero-content {
+  flex: 2;
+}
+.hero-text {
+  background-color: rgba(0,0,0,0.5);
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+.hero-text h1 {
+  font-size: 48px;
+  margin: 0 0 10px;
+  font-weight: 600;
+  
+}
+.hero-text p {
+  font-size: 18px;
+  margin: 0 0 10px;
+  
+}
+.hero-text small {
+  font-size: 14px;
+}
+
+/* 6) LOGIN PANEL a la derecha */
+.login-panel {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-.content-login {
-  background-color: #ffffff;
+.login-panel-content {
+  background-color: rgba(255, 255, 255, 0.486);
   padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  width: 80%;
+  max-width: 320px;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+
+  display: flex;
+  flex-direction: column;
   text-align: center;
+  color: #333; /* Texto oscuro dentro del panel */
 }
-
-.content-login h2 {
-  margin-bottom: 20px;
+.login-panel-content h2 {
+  margin-top: 0; margin-bottom: 5px;
   font-size: 24px;
-  color: #333;
+  color: #000;
+}
+.login-panel-content h3 {
+  margin: 5px 0 15px;
+  font-size: 18px;
+  color: #555;
+}
+.login-panel-content form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+}
+.login-panel-content form mat-form-field {
+  width: 100%;
+  margin-bottom: 10px;
+  
 }
 
-.mat-form-field {
-  display: block;
-  margin-bottom: 15px;
-}
+
 
 .btn-ingreso {
-  background-color: #1976d2;
-  color: #ffffff;
-  padding: 10px 15px;
+  background-color: #333;
+  color: #fff;
+  width: 100%;
+  padding: 10px;
   font-size: 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.3s;
+}
+.btn-ingreso:hover {
+  background-color: #555; 
+}
+.login-panel-content a {
+  color: #1976d2; 
+  text-decoration: none;
+}
+.login-panel-content a:hover {
+  text-decoration: underline;
+}
+
+/* 7) SOBRE NOSOTROS, ajustando para que se vea el fondo global en vez de fondo negro */
+.sobre-nosotros-container {
+  background-color: transparent; /* Deja ver el fondo global */
+  color: #fff;
+  padding: 60px 20px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* Para destacar en fondo claro */
+}
+.sobre-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.sobre-text {
+  flex: 1;
+  padding: 20px;
+}
+.sobre-titulo {
+  font-size: 48px;
+  margin: 0 0 10px;
+  font-weight: 600;
+  
+}
+.sobre-subtitulo {
+  font-size: 48px;
+  font-weight: normal;
+}
+.sobre-text p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+  text-align: justify;
+}
+.sobre-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+.sobre-image img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+/* 8) SERVICIOS => retira la superposición con background negro */
+.servicios-container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  /* Sin background: deja ver el global */
+}
+.servicios-overlay {
+  background-color: rgba(0,0,0,0.6);
+  color: #fff;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.servicios-titulo {
+  text-align: center;
+  font-size: 48px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+.servicios-descripcion {
+  text-align: center;
+  font-size: 18px;
+  max-width: 800px;
+  margin: 0 auto 40px auto;
+  line-height: 1.5;
+}
+.servicios-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px; 
+}
+.servicio-card {
+  background-color: rgba(0,0,0,0.7);
+  border-radius: 12px;
+  text-align: center;
+  width: 300px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: transform 0.3s;
+}
+.servicio-card:hover {
+  transform: scale(1.03);
+}
+.servicio-card-imagen {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+.servicio-card-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.servicio-card h3 {
+  margin: 10px 0;
+  font-size: 22px;
+  color: #ffd700; /* color dorado */
+}
+.servicio-card p {
+  font-size: 16px;
+  color: #ddd;
+  margin: 0;
+  line-height: 1.4;
+}
+.dots-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+.dot {
+  width: 12px; 
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 5px;
+  background-color: #bbb;
   cursor: pointer;
 }
-
-.btn-ingreso:hover {
-  background-color: #155a9b;
+.dot.active {
+  background-color: #ffd700;
 }
 
-.btn-ingreso:disabled {
-  background-color: #b3cde0;
-  cursor: not-allowed;
+/* 9) Sección CONTÁCTANOS */
+.planes-container {
+  min-height: 100vh;
+  /* Deja ver el fondo global */
+  padding: 60px 20px;
 }
-
+.planes-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
   
+  color: #ffffff; /* dorado o similar */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+  font-size: 48px;
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+.planes-container p {
+  text-align: center;
+  color: #fff;
+  max-width: 600px;
+  margin: 0 auto 40px;
+  line-height: 1.5;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+}
+.form-contacto {
+  max-width: 600px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.486);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.form-group {
+  margin-bottom: 15px;
+  color: #333;
+}
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.btn-enviar {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.btn-enviar:hover {
+  background-color: #555;
+}
+
+/* 10) Footer */
+.footer-container {
+  background-color: rgba(0,0,0,10);
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+.footer-content p {
+  margin: 0;
+  line-height: 1.5;
+}
+.footer-icons {
+  margin-top: 10px;
+}
+.social-icon {
+  width: 32px;
+  height: 32px;
+  margin: 0 8px;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+.social-icon:hover {
+  opacity: 0.8;
+}
+
+.section-box {
+  background-color: rgba(0, 0, 0, 0.5); /* Gris oscuro translúcido */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.download-pdf-container {
+  text-align: center;      /* centrar contenido inline (el botón) */
+  margin-top: 20px;        /* separación superior */
+}
+
+/* Estilos del botón */
+.pdf-btn {
+  background-color: #25201d;  /* color acorde a la web */
+  color: #ffffff;             /* texto en blanco */
+  padding: 10px 20px;
+  border: none;               /* sin borde */
+  border-radius: 8px;         /* esquinas redondeadas */
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  
+}
+
+/* Efecto hover */
+.pdf-btn:hover {
+  background-color: #080705;   /* un tono más oscuro al pasar el mouse */
+}

@@ -1,12 +1,100 @@
-.content {
-    background: #eee; /* Establece el fondo del elemento con el color gris claro #eee */
-    position: absolute; /* Posiciona el elemento en relación a sus ancestros */
-    left: 50%; /* Ubica el elemento al 50% del ancho de su contenedor padre */
-    top: 50%; /* Ubica el elemento al 50% de la altura de su contenedor padre */
-    transform: translate(-50%, -50%); /* Desplaza el elemento hacia la izquierda y hacia arriba en un 50% de su propio ancho y alto, centrándolo así */
-    padding: 50px; /* Añade un relleno interno de 50 píxeles en todos los lados del elemento */
-  }
-  
-  .btn {
-    margin: 30px 5px; /* Establece los márgenes del elemento: 30 píxeles arriba y abajo, 5 píxeles a la izquierda y a la derecha */
-  }
+.agregar-servicio-container {
+  max-width: 600px;            /* Limita el ancho máximo */
+  margin: 2rem auto;           /* Centra el contenedor vertical y horizontal */
+  padding: 2rem;               /* Espacio interno */
+  background-color: #ffffff;   /* Fondo blanco */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  border-radius: 8px;          /* Bordes redondeados */
+}
+
+.agregar-servicio-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem; /* Espacio horizontal/vertical entre items */
+  margin-bottom: 1rem;
+}
+
+/* Ajusta el mat-form-field para que crezcan uniformemente */
+.form-row mat-form-field {
+  flex: 1;
+}
+
+/* Estilos para el grupo que contiene la carga de archivo */
+.file-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.file-group label {
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+/* Fila de botones */
+.button-row {
+  display: flex;
+  justify-content: flex-end; /* Alinea los botones a la derecha */
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Opcional: estilizar botones */
+.cancel-button {
+  background-color: #f5f5f5;
+}
+
+.cancel-button:hover {
+  background-color: #e0e0e0;
+}
+
+
+.agregar-menu-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.agregar-menu-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-row mat-form-field {
+  flex: 1;
+}
+
+.file-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.file-group label {
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}

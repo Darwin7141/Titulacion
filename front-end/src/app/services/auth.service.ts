@@ -14,6 +14,15 @@ export class AuthService {
     return null; // En caso de que no estés en un entorno de navegador
   }
 
+  getToken() {
+    let token = localStorage.getItem("token");
+    if (token) {
+        return token;
+    } else {
+        return null;
+    }
+}
+
   logOut() {
     if (typeof window !== 'undefined' && localStorage) {
       localStorage.removeItem('identity_user');

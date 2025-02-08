@@ -26,7 +26,7 @@ export class UsuariosService {
       })
     };
 
-    return this.http.post<any>(this.url +"usuario", usuario, httpOptions);
+    return this.http.post<any>(this.url +"precliente", usuario, httpOptions);
   }
 
   editarUsuario(usuario: any): Observable<any> {
@@ -43,4 +43,15 @@ export class UsuariosService {
     return this.http.delete<any>(`${this.url}usuario/${idcuenta}`);
   }
   
+  verificarCedula(ci: string): Observable<any> {
+    return this.http.get(`${this.url}pre/verificarCedula/${ci}`);
+  }
+  
+  verificarEmail(email: string): Observable<any> {
+    return this.http.get(`${this.url}pre/verificarEmail/${email}`);
+  }
+  
+  verificarTelefono(telefono: string): Observable<any> {
+    return this.http.get(`${this.url}pre/verificarTelefono/${telefono}`);
+  }
 }

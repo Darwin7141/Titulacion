@@ -1,0 +1,41 @@
+<div class="container-mis-reservas">
+  <h2>Mis Reservas</h2>
+
+  <div *ngFor="let reserva of reservas; let i = index" class="reserva-card">
+    <h3>Reserva: Nro {{ i + 1 }}</h3> <!-- Cambié el texto a "Reserva: Nro X" -->
+    <p>Fecha: {{ reserva.fechaevento }}</p>
+    <p>Dirección: {{ reserva.direccionevento }}</p>
+    <p>Total: {{ reserva.total }}</p>
+
+    <!-- Subtabla de detalles -->
+    <table>
+      <thead>
+        <tr>
+          <th>Menú</th>
+          <th>Precio Unit.</th>
+          <th>Cant.</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let det of reserva.detalles">
+          <td>{{ det.menu?.nombre }}</td>
+          <td>{{ det.preciounitario }}</td>
+          <td>{{ det.cantpersonas }}</td>
+          <td>{{ det.subtotal }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Botones de acción: Editar, Eliminar -->
+    <div class="actions">
+      <button (click)="editarReserva(reserva.idreserva)" class="edit-button">
+        <i class="fa fa-edit"></i> Editar
+      </button>
+      <button (click)="eliminarReserva(reserva.idreserva)" class="delete-button">
+        <i class="fa fa-trash"></i> Eliminar
+      </button>
+    </div>
+    <hr />
+  </div>
+</div>

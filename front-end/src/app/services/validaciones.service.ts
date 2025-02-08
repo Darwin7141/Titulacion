@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ValidacionesService {
-
-  constructor() { }
+  constructor(private http: HttpClient) {}
 
   validarCedulaEcuador(cedula: string): boolean {
     if (cedula.length !== 10) {
@@ -13,9 +14,9 @@ export class ValidacionesService {
     }
 
     const digito_region = parseInt(cedula.substring(0, 2), 10);
-if (digito_region < 1 || digito_region > 24) {
-  return false;
-}
+    if (digito_region < 1 || digito_region > 24) {
+      return false;
+    }
 
     const ultimo_digito = parseInt(cedula.substring(9, 10));
     const pares = [1, 3, 5, 7].reduce((acc, cur) => acc + parseInt(cedula.substring(cur, cur + 1)), 0);
@@ -34,16 +35,24 @@ if (digito_region < 1 || digito_region > 24) {
   }
 
   validarEmail(email: string): boolean {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const re = /^[^\s@]+@gmail\.com$/;
     return re.test(email);
   }
 
   validarTelefono(telefono: string): boolean {
-    return /^0\d{9}$/.test(telefono); // Asegura que el teléfono tenga 10 dígitos y comience con 0
+    return /^0\d{9}$/.test(telefono);
   }
 
-  validarCodigoAdmin(codigo: string): boolean {
-    const regex = /^[A-Za-z][0-9]+$/;
-    return regex.test(codigo);
+  // Métodos para consultar si ya existe en la base de datos
+  cedulaExiste(cedula: string): Observable<boolean> {
+    return this.http.get<boolean>(`/api/validaciones/cedula/${cedula}`);
+  }
+
+  emailExiste(email: string): Observable<boolean> {
+    return this.http.get<boolean>(`/api/validaciones/email/${email}`);
+  }
+
+  telefonoExiste(telefono: string): Observable<boolean> {
+    return this.http.get<boolean>(`/api/validaciones/telefono/${telefono}`);
   }
 }

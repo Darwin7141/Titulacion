@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Inicio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@angular/material/prebuilt-themes/indigo-pink.css">
+</head>
+
+<body>
+  <div class="servicios-container">
+    <!-- Si no hay servicios -->
+    <div *ngIf="servicio.length === 0">
+      <p>No hay servicios disponibles en este momento.</p>
+    </div>
+  
+    <!-- Galería de imágenes (tarjetas) -->
+    <div
+      *ngFor="let s of servicio"
+      class="servicio-card"
+      (click)="verDetalles(s)"
+    >
+      <img
+        [src]="s.fotografiaUrl"
+        alt="Fotografía de {{ s.nombre }}"
+        class="servicio-imagen"
+      />
+      <!-- NUEVO: Nombre del servicio -->
+      <h4 class="servicio-nombre">{{ s.nombre }}</h4>
+    </div>
+  </div>
+  
+  <!-- MODAL: se muestra sólo si hay un servicioSeleccionado -->
+  <div class="modal-backdrop" *ngIf="servicioSeleccionado">
+    <div class="modal-content">
+      <!-- Botón para cerrar el modal -->
+      <button class="close-button" (click)="cerrarDetalles()">×</button>
+  
+      <!-- Título: nombre del servicio -->
+      <h3>{{ servicioSeleccionado.nombre }}</h3>
+  
+      <!-- Descripción del servicio -->
+      <p class="descripcion-servicio">
+        {{ servicioSeleccionado.descripcion }}
+      </p>
+  
+      <!-- Botón para mostrar menús -->
+      <button class="mostrar-menus-button" (click)="mostrarMenus()">
+        Mostrar Menús
+      </button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="mostrarServicioNoDisponibleModal">
+    <div class="modal-content">
+      <button class="close-button" (click)="cerrarModalNoDisponible()">×</button>
+  
+      <h3>Servicio no disponible</h3>
+      <p>Por el momento, este servicio no se encuentra disponible.</p>
+    </div>
+  </div>
+  
+  <script src="https://code.angularjs.org/1.8.2/angular.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@angular/material/bundles/material.umd.js"></script>
+  
+  <div class="content-admin">
+    <router-outlet></router-outlet>
+  </div>
+
+</body>
+</html>
+

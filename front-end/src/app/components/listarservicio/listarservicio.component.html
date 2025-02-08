@@ -1,4 +1,12 @@
 <div class="clientes-container">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <mat-progress-spinner
+      mode="indeterminate"
+      color="accent"
+      diameter="50">
+    </mat-progress-spinner>
+    <p>Procesando...</p>
+  </div>
     <h2>Lista de Servicios</h2>
   
     <!-- Campo de búsqueda -->
@@ -31,7 +39,9 @@
           <th>Código</th>
           <th>Nombre</th>
           <th>Descripción</th>
+          <th>Muestra</th>
           <th>Tipo</th>
+          <th>Estado</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -40,7 +50,19 @@
           <td>{{ serv.idservicio }}</td>
           <td>{{ serv.nombre }}</td>
           <td>{{ serv.descripcion }}</td>
+          <td>
+            <img
+              *ngIf="serv.fotografiaUrl"
+              [src]="serv.fotografiaUrl"
+              alt="Imagen de {{ serv.nombre }}"
+              width="100"
+              height="100"
+            />
+            <!-- Opcional: si no hay imagen o falla la carga -->
+           
+          </td>
           <td>{{ serv.tipo.nombre }}</td>
+          <td>{{ serv.estado.estado }}</td>
           
           <td>
             <button mat-icon-button color="primary" (click)="editarServicios(serv)">
@@ -89,6 +111,26 @@
         </div>
         
         <div class="form-group">
+          <label>Muestra (imagen actual)</label>
+          <div *ngIf="servSeleccionado.fotografiaUrl">
+            <img
+              [src]="servSeleccionado.fotografiaUrl"
+              alt="Imagen de {{ servSeleccionado.nombre }}"
+              width="120"
+              height="80"
+            />
+          </div>
+          
+          <label for="nuevaImagen">Cambiar imagen:</label>
+          <input
+            id="nuevaImagen"
+            type="file"
+            (change)="onNewImageSelected($event)"
+          />
+        </div>
+    
+
+        <div class="form-group">
           <mat-form-field class="col-xs-12">
             <mat-select #idCargoField="ngModel" name="idtipo" [(ngModel)]="servSeleccionado.idtipo" required placeholder="Seleccione un tipo">
               <mat-option *ngFor="let serv of tipo" [value]="serv.idtipo">
@@ -98,6 +140,23 @@
             <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un tipo</mat-error>
           </mat-form-field>
         </div>
+
+        <div class="form-group">
+          <mat-form-field class="col-xs-12">
+            <mat-select 
+              #idEstadoField="ngModel" 
+              name="idestado" 
+              [(ngModel)]="servSeleccionado.idestado" 
+              required 
+              placeholder="Seleccione un estado">
+              
+              <mat-option *ngFor="let est of estados" [value]="est.idestado">
+                {{ est.estado }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="idEstadoField.invalid">Debe seleccionar un estado</mat-error>
+          </mat-form-field>
+        </div> 
   
         <div class="form-actions">
           <button type="button" (click)="cancelarEdicion()">Cancelar</button>

@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         descripcion: {
             type: DataTypes.TEXT
+        },
+        imagen: {
+            type: DataTypes.STRING
+        },
+        idestado: {
+            type: DataTypes.INTEGER
         }
 
     }, {
@@ -25,6 +31,19 @@ module.exports = (sequelize, DataTypes) => {
           foreignKey: 'idtipo',
           as: 'tipo',
         });
+
+        servicio.belongsTo(models.menu, {
+            foreignKey: 'idservicio',
+            as: 'tipoServicios',
+          });
+
+          servicio.belongsTo(models.estadocatering, {
+            foreignKey: 'idestado',
+            as: 'estado',
+        });
+
+        
+        
       };
 
     

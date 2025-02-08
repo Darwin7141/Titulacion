@@ -1,67 +1,101 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductosService } from '../../services/productos.service';
 import { ProveedoresService } from '../../services/proveedores.service';
+import { CategoriaProductosService } from '../../services/categoria-productos.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-listarproductos',
-  standalone: false,
   
   templateUrl: './listarproductos.component.html',
-  styleUrl: './listarproductos.component.css'
+
+  styleUrls: ['./listarproductos.component.css'],
+  standalone: false,
 })
 export class ListarproductosComponent implements OnInit {
-  productos: any[] =[];
+  productos: any[] = [];
   prodFiltrados: any[] = [];
   prov: any[] = [];
+  cat: any[] = [];
   searchTerm: string = '';
   isEditMode: boolean = false;
   prodSeleccionado: any = null;
+  idCatParam: string | null = null;
 
   constructor(
     private proveedorService: ProveedoresService,
-    private productoService: ProductosService
-    ) {}
+    private productoService: ProductosService,
+    private categoriaService: CategoriaProductosService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
+    this.idCatParam = this.route.snapshot.paramMap.get('idCategoria');
+
+    // Cargar proveedores
     this.proveedorService.getProveedor().subscribe({
       next: (data) => {
-        this.prov = data; // Asigna los cargos a la lista
+        this.prov = data;
       },
       error: (err) => {
-        console.error('Error al obtener los proveedores:', err);
+        console.error('Error al obtener proveedores:', err);
       },
     });
-    this.obtenerProducto();
-    this.cargarLista();
+
+    // Cargar categorías
+    this.categoriaService.getCategoria().subscribe({
+      next: (data) => {
+        this.cat = data;
+      },
+      error: (err) => {
+        console.error('Error al obtener categorías:', err);
+      },
+    });
+
+    // Cargar productos (filtrados o no)
+    this.loadProducts();
   }
 
-  obtenerProducto(): void {
-    this.productoService.getProducto().subscribe({
-      next: (data) => {
-        this.productos= data;
-        this.prodFiltrados = data;
-      },
-      error: (err) => {
-        console.error('Error al obtener los productos:', err);
-      },
-    });
+  // Método centralizado para filtrar o no según la categoría
+  private loadProducts(): void {
+    if (this.idCatParam) {
+      this.productoService.getProductoByCategoria(this.idCatParam).subscribe({
+        next: (data) => {
+          this.productos = data;
+          this.prodFiltrados = data;
+        },
+        error: (err) => {
+          console.error('Error al obtener productos de la categoría:', err);
+        },
+      });
+    } else {
+      this.productoService.getProducto().subscribe({
+        next: (data) => {
+          this.productos = data;
+          this.prodFiltrados = data;
+        },
+        error: (err) => {
+          console.error('Error al obtener productos:', err);
+        },
+      });
+    }
   }
 
   buscarProducto(): void {
-    const searchTermLower = this.searchTerm.trim().toLowerCase(); // Normalizamos el término de búsqueda
+    const searchTermLower = this.searchTerm.trim().toLowerCase();
     if (searchTermLower === '') {
-      this.prodFiltrados = this.productos; // Si no hay búsqueda, mostramos todos los productos
+      this.prodFiltrados = this.productos;
     } else {
       this.prodFiltrados = this.productos.filter((producto) =>
         producto.nombre.toLowerCase().includes(searchTermLower) ||
-        producto.idproducto.toLowerCase().includes(searchTermLower) // Filtra también por código
+        producto.idproducto.toLowerCase().includes(searchTermLower)
       );
     }
   }
 
   editarProducto(productos: any): void {
     this.isEditMode = true;
-    this.prodSeleccionado = { ...productos }; // Copia para evitar modificar el original
+    this.prodSeleccionado = { ...productos };
   }
 
   guardarEdicion(): void {
@@ -70,7 +104,7 @@ export class ListarproductosComponent implements OnInit {
         next: () => {
           this.isEditMode = false;
           this.prodSeleccionado = null;
-          this.obtenerProducto();
+          this.loadProducts(); // volver a cargar
         },
         error: (err) => {
           console.error('Error al actualizar producto:', err);
@@ -83,7 +117,9 @@ export class ListarproductosComponent implements OnInit {
     if (confirm('¿Está seguro de que desea eliminar este producto?')) {
       this.productoService.eliminarProducto(idproducto).subscribe({
         next: () => {
-          this.obtenerProducto();
+          // Llamamos de nuevo a loadProducts para recargar la lista,
+          // respetando si estamos en categoría o en la lista general
+          this.loadProducts();
         },
         error: (err) => {
           console.error('Error al eliminar producto:', err);
@@ -95,21 +131,12 @@ export class ListarproductosComponent implements OnInit {
   cancelarEdicion(): void {
     this.isEditMode = false;
     this.prodSeleccionado = null;
-  }
-  cargarLista(): void {
-    this.productoService.getProducto().subscribe({
-      next: (data) => {
-        this.productos = data;
-        this.prodFiltrados = data;
-      },
-      error: (err) => {
-        console.error('Error al obtener productos:', err);
-      },
-    });
+    this.loadProducts(); // recarga para mostrar la lista sin edición
   }
 
   recargarLista(): void {
     this.searchTerm = '';
-    this.cargarLista();
+    this.loadProducts(); // recarga lista filtrada o general
   }
 }
+

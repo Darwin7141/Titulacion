@@ -1,45 +1,90 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Página de Inicio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@angular/material/prebuilt-themes/indigo-pink.css">
+  <!-- Fuentes y Material Design -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@angular/material/prebuilt-themes/indigo-pink.css"
+  />
 </head>
 
 <body>
+  <!-- Barra superior -->
   <ul>
-    <li><a href="#home">Administrador</a></li>
-    <li style="float:right"><a class="logout" (click)="logout()">Cerrar Sesión</a></li>
+    <!-- Ajusta la ruta o el routerLink según tu lógica -->
+    <li>
+      <a [routerLink]="['/listaAdministrador']">Administrador</a>
+    </li>
+    <li style="float:right">
+      <!-- Aquí asumimos que tienes un método logout() en tu componente TS -->
+      <a class="logout" (click)="logout()">Cerrar Sesión</a>
+    </li>
   </ul>
-  
+
+  <!-- Menú lateral (sidenav) -->
   <div class="sidenav">
-    <a [routerLink]="['/listaAdministrador']">Administrador</a>
-    <a [routerLink]="['/listaUsuarios']">Cuentas Usuarios</a>
-    <a [routerLink]="['/listaClientes']">Clientes </a>
-    <a [routerLink]="['/listaCargos']">Cargos Empleados </a>
-    <a [routerLink]="['/listaEmpleados']">Empleados</a>
-    <a [routerLink]="['/listaProveedor']">Proveedores</a>
-    <a [routerLink]="['/listaProductos']">Productos</a>
-    <a [routerLink]="['/listaTipos']">Tipos de catering</a>
-    <a [routerLink]="['/listaServicios']">Servicios</a>
-    <a [routerLink]="['/listaMenus']">Menús</a>
-    <a href="#">Reservas</a>
+    <!-- 1. Submenú "Gestión Usuarios" -->
+    <a href="javascript:void(0)" (click)="toggleGestionUsuarios()">
+      Gestión Usuarios
+    </a>
+    <div *ngIf="showGestionUsuarios" class="submenu">
+      <a [routerLink]="['/listaAdministrador']">Administrador</a>
+      <a [routerLink]="['/listaUsuarios']">Cuentas Usuarios</a>
+      <a [routerLink]="['/listaClientes']">Clientes</a>
+      <a [routerLink]="['/listaCargos']">Cargos Empleados</a>
+      <a [routerLink]="['/listaEmpleados']">Empleados</a>
+      <a [routerLink]="['/listaProveedor']">Proveedores</a>
+    </div>
+
+    <!-- 2. Submenú "Productos" -->
+    <a href="javascript:void(0)" (click)="toggleProductos()">
+      Productos
+    </a>
+    <div *ngIf="showProductos" class="submenu">
+      <!-- Ajusta las rutas según tu configuración de routing -->
+      <a [routerLink]="['/listaProductos']">Lista General</a>
+      <a [routerLink]="['/listaCategorias']">Categorias</a>
+      <a [routerLink]="['/listaProductos/categoria',7]">Bebidas</a>
+      <a [routerLink]="['/listaProductos/categoria',3]">Carnes</a>
+      <a [routerLink]="['/listaProductos/categoria',8]">Materiales</a>
+      <a [routerLink]="['/listaProductos/categoria',9]">Granos</a>
+      <a [routerLink]="['/listaProductos/categoria',5]">Panadería y Repostería</a>
+    </div>
+
+    <!-- 3. Submenú "Catering" -->
+    <a href="javascript:void(0)" (click)="toggleCatering()">
+      Catering
+    </a>
+    <div *ngIf="showCatering" class="submenu">
+      <a [routerLink]="['/listaTipos']">Tipos de catering</a>
+      <a [routerLink]="['/listaServicios']">Servicios</a>
+      <a [routerLink]="['/listaMenus']">Menús</a>
+      <a [routerLink]="['/listaReservas']">Reservas</a>
+    </div>
+
+    <!-- "Reservas" (sin submenú, tal cual) -->
+    <!-- <a [routerLink]="['/reservas']">Reservas</a>-->
   </div>
-  
+
+  <!-- Contenido o RouterOutlet principal -->
   <div class="content">
     <h2></h2>
     <p></p>
   </div>
 
-  <script src="https://code.angularjs.org/1.8.2/angular.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@angular/material/bundles/material.umd.js"></script>
-  
   <div class="content-admin">
     <router-outlet></router-outlet>
   </div>
-
 </body>
 </html>

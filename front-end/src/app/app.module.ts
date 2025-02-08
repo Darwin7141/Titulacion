@@ -10,6 +10,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 
 
 
@@ -44,6 +47,20 @@ import { ListarmenusComponent } from './components/listarmenus/listarmenus.compo
 import { MenusComponent } from './components/menus/menus.component';
 import { RecuperarContrasenaComponent } from './components/recuperar-contrasena/recuperar-contrasena.component';
 import { RestablecerContrasenaComponent } from './components/restablecer-contrasena/restablecer-contrasena.component';
+import { ServiciosClienteComponent } from './componentsCliente/servicios-cliente/servicios-cliente.component';
+import { InicioClienteComponent } from './componentsCliente/inicio-cliente/inicio-cliente.component';
+import { DialogoComponent } from './validaciones/dialogo/dialogo.component';
+import { RegistroClienteComponent } from './componentsCliente/registro-cliente/registro-cliente.component';
+import { InicioEmpleadoComponent } from './componentsEmpleado/inicio-empleado/inicio-empleado.component';
+import { MenusClienteComponent } from './componentsCliente/menus-cliente/menus-cliente.component';
+import { ListarCategoriasComponent } from './components/listar-categorias/listar-categorias.component';
+import { CategoriaProductosComponent } from './components/categoria-productos/categoria-productos.component';
+import { AgendarReservaComponent } from './componentsCliente/agendar-reserva/agendar-reserva.component';
+import { MisReservasComponent } from './componentsCliente/mis-reservas/mis-reservas.component';
+import { EditarReservaComponent } from './componentsCliente/editar-reserva/editar-reserva.component';
+import { ListarReservasComponent } from './components/listar-reservas/listar-reservas.component';
+import { ContactoComponent } from './componentsCliente/contacto/contacto.component';
+import { AsistenteVirtualComponent } from './componentsCliente/asistente-virtual/asistente-virtual.component';
 
 
 
@@ -76,7 +93,23 @@ import { RestablecerContrasenaComponent } from './components/restablecer-contras
     ListarmenusComponent,
     MenusComponent,
     RecuperarContrasenaComponent,
-    RestablecerContrasenaComponent
+    RestablecerContrasenaComponent,
+    ServiciosClienteComponent,
+    InicioClienteComponent,
+    DialogoComponent,
+    RegistroClienteComponent,
+    InicioEmpleadoComponent,
+    MenusClienteComponent,
+    ListarCategoriasComponent,
+    CategoriaProductosComponent,
+    AgendarReservaComponent,
+    MisReservasComponent,
+    EditarReservaComponent,
+    ListarReservasComponent,
+    ContactoComponent,
+    AsistenteVirtualComponent,
+    
+    
   
     
     
@@ -94,7 +127,9 @@ import { RestablecerContrasenaComponent } from './components/restablecer-contras
     BrowserAnimationsModule,
     MatSidenavModule,
     MatSelectModule,
-    MatOptionModule
+    MatOptionModule,
+    MatDialogModule,
+    MatProgressSpinnerModule
     
     
     
@@ -102,8 +137,10 @@ import { RestablecerContrasenaComponent } from './components/restablecer-contras
   ],
   providers: [
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withFetch())
+    provideHttpClient(withFetch()),
+    
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  
 })
 export class AppModule { }

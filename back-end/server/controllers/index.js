@@ -10,7 +10,11 @@ const serviciocatering = require('./serviciocatering');
 const menucatering = require('./menu');
 const estadocatering = require('./estadocatering');
 const TokensRecuperacion = require('./TokensRecuperacion');
-
+const preclientes = require('./preclientes');
+const categoriaProductos = require('./categoriaProductos');
+const reservas = require('./reservas');
+const detallereservas = require('./detalle_reserva');
+const correoContacto = require('./contacto');
 
 
 module.exports={
@@ -25,7 +29,12 @@ module.exports={
     serviciocatering,
     menucatering,
     estadocatering,
-    TokensRecuperacion
+    TokensRecuperacion,
+    preclientes,
+    categoriaProductos,
+    reservas,
+    detallereservas,
+    correoContacto
     
 
 

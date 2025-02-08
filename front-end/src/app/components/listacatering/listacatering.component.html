@@ -32,7 +32,7 @@
           <th>Nombre</th>
           <th>Descripción</th>
        <!--   <th>CodEstado</th> -->
-           <th>Estado</th> 
+           
           <th>Acciones</th>
         </tr>
       </thead>
@@ -41,7 +41,7 @@
           <td>{{ tipo.idtipo }}</td>
           <td>{{ tipo.nombre }}</td>
           <td>{{ tipo.descripcion }}</td>
-          <td>{{ tipo.estado.estado }}</td>
+         
       <!--    <td>{{ tipo.estado.estado }}</td> -->
          
           
@@ -101,22 +101,7 @@
           />
         </div> -->
         
-        <div class="form-group">
-          <mat-form-field class="col-xs-12">
-            <mat-select 
-              #idEstadoField="ngModel" 
-              name="idestado" 
-              [(ngModel)]="tipoSeleccionado.idestado" 
-              required 
-              placeholder="Seleccione un estado">
-              
-              <mat-option *ngFor="let est of estados" [value]="est.idestado">
-                {{ est.estado }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="idEstadoField.invalid">Debe seleccionar un estado</mat-error>
-          </mat-form-field>
-        </div> 
+        
        
   
         <div class="form-actions">

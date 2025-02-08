@@ -1,0 +1,143 @@
+<!-- Botón flotante -->
+<button class="assistant-btn" (click)="toggleChat()">
+  <img 
+    src="https://img.icons8.com/?size=100&id=37966&format=png&color=ffffff"
+    alt="Asistente"
+  />
+</button>
+
+<!-- Ventana del chat -->
+<div class="chat-window" *ngIf="chatAbierto" [class.minimized]="chatMinimizado">
+  <!-- Cabecera -->
+  <div class="chat-header">
+    <div class="header-left">
+      <img
+        src="https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/244667863_115293174241931_2042471049205914810_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=_9_A6lWreIsQ7kNvgEJSRjK&_nc_oc=Adgf7jvDsQq9hgsoNgpQAKgLPHecPmmy5pud8jMztJdY6xUZklZjtuenY3E1Mx8EpBc&_nc_zt=23&_nc_ht=scontent.fuio35-1.fna&_nc_gid=AVRDkByqjuSf0uJB5oI-RYq&oh=00_AYBifsLAZyLE2-qoxU9xdJYPdWU3mkDt_yUi6UjI7jxrFQ&oe=67A499E2"
+        alt="Logo-peq"
+        class="logo-small"
+      />
+      <span class="header-title">Asistente</span>
+    </div>
+    <div class="header-buttons">
+      <button class="minimize-btn" (click)="toggleMinimizar()">-</button>
+      <button class="close-btn" (click)="cerrarChat()">X</button>
+    </div>
+  </div>
+
+  <!-- Cuerpo (si no minimizado) -->
+  <div class="chat-body" *ngIf="!chatMinimizado">
+    <!-- Sección de presentación si es el primer mensaje del bot -->
+    <div
+      *ngIf="
+        mensajes.length === 1 &&
+        mensajes[0].remitente === 'bot' &&
+        mensajes[0].texto === '¿Cómo puedo ayudarte?'
+      "
+      class="intro-section"
+    >
+      <div class="big-logo">
+        <img
+          src="https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/244667863_115293174241931_2042471049205914810_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=_9_A6lWreIsQ7kNvgEJSRjK&_nc_oc=Adgf7jvDsQq9hgsoNgpQAKgLPHecPmmy5pud8jMztJdY6xUZklZjtuenY3E1Mx8EpBc&_nc_zt=23&_nc_ht=scontent.fuio35-1.fna&_nc_gid=AVRDkByqjuSf0uJB5oI-RYq&oh=00_AYBifsLAZyLE2-qoxU9xdJYPdWU3mkDt_yUi6UjI7jxrFQ&oe=67A499E2"
+          alt="Logo grande"
+        />
+      </div>
+      <h3 class="asistente-title">Asistente</h3>
+      <div class="bot-msg">
+        <span>{{ mensajes[0].texto }}</span>
+      </div>
+      <div class="quick-options">
+        <button (click)="seleccionarOpcion('Información de la empresa')">
+          Información de la empresa
+        </button>
+        <button (click)="seleccionarOpcion('Servicios y menús')">
+          Servicios y menús
+        </button>
+        <button (click)="seleccionarOpcion('Cotizar reserva')">
+          Cotizar reserva
+        </button>
+      </div>
+    </div>
+
+    <!-- Resto de mensajes -->
+    <ng-container *ngFor="let msg of mensajes; let i = index">
+      <!-- Omitimos el índice 0 si todavía solo hay 1 mensaje y es “¿Cómo puedo ayudarte?” -->
+      <ng-container *ngIf="!(
+        mensajes.length === 1 &&
+        i === 0 &&
+        msg.remitente === 'bot' &&
+        msg.texto === '¿Cómo puedo ayudarte?'
+      )">
+        <div
+          [ngClass]="{
+            'user-msg': msg.remitente === 'user',
+            'bot-msg': msg.remitente === 'bot'
+          }"
+        >
+          <!-- Usuario: texto normal -->
+          <span *ngIf="msg.remitente === 'user'">{{ msg.texto }}</span>
+          <!-- Bot: HTML interpretado -->
+          <span *ngIf="msg.remitente === 'bot'" [innerHTML]="msg.texto"></span>
+        </div>
+      </ng-container>
+    </ng-container>
+    <div
+  class="quick-options"
+  *ngIf="
+    mensajes.length > 0 && 
+    mensajes[mensajes.length - 1].remitente === 'bot' &&
+    mensajes[mensajes.length - 1].texto === '¿Te puedo ayudar en algo más?'
+  "
+>
+  <button (click)="seleccionarOpcion('Servicios y menús')">
+    Servicios y menús
+  </button>
+  <button (click)="seleccionarOpcion('Cotizar reserva')">
+    Cotizar reserva
+  </button>
+</div>
+
+<div
+  class="quick-options"
+  *ngIf="
+    mensajes.length > 0 &&
+    mensajes[mensajes.length - 1].remitente === 'bot' &&
+    mensajes[mensajes.length - 1].texto === '¿Te puedo ayudar en algo más?.'
+  "
+>
+  <button (click)="seleccionarOpcion('Información de la empresa')">
+    Información de la empresa
+  </button>
+  <button (click)="seleccionarOpcion('Cotizar reserva')">
+    Cotizar reserva
+  </button>
+</div>
+
+<div
+  class="quick-options"
+  *ngIf="
+    mensajes.length > 0 &&
+    mensajes[mensajes.length - 1].remitente === 'bot' &&
+    mensajes[mensajes.length - 1].texto === 'Aquí tienes tu cotización. ¿Te puedo ayudar en algo más?'
+  "
+>
+  <button (click)="seleccionarOpcion('Información de la empresa')">
+    Información de la empresa
+  </button>
+  <button (click)="seleccionarOpcion('Cotizar reserva')">
+    Servicios y menús
+  </button>
+</div>
+  </div>
+  <!-- Cierra el .chat-body aquí ^^^ -->
+
+  <!-- Pie de chat (INPUT + BOTÓN), después del body -->
+  <div class="chat-footer" *ngIf="!chatMinimizado">
+    <input
+      type="text"
+      [(ngModel)]="mensajeUsuario"
+      placeholder="Mensaje..."
+      (keyup.enter)="enviarMensaje()"
+    />
+    <button (click)="enviarMensaje()">Enviar</button>
+  </div>
+</div>
