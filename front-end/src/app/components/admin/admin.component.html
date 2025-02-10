@@ -22,13 +22,31 @@
 <body>
   <!-- Barra superior -->
   <ul>
-    <!-- Ajusta la ruta o el routerLink según tu lógica -->
-    <li>
-      <a [routerLink]="['/listaAdministrador']">Administrador</a>
+    <!-- Sección izquierda: Ícono de usuario + nombre de usuario -->
+    <li style="float: left;">
+      <!-- Puedes enlazar (click) si quieres mostrar un menú de perfil, etc. -->
+      <a class="profile">
+        <i class="material-icons" style="vertical-align: middle;">person</i>
+        {{ userEmail }}
+      </a>
     </li>
-    <li style="float:right">
-      <!-- Aquí asumimos que tienes un método logout() en tu componente TS -->
-      <a class="logout" (click)="logout()">Cerrar Sesión</a>
+  
+    <!-- Sección derecha: Ícono para cerrar sesión -->
+
+    
+    <li style="float: right;">
+      <a class="logout" type="button" (click)="logout()">
+        <i class="material-icons" style="vertical-align: middle;">power_settings_new</i>
+      </a>
+    </li>
+
+    <li style="float: right; ">
+      <a  class="campana-container" type="button" (click)="verNotificaciones()">
+        <i class="material-icons" style="vertical-align: middle;">
+          {{ hayNuevas ? 'notifications_active' : 'notifications' }}
+        </i>
+        <span *ngIf="hayNuevas" class="badge">{{ cantidadNuevas }}</span>
+      </a>
     </li>
   </ul>
 

@@ -15,6 +15,7 @@ const categoriaProductos = require('./categoriaProductos');
 const reservas = require('./reservas');
 const detallereservas = require('./detalle_reserva');
 const correoContacto = require('./contacto');
+const estadoReserva = require('./estado_reserva');
 
 
 module.exports={
@@ -34,7 +35,8 @@ module.exports={
     categoriaProductos,
     reservas,
     detallereservas,
-    correoContacto
+    correoContacto,
+    estadoReserva
     
 
 

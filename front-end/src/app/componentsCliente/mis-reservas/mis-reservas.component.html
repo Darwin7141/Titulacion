@@ -2,12 +2,22 @@
   <h2>Mis Reservas</h2>
 
   <div *ngFor="let reserva of reservas; let i = index" class="reserva-card">
-    <h3>Reserva: Nro {{ i + 1 }}</h3> <!-- Cambié el texto a "Reserva: Nro X" -->
-    <p>Fecha: {{ reserva.fechaevento }}</p>
-    <p>Dirección: {{ reserva.direccionevento }}</p>
-    <p>Total: {{ reserva.total }}</p>
+    <h3>Reserva: Nro {{ i + 1 }}</h3>
 
-    <!-- Subtabla de detalles -->
+    <!-- 1) Etiquetas en negrita -->
+    <p><strong>Fecha:</strong> {{ reserva.fechaevento }}</p>
+    <p><strong>Dirección:</strong> {{ reserva.direccionevento }}</p>
+
+    <!-- Quitamos el <p>Total: ...> que tenías antes, 
+         para moverlo a la tabla de detalles. -->
+
+    <!-- 3) Resaltar estado con un “badge” -->
+    <p *ngIf="reserva.nombre">
+      <strong>Estado:</strong>
+      <span class="estado-badge">{{ reserva.nombre.estado_reserva }}</span>
+    </p>
+
+    <!-- Tabla de detalles -->
     <table>
       <thead>
         <tr>
@@ -24,10 +34,18 @@
           <td>{{ det.cantpersonas }}</td>
           <td>{{ det.subtotal }}</td>
         </tr>
+
+        <!-- 2) Última fila para el Total -->
+        <tr>
+          <!-- Span 3 columnas para que el "Total:" quede alineado al subtotal -->
+          <td colspan="3" style="text-align: right; font-weight: bold;">
+            Total:
+          </td>
+          <td>{{ reserva.total }}</td>
+        </tr>
       </tbody>
     </table>
 
-    <!-- Botones de acción: Editar, Eliminar -->
     <div class="actions">
       <button (click)="editarReserva(reserva.idreserva)" class="edit-button">
         <i class="fa fa-edit"></i> Editar
@@ -36,6 +54,7 @@
         <i class="fa fa-trash"></i> Eliminar
       </button>
     </div>
+
     <hr />
   </div>
 </div>

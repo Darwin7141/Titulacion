@@ -16,14 +16,21 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT
         },
         
-        precio: {
-            type: DataTypes.DOUBLE
-        },
+        
         cantpersonas: {
             type: DataTypes.INTEGER
         },
         total: {
             type: DataTypes.DOUBLE
+        },
+        pagorealizado: {
+            type: DataTypes.DOUBLE
+        },
+        saldopendiente: {
+            type: DataTypes.DOUBLE
+        },
+        idestado: {
+            type: DataTypes.INTEGER
         },
 
     }, {
@@ -40,6 +47,11 @@ module.exports = (sequelize, DataTypes) => {
           reserva.hasMany(models.detalle_reserva, {
             foreignKey: 'idreserva',
             as: 'detalles'
+          });
+
+          reserva.belongsTo(models.estado_reserva, {
+            foreignKey: 'idestado',
+            as: 'nombre'
           });
 
        

@@ -2,12 +2,36 @@ const modelos = require('../models');
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); 
 
 async function create(req, res) {
-  // (QUEDA IGUAL QUE SIEMPRE)
-  const { fechaevento, codigocliente, direccionevento, precio, cantpersonas, total, detalle } = req.body;
-  
+  const {
+    fechaevento,
+    codigocliente,
+    direccionevento,
+    cantpersonas,
+    total,
+    pagorealizado,
+    saldopendiente,
+    idestado,  // puede venir vacío
+    detalle
+  } = req.body;
+
   let reservaCreada = null; 
   try {
-    // 1) Generar idreserva
+    // 1) Si no hay idestado, asignar el estado "Solicitada"
+    let estadoParaInsertar = idestado;
+    if (!estadoParaInsertar) {
+      // Busca en la tabla estado_reserva aquel que tenga estado_reserva = "Solicitada"
+      const estadoSolicitada = await modelos.estado_reserva.findOne({
+        where: { estado_reserva: 'Solicitada' }
+      });
+      if (!estadoSolicitada) {
+        return res.status(400).json({
+          message: 'No existe el estado "Solicitada" en la tabla estado_reserva.'
+        });
+      }
+      estadoParaInsertar = estadoSolicitada.idestado;
+    }
+
+    // 2) Generar idreserva (código interno como "R001", "R002", etc.)
     const lastReserva = await modelos.reservas.findOne({ order: [['idreserva', 'DESC']] });
     let nextCodigo = 'R001';
     if (lastReserva && lastReserva.idreserva) {
@@ -15,18 +39,20 @@ async function create(req, res) {
       nextCodigo = 'R' + String(lastNumber + 1).padStart(3, '0');
     }
 
-    // 2) Crear la reserva (cabecera)
+    // 3) Crear la reserva en la tabla "reservas"
     reservaCreada = await modelos.reservas.create({
       idreserva: nextCodigo,
       fechaevento,
       codigocliente,
       direccionevento,
-      precio,
       cantpersonas,
-      total
+      total,
+      pagorealizado,
+      saldopendiente,
+      idestado: estadoParaInsertar
     });
 
-    // 3) Crear detalles en detalle_reserva
+    // 4) Crear los detalles en "detalle_reserva"
     if (Array.isArray(detalle)) {
       for (const d of detalle) {
         await modelos.detalle_reserva.create({
@@ -39,7 +65,6 @@ async function create(req, res) {
       }
     }
 
-    // 4) Responder OK
     return res.status(201).json({
       message: 'Reserva creada con detalle',
       idreserva: nextCodigo
@@ -48,7 +73,7 @@ async function create(req, res) {
   } catch (err) {
     console.error('Error al crear la reserva o sus detalles:', err);
 
-    // ROLLBACK de la reserva si se creó
+    // ROLLBACK si ya se creó la reserva
     if (reservaCreada) {
       try {
         await modelos.reservas.destroy({
@@ -66,17 +91,15 @@ async function create(req, res) {
   }
 }
 
-
 async function createClienteYReserva(req, res) {
   let clienteCreado = null;
   let reservaCreada = null;
 
   try {
-    // 1) EXTRAER datos para el cliente
+    // ================ CREACIÓN DE CLIENTE ================
     const { ci, nombre, telefono, direccion, e_mail, idprecliente } = req.body;
-    // Opcional: Validaciones (cedula, correo, etc.)
 
-    // 2) Crear cliente => generamos codigocliente
+    // Generar un nuevo codigocliente
     const lastCliente = await modelos.clientes.findOne({ order: [['codigocliente','DESC']] });
     let nextCodigoCliente = 'CL001';
     if (lastCliente && lastCliente.codigocliente) {
@@ -84,7 +107,7 @@ async function createClienteYReserva(req, res) {
       nextCodigoCliente = 'CL' + String(lastNum + 1).padStart(3, '0');
     }
 
-    // 3) Insertar el nuevo cliente
+    // Insertar el nuevo cliente
     clienteCreado = await modelos.clientes.create({
       codigocliente: nextCodigoCliente,
       ci,
@@ -95,8 +118,31 @@ async function createClienteYReserva(req, res) {
       idprecliente
     });
 
-    // 4) Crear la reserva => extraer datos de reserva
-    const { fechaevento, direccionevento, precio, cantpersonas, total, detalle } = req.body;
+    // ================ CREACIÓN DE RESERVA ================
+    const {
+      fechaevento,
+      direccionevento,
+      cantpersonas,
+      total,
+      pagorealizado,
+      saldopendiente,
+      idestado,  // puede venir vacío
+      detalle
+    } = req.body;
+
+    // 1) Si no hay idestado, asignar "Solicitada"
+    let estadoParaInsertar = idestado;
+    if (!estadoParaInsertar) {
+      const estadoSolicitada = await modelos.estado_reserva.findOne({
+        where: { estado_reserva: 'Solicitada' }
+      });
+      if (!estadoSolicitada) {
+        return res.status(400).json({
+          message: 'No existe el estado "Solicitada" en la tabla estado_reserva.'
+        });
+      }
+      estadoParaInsertar = estadoSolicitada.idestado;
+    }
 
     // Generar un nuevo id de reserva
     const lastReserva = await modelos.reservas.findOne({ order: [['idreserva','DESC']] });
@@ -106,18 +152,20 @@ async function createClienteYReserva(req, res) {
       nextCodigoReserva = 'R' + String(lastNumber + 1).padStart(3,'0');
     }
 
-    // 5) Insertar la reserva en la tabla reservas
+    // Insertar la reserva
     reservaCreada = await modelos.reservas.create({
       idreserva: nextCodigoReserva,
       fechaevento,
-      codigocliente: nextCodigoCliente, // enlazamos con el cliente recién creado
+      codigocliente: nextCodigoCliente, 
       direccionevento,
-      precio,
       cantpersonas,
-      total
+      total,
+      pagorealizado,
+      saldopendiente,
+      idestado: estadoParaInsertar
     });
 
-    // 6) Insertar los detalles de la reserva
+    // 2) Insertar los detalles
     if (Array.isArray(detalle)) {
       for (const d of detalle) {
         await modelos.detalle_reserva.create({
@@ -130,27 +178,22 @@ async function createClienteYReserva(req, res) {
       }
     }
 
-    // 7) **Actualizar el rol** en la tabla cuentasusuarios
-    // => Buscamos al usuario que tenía rol = "PRE001" (idprecliente),
-    //    y le asignamos ahora el rol = nextCodigoCliente (ej. "CL001")
+    // ================ Actualizar rol en cuentasusuarios ================
     await modelos.cuentasusuarios.update(
-      { rol: nextCodigoCliente },           // Nuevo rol de cliente
-      { where: { rol: idprecliente } }      // Rol anterior de precliente
+      { rol: nextCodigoCliente },           // Nuevo rol
+      { where: { rol: idprecliente } }
     );
 
-    
-
-    // 8) Respuesta de éxito
     return res.status(201).json({
       message: 'Cliente y reserva creados exitosamente (con detalles)',
       codigocliente: nextCodigoCliente,
       idreserva: nextCodigoReserva,
       cliente: {
-        ci: ci,
-        nombre: nombre,
-        telefono: telefono,
-        direccion: direccion,
-        e_mail: e_mail,
+        ci,
+        nombre,
+        telefono,
+        direccion,
+        e_mail,
         codigocliente: nextCodigoCliente
       }
     });
@@ -158,7 +201,7 @@ async function createClienteYReserva(req, res) {
   } catch (error) {
     console.error('Error al crear cliente/reserva/detalle:', error);
 
-    // === ROLLBACK MANUAL ===
+    // ROLLBACK MANUAL
     try {
       if (reservaCreada) {
         await modelos.reservas.destroy({ where: { idreserva: reservaCreada.idreserva } });
@@ -182,31 +225,42 @@ async function createClienteYReserva(req, res) {
 
 // ======================== MÉTODO update ========================
 async function update(req, res) {
-  const { idreserva } = req.params; // Código de la reserva desde los parámetros de la URL
-  const { fechaevento, codigocliente, direccionevento, precio, cantpersonas, total, detalle } = req.body; // Datos a actualizar
+  const { idreserva } = req.params; 
+  const { 
+    fechaevento, 
+    direccionevento,
+    cantpersonas, 
+    total,
+    pagorealizado, 
+    saldopendiente, 
+    idestado, 
+    detalle 
+  } = req.body;
 
   try {
-    // Buscar la reserva
+    // 1) Buscar la reserva
     const reserva = await modelos.reservas.findOne({ where: { idreserva } });
     if (!reserva) {
       return res.status(404).json({ message: 'Reserva no encontrada.' });
     }
 
-    // Actualizar los datos de la cabecera de la reserva
+    // 2) Actualizar cabecera (campos que vienen en el body)
     await reserva.update({
-      fechaevento: fechaevento || reserva.fechaevento,
-      codigocliente: codigocliente || reserva.codigocliente,
-      direccionevento: direccionevento || reserva.direccionevento,
-      precio: precio || reserva.precio,
-      cantpersonas: cantpersonas || reserva.cantpersonas,
-      total: total || reserva.total,
+      fechaevento: fechaevento ?? reserva.fechaevento,
+      direccionevento: direccionevento ?? reserva.direccionevento,
+      cantpersonas: cantpersonas ?? reserva.cantpersonas,
+      total: total ?? reserva.total,
+      pagorealizado: pagorealizado ?? reserva.pagorealizado,
+      saldopendiente: saldopendiente ?? reserva.saldopendiente,
+      idestado: idestado ?? reserva.idestado
     });
 
-    // Eliminar los detalles anteriores
-    await modelos.detalle_reserva.destroy({ where: { idreserva } });
-
-    // Agregar los nuevos detalles (menús seleccionados)
+    // 3) Si el front SÍ envía un array "detalle", entonces los reemplazamos.
+    //    Caso contrario, no tocamos los detalles existentes.
     if (Array.isArray(detalle)) {
+      // Eliminar detalles anteriores
+      await modelos.detalle_reserva.destroy({ where: { idreserva } });
+      // Insertar los nuevos detalles
       for (const d of detalle) {
         await modelos.detalle_reserva.create({
           idreserva: idreserva,
@@ -230,7 +284,6 @@ async function update(req, res) {
     });
   }
 }
-
 function eliminar(req, res) {
   const { idreserva } = req.params;
 
@@ -291,6 +344,18 @@ function getAll(req, res) {
             as: 'cliente', // Este alias debe coincidir con el definido en el modelo
             attributes: ['nombre'], // Seleccionar solo el campo necesario
           },  
+
+          {
+            model: modelos.clientes,
+            as: 'cliente', // Este alias debe coincidir con el definido en el modelo
+            attributes: ['ci'], // Seleccionar solo el campo necesario
+          }, 
+
+          {
+            model: modelos.estado_reserva,
+            as: 'nombre', // Este alias debe coincidir con el definido en el modelo
+            attributes: ['estado_reserva'], // Seleccionar solo el campo necesario
+          },
       ],
 
     order: [['idreserva', 'ASC']] // Ordenar por codigocliente en orden ascendente
@@ -312,14 +377,18 @@ async function getByCliente(req, res) {
   try {
     const reservas = await modelos.reservas.findAll({
       where: { codigocliente },
-      include: [{
-        model: modelos.detalle_reserva,
-        as: 'detalles',
-        include: [{
-          model: modelos.menu,
-          as: 'menu'
-        }]
-      }]
+      include: [
+        {
+          model: modelos.detalle_reserva,
+          as: 'detalles',
+          include: [{ model: modelos.menu, as: 'menu' }]
+        },
+        {
+          model: modelos.estado_reserva,
+          as: 'nombre',  // alias en el modelo
+          attributes: ['estado_reserva']
+        }
+      ]
     });
     res.status(200).send(reservas);
   } catch (err) {
@@ -330,6 +399,7 @@ async function getByCliente(req, res) {
     });
   }
 }
+
 
 async function getOne(req, res) {
   const { idreserva } = req.params;

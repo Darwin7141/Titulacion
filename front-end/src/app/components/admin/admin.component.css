@@ -10,34 +10,52 @@ ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;
+  background-color: #333; /* color de fondo oscuro */
+  position: fixed;        /* la fijamos arriba */
+  top: 0;                 /* empieza en la parte superior */
+  width: 100%;            /* ocupa todo el ancho */
+  z-index: 9999;          /* que quede sobre otros elementos */
+  border: none;           /* quita el borde si no lo quieres */
 }
 
+/* Links dentro de la barra */
 li {
   float: left;
 }
-
 li a {
   display: block;
-  color: white;
+  color: white;         /* texto en blanco */
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
 }
-
-/* Change the link color to #111 (black) on hover */
 li a:hover {
   background-color: #111;
 }
 
-ul {
-  border: 1px solid #e7e7e7;
-  background-color: #f3f3f3;
+ul li a.profile {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  color: white;
+  text-decoration: none;
 }
 
-li a {
-  color: #666;
+ul li a.profile i {
+  margin-right: 8px; /* Espacio entre icono y texto */
 }
+
+ul li a.logout {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  color: white;
+  text-decoration: none;
+}
+ul li a.logout:hover {
+  background-color: #111;
+}
+
 
 * {
   box-sizing: border-box;
@@ -47,16 +65,17 @@ li a {
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
+  /* Podrías darle un padding-top de ~48px para no tapar el contenido */
+  padding-top: 48px;  /* Ajusta según la altura real de tu barra */
 }
 
 /* Style the side navigation */
 .sidenav {
-  height: 100%;
-  width: 200px;
   position: fixed;
-  z-index: 1;
-  top: 0;
+  top: 48px;       /* Inicia debajo de la barra (que mide ~48px) */
   left: 0;
+  width: 200px;
+  height: calc(100% - 48px); /* Ajusta la altura */
   background-color: #111;
   overflow-x: hidden;
 }
@@ -84,4 +103,36 @@ body {
 /* Nueva clase para submenús */
 .submenu {
   margin-left: 15px; 
+}
+.campana-container {
+  position: relative;
+  display: inline-block;
+  color: white;
+  text-decoration: none;
+  padding: 14px 16px;
+}
+
+
+
+.campana-container i {
+  font-size: 24px;
+  vertical-align: middle;
+}
+
+/* El circulito rojo */
+.badge {
+  position: absolute;
+  top: 2px;     /* Ajusta hasta que quede pegado a la campana */
+  right: 4px;   /* Muévelo un poco más a la izquierda/derecha */
+  width: 18px;   /* Tamaño del círculo */
+  height: 18px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  display: flex; 
+  
+  align-items: center;     /* Centra verticalmente */
+  justify-content: center;  /* Centra verticalmente */
+  font-weight: bold;
 }

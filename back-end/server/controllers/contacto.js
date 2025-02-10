@@ -5,13 +5,6 @@ const twilio = require('twilio');
 
 
 
-
-// El número de WhatsApp “from” se obtiene de Twilio
-const TWILIO_WHATSAPP_FROM = 'whatsapp:+14155238886';  
-// Ejemplo, es el “sandbox” de Twilio para WhatsApp
-const EMPRESA_WHATSAPP = 'whatsapp:+593992268003'; 
-// El número de WhatsApp de tu empresa
-
 function enviarContacto(req, res) {
   try {
     const { nombre, email, celular, serviciosSeleccionados } = req.body;

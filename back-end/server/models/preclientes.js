@@ -12,8 +12,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
 
-        
-
         telefono: {
             type: DataTypes.CHAR
         },

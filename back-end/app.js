@@ -37,6 +37,7 @@ require('./server/routes/categoriaProductos')(app);
 require('./server/routes/reservas')(app);
 require('./server/routes/detalle_reserva')(app);
 require('./server/routes/contacto')(app);
+require('./server/routes/estado_reserva')(app);
 
 app.get('*', (req, res) => {
     res.status(200).send({ message: "Bienvenido al servidor NodeJS" });

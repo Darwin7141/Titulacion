@@ -1,14 +1,13 @@
-/* Contenedor de las reservas */
+/* Contenedor principal de la vista */
 .container-mis-reservas {
-  max-width: 900px; /* No ocupará todo el ancho de la página */
-  margin: 20px auto; /* Centrado horizontalmente */
+  max-width: 900px;
+  margin: 20px auto;
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Card de cada reserva */
 .reserva-card {
   background-color: #fff;
   padding: 20px;
@@ -35,7 +34,8 @@ table {
   border-collapse: collapse;
 }
 
-table th, table td {
+table th,
+table td {
   text-align: center;
   padding: 8px;
   border: 1px solid #ddd;
@@ -46,7 +46,7 @@ table th {
   font-weight: bold;
 }
 
-/* Botones de acción */
+/* Botones de acción (Editar, Eliminar) */
 .actions {
   display: flex;
   justify-content: center;
@@ -68,12 +68,10 @@ button i {
   margin-right: 5px;
 }
 
-/* Botones de editar y eliminar */
 .edit-button {
   background-color: #007bff;
   color: white;
 }
-
 .edit-button:hover {
   background-color: #0056b3;
 }
@@ -82,17 +80,21 @@ button i {
   background-color: #dc3545;
   color: white;
 }
-
 .delete-button:hover {
   background-color: #c82333;
 }
 
-/* Estilos para íconos */
-button i {
-  font-size: 18px; /* Tamaño adecuado para los íconos */
+/* Badge para el estado */
+.estado-badge {
+  background-color: #d1ecf1; /* Color de fondo (azul claro) */
+  color: #0c5460;           /* Texto azul oscuro */
+  padding: 4px 8px;
+  border-radius: 12px;      /* Bordes redondeados */
+  font-weight: bold;        /* Resaltarlo un poco más */
+  display: inline-block;
 }
 
-/* Responsividad para pantallas pequeñas */
+/* Responsivo */
 @media screen and (max-width: 768px) {
   .container-mis-reservas {
     width: 100%;
@@ -103,7 +105,8 @@ button i {
     padding: 15px;
   }
 
-  table th, table td {
+  table th,
+  table td {
     padding: 5px;
     font-size: 14px;
   }

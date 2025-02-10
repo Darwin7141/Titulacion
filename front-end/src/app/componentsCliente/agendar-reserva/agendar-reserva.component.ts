@@ -259,6 +259,13 @@ export class AgendarReservaComponent implements OnInit {
     // Llama a tu “createReserva” normal
     this.reservasService.createReserva(dataReserva).subscribe({
       next: (respReserva) => {
+        const nuevas = JSON.parse(localStorage.getItem('nuevasReservas') || '[]');
+
+      // 2) Agregar la nueva ID de reserva
+      nuevas.push(respReserva.idreserva);
+
+      // 3) Guardar de nuevo en localStorage
+      localStorage.setItem('nuevasReservas', JSON.stringify(nuevas));
         Swal.fire({
           icon: 'success',
           title: 'Reserva generada',
@@ -314,7 +321,10 @@ export class AgendarReservaComponent implements OnInit {
     // 2) Llamar al nuevo método “crearClienteYReserva” (todo en uno)
     this.reservasService.crearClienteYReserva(dataCompleta).subscribe({
       next: (resp) => {
-        // Respuesta: { message, codigocliente, idreserva, etc. }
+        const nuevas = JSON.parse(localStorage.getItem('nuevasReservas') || '[]');
+      nuevas.push(resp.idreserva);
+      localStorage.setItem('nuevasReservas', JSON.stringify(nuevas));
+
         const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
     user.codigocliente = resp.codigocliente;
     localStorage.setItem('identity_user', JSON.stringify(user))
