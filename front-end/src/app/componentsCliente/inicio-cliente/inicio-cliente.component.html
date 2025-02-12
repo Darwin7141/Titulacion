@@ -10,31 +10,49 @@
 </head>
 
 <body>
+  <!-- Barra superior -->
   <ul>
-    <li><a href="#home">Administrador</a></li>
-    <li style="float:right"><a class="logout" (click)="logout()">Cerrar Sesión</a></li>
+    <!-- Sección izquierda: Ícono de usuario + correo -->
+    <li style="float: left; display: flex; align-items: center; color: white; padding-left: 10px;">
+      <i class="material-icons" style="vertical-align: middle; padding-right: 8px;">person</i>
+      {{ userEmail }}
+    </li>
+    
+    <!-- Sección derecha: Contenedor para íconos de notificación y logout -->
+    <li style="float: right; display: flex; align-items: center; padding-right: 10px;">
+      <!-- Campana de notificaciones -->
+     
+      <!-- Botón de logout -->
+      <a class="logout" (click)="logout()">
+        <i class="material-icons" type="button" style="vertical-align: middle; color: white;">power_settings_new</i>
+      </a>
+    </li>
   </ul>
   
+  <!-- Barra lateral -->
   <div class="sidenav">
     <a [routerLink]="['/serviciosClientes']">Servicios</a>
-    <a (click)="abrirInstrucciones()" >Agendar Reserva</a>
-    <a [routerLink]="['/misReservas']">Mis reservas</a>
-    
-  </div>
-  
-  <div class="content">
-    <h2></h2>
-    <p></p>
+    <a [routerLink]="['/generarReserva']">Agendar Reserva</a>
+    <a [routerLink]="['/misReservas']">Mis Reservas</a>
   </div>
 
-  <script src="https://code.angularjs.org/1.8.2/angular.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@angular/material/bundles/material.umd.js"></script>
+  <div class="content-admin">
+    <!-- Contorno con imagen de fondo -->
+    <div class="content-main">
+      <div class="background-image"></div>
+      <h1>Bienvenido A DAAYFOOD</h1>
+      <img src="https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/244667863_115293174241931_2042471049205914810_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=8_Wqj8usErYQ7kNvgFrFLFE&_nc_oc=AdgLunbNPIccLEhHseo9CkWC1oBt5vA8mRpT1fhAXKthLm2bCpQuxsbWvGlmz6Y6Ozw&_nc_zt=23&_nc_ht=scontent.fuio35-1.fna&_nc_gid=AFacjW9VJpguFPC2WbxE4Pm&oh=00_AYB92mMFtq-mfdUZ9SMPAhBKMVKBdy8-vvz6cB6xHpEKpw&oe=67B2A9E2" alt="Imagen de comida" />
+      <p>Gracias por preferirnos</p>
+    </div>
+  </div>
   
+
   <div class="content-admin">
     <router-outlet></router-outlet>
   </div>
 
+  <script src="https://code.angularjs.org/1.8.2/angular.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@angular/material/bundles/material.umd.js"></script>
+
 </body>
 </html>
-
-

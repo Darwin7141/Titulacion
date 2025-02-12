@@ -136,3 +136,55 @@ body {
   justify-content: center;  /* Centra verticalmente */
   font-weight: bold;
 }
+.content-admin {
+  margin-left: 200px;
+  padding-left: 20px;
+  padding-top: 60px;
+}
+
+/* Estilo del contorno en blanco */
+.content-main {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.content-main img {
+  width: 40%;
+  border-radius: 200px;
+  margin-top: 50px;
+}
+
+.content-main h1,
+.content-main p {
+  color: #333;
+}
+
+.content-main h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+
+.content-main p {
+  font-size: 1.2rem;
+  margin-top: 20px;
+}
+
+/* Fondo de la imagen de bienvenida */
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/244667863_115293174241931_2042471049205914810_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=8_Wqj8usErYQ7kNvgFrFLFE&_nc_oc=AdgLunbNPIccLEhHseo9CkWC1oBt5vA8mRpT1fhAXKthLm2bCpQuxsbWvGlmz6Y6Ozw&_nc_zt=23&_nc_ht=scontent.fuio35-1.fna&_nc_gid=AFacjW9VJpguFPC2WbxE4Pm&oh=00_AYB92mMFtq-mfdUZ9SMPAhBKMVKBdy8-vvz6cB6xHpEKpw&oe=67B2A9E2');
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  filter: blur(8px);
+}

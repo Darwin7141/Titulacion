@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UsuariosService } from '../../services/usuarios.service';
+import { PreclientesService } from '../../services/preclientes.service';
 import { Router } from '@angular/router';
 import { ValidacionesService } from '../../services/validaciones.service'; // Importar el servicio de validaciones
 import Swal from 'sweetalert2';
@@ -23,7 +23,7 @@ export class RegistroClienteComponent implements OnInit {
   };
 
   constructor(
-      private serviceRegistro: UsuariosService,
+      private serviceRegistro: PreclientesService,
       private validaciones: ValidacionesService, // Inyectar el servicio de validaciones
       private _router: Router
     ) {}

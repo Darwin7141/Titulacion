@@ -82,6 +82,30 @@ export class AsistenteVirtualComponent {
 
   async responder(txt: string) {
     const lower = txt.toLowerCase();
+    const saludos = ['hola', 'qué tal', 'qué haces', 'buenos días', 'buenas tardes', 'buenas noches'];
+    if (saludos.some(saludo => lower.includes(saludo))) {
+        this.mensajes.push({
+          remitente: 'bot',
+          texto: '¿Cómo puedo ayudarte?'
+        });
+
+        // Opciones
+        this.mensajes.push({
+          remitente: 'bot',
+          texto: 'Información de la empresa'
+        });
+        this.mensajes.push({
+          remitente: 'bot',
+          texto: 'Servicios y menús'
+        });
+        this.mensajes.push({
+          remitente: 'bot',
+          texto: 'Cotizar reserva'
+        });
+
+        return;
+    }
+
     if (this.estadoCotizacion === 'seleccionMenu') {
       // El usuario nos da un nombre de menú
       const menuEncontrado = this.menus.find(m => m.nombre.toLowerCase().includes(lower));
@@ -283,31 +307,65 @@ export class AsistenteVirtualComponent {
 
   async generarPDFCotizacion() {
     const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text('Cotización Detallada', 10, 20);
+    
+    // Configuración de estilo
+    doc.setFontSize(12); // Tamaño de letra reducido para que sea más similar a la imagen 2
+    doc.setFont("helvetica", "bold");
 
-    let yPos = 40;
+    // Centrar "COTIZACIÓN" en la página
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const cotizacionTextWidth = doc.getTextWidth("COTIZACIÓN");
+    doc.text("COTIZACIÓN", (pageWidth - cotizacionTextWidth) / 2, 20);
 
-    // Listar cada ítem del carrito
+    // Dirección y contactos centrados, ajustados para que no ocupen todo el ancho de la página
+    const direccion = "DIRECCIÓN: Av. Auca y SN, km 34, comunidad San Pedro, Parroquia Dayuma, Cantón Francisco de Orellana, Provincia de Orellana.";
+    const telefonos = "TELÉFONOS: (+593) 096 297 1709 - 098 059 6056 - 099 522 1821";
+
+    const direccionTextWidth = doc.getTextWidth(direccion);
+    const telefonosTextWidth = doc.getTextWidth(telefonos);
+
+    // Aseguramos que no ocupe todo el ancho de la página, con un margen similar al de la tabla
+    const margin = 10;
+    const tableWidth = pageWidth - 20; // Ancho de la tabla para que la dirección no ocupe todo el espacio
+    doc.text(direccion, (pageWidth - tableWidth) / 2, 50);
+    doc.text(telefonos, (pageWidth - tableWidth) / 2, 55);
+
+    // Espaciado antes de la tabla
+    let yPos = 70;
+
+    // Títulos de la tabla
+    doc.setFont("helvetica", "bold");
+    doc.text("PRODUCTO", 10, yPos);
+    doc.text("CANTIDAD", 60, yPos);
+    doc.text("PRECIO", 110, yPos);
+    doc.text("SUBTOTAL", 160, yPos);
+
+    // Líneas de la tabla
+    doc.line(10, yPos + 2, pageWidth - 10, yPos + 2); // Línea superior de la tabla
+    yPos += 10;
+
+    // Establecemos el estilo de la tabla
+    doc.setFont("helvetica", "normal");
+
+    // Listar cada ítem del carrito de cotización
     this.carritoCotizacion.forEach((item) => {
-      doc.setFontSize(14);
-      doc.text(`Menú: ${item.nombre}`, 10, yPos); 
-      yPos += 14;
-
-      doc.setFontSize(12);
-      doc.text(`Precio: $${item.precio} | Cantidad: ${item.cantidad}`, 10, yPos);
-      yPos += 14;
-
-      doc.text(`Subtotal: $${item.subtotal.toFixed(2)}`, 10, yPos);
-      yPos += 20; 
+        doc.text(item.nombre, 10, yPos);
+        doc.text(item.cantidad.toString(), 60, yPos);
+        doc.text(`$${item.precio.toFixed(2)}`, 110, yPos);
+        doc.text(`$${item.subtotal.toFixed(2)}`, 160, yPos);
+        yPos += 10;
     });
 
-    // total final
-    const total = this.carritoCotizacion.reduce((acc, i) => acc + i.subtotal, 0);
-    doc.setFontSize(14);
-    doc.text(`Total: $${total.toFixed(2)}`, 10, yPos);
+    // Línea inferior de la tabla
+    doc.line(10, yPos, pageWidth - 10, yPos);
 
-    // Generamos link PDF
+    // Total general debajo de SUBTOTAL
+    const total = this.carritoCotizacion.reduce((acc, i) => acc + i.subtotal, 0);
+    yPos += 10;
+    doc.setFont("helvetica", "bold");
+    doc.text(`Total: $${total.toFixed(2)}`, 160, yPos);
+
+    // Generación de PDF
     const pdfBlob = doc.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const linkHTML = `
@@ -315,11 +373,10 @@ export class AsistenteVirtualComponent {
         Descargar Cotización
       </a>
     `;
-    // Enviamos el link al chat
     this.mensajes.push({ remitente: 'bot', texto: linkHTML });
-    // Limpiamos carrito si deseas
-    // this.carritoCotizacion = [];
-  }
+}
+
+
 
   private checkAddPage(doc: jsPDF, yPos: number): number {
     // Altura de la página

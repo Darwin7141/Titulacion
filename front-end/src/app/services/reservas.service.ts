@@ -71,4 +71,21 @@ export class ReservasService {
     return this.http.get<any>(`${this.url}reservas/${idreserva}`);
   }
 
+  procesarPrimerPago(idreserva: string, montoPago: number): Observable<any> {
+    return this.http.post<any>(`${this.url}reservas/${idreserva}/pago/primerPago`, { montoPago });
+  }
+
+  procesarSegundoPago(idreserva: string, montoPago: number, ): Observable<any> {
+    return this.http.post<any>(`${this.url}reservas/${idreserva}/pago/segundoPago`, { montoPago });
+  }
+
+  // Método para procesar el pago con tarjeta
+  procesarPagoConTarjeta(idreserva: string, saldopendiente: number, montoPago: number, numeroTarjeta: string, fechaExpiracion: string, cvc: string, titular: string): Observable<any> {
+    return this.http.post<any>(`${this.url}reservas/${idreserva}/pago/tarjeta`, {
+      montoPago, saldopendiente, // Agregar el montoPago aquí
+      detallesTarjeta: { numeroTarjeta, fechaExpiracion, cvc, titular } // Correctamente configurado
+    });
+  }
+  
 }
+

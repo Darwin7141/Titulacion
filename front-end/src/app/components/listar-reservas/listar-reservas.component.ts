@@ -96,10 +96,25 @@ export class ListarReservasComponent implements OnInit {
       next: (resp) => {
         console.log('Estado actualizado correctamente', resp);
         this.cargarReservas();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Cambios guardados',
+          text: 'Los cambios se han guardado correctamente.',
+          confirmButtonText: 'Aceptar'
+        });
       },
       error: (err) => {
         console.error('Error al actualizar estado:', err);
-      },
+        
+        // Mostrar un mensaje de error si la actualización falla
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo guardar los cambios. Inténtelo nuevamente.',
+          confirmButtonText: 'Cerrar'
+        });
+      }
     });
   }
   // ===================== Búsqueda ============================

@@ -26,7 +26,7 @@ export class UsuariosService {
       })
     };
 
-    return this.http.post<any>(this.url +"precliente", usuario, httpOptions);
+    return this.http.post<any>(this.url +"usuario", usuario, httpOptions);
   }
 
   editarUsuario(usuario: any): Observable<any> {

@@ -256,6 +256,20 @@ export class AgendarReservaComponent implements OnInit {
       detalle
     };
 
+    const clienteReservaData = {
+      ci: this.formReserva.ci,
+      nombre: this.formReserva.nombre,
+      telefono: this.formReserva.telefono,
+      direccion: this.formReserva.direccion,
+      e_mail: this.formReserva.e_mail,
+      fechaevento: this.formReserva.fechaevento,
+      direccionevento: this.formReserva.direccionevento,
+      total: this.formReserva.total,
+      menusSeleccionados: this.menusSeleccionados
+    };
+    console.log("Guardando datos del cliente en localStorage:", clienteReservaData);
+    localStorage.setItem('clienteReservaData', JSON.stringify(clienteReservaData));
+
     // Llama a tu “createReserva” normal
     this.reservasService.createReserva(dataReserva).subscribe({
       next: (respReserva) => {
@@ -269,7 +283,7 @@ export class AgendarReservaComponent implements OnInit {
         Swal.fire({
           icon: 'success',
           title: 'Reserva generada',
-          text: `Se creó la reserva con código: ${respReserva.idreserva}`,
+          text: `Su reserva ha sido creada con éxito`,
         }).then(() => {
           this.router.navigate(['/inicioCliente']);
         });
@@ -318,6 +332,8 @@ export class AgendarReservaComponent implements OnInit {
       detalle
     };
 
+    localStorage.setItem('formReserva', JSON.stringify(dataCompleta));
+
     // 2) Llamar al nuevo método “crearClienteYReserva” (todo en uno)
     this.reservasService.crearClienteYReserva(dataCompleta).subscribe({
       next: (resp) => {
@@ -331,17 +347,17 @@ export class AgendarReservaComponent implements OnInit {
         Swal.fire({
           icon: 'success',
           title: 'Reserva generada',
-          text: `Cliente+Reserva con código de reserva: ${resp.idreserva}`
+          text: `Su reserva fue creada`
         }).then(() => {
           this.router.navigate(['/inicioCliente']);
         });
       },
       error: (err) => {
-        console.error('Error al crear cliente+reserva:', err);
+        console.error('Error al crear reserva:', err);
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Ocurrió un error al crear cliente+reserva (rollback en backend).'
+          text: 'Ocurrió un error al crear la reserva.'
         });
       }
     });

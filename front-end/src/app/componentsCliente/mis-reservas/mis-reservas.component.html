@@ -47,12 +47,31 @@
     </table>
 
     <div class="actions">
+      
       <button (click)="editarReserva(reserva.idreserva)" class="edit-button">
         <i class="fa fa-edit"></i> Editar
       </button>
       <button (click)="eliminarReserva(reserva.idreserva)" class="delete-button">
         <i class="fa fa-trash"></i> Eliminar
       </button>
+      <button *ngIf="reserva.nombre.estado_reserva === 'Aceptada'" 
+      (click)="pagarReserva(reserva.idreserva, reserva.saldopendiente)" 
+      class="pay-button" 
+      [disabled]="reserva.pagorealizado > 0">
+Realizar Pago Inicial
+</button>
+
+<button *ngIf="reserva.nombre.estado_reserva === 'Aceptada'" 
+      (click)="pagarReserva(reserva.idreserva, reserva.saldopendiente)" class="pay-button">
+Realizar Pago Final
+</button>
+
+<button *ngIf="reserva.nombre.estado_reserva === 'Pagada'" 
+        (click)="descargarComprobante(reserva)" class="download-button">
+  Descargar Comprobante
+</button>
+
+    
     </div>
 
     <hr />

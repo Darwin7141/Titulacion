@@ -138,7 +138,7 @@ async function createClienteYReserva(req, res) {
       });
       if (!estadoSolicitada) {
         return res.status(400).json({
-          message: 'No existe el estado "Solicitada" en la tabla estado_reserva.'
+          message: 'No existe el estado "Solicitada" .'
         });
       }
       estadoParaInsertar = estadoSolicitada.idestado;
@@ -185,7 +185,7 @@ async function createClienteYReserva(req, res) {
     );
 
     return res.status(201).json({
-      message: 'Cliente y reserva creados exitosamente (con detalles)',
+      message: 'Cliente y reserva creados exitosamente ',
       codigocliente: nextCodigoCliente,
       idreserva: nextCodigoReserva,
       cliente: {
@@ -199,7 +199,7 @@ async function createClienteYReserva(req, res) {
     });
 
   } catch (error) {
-    console.error('Error al crear cliente/reserva/detalle:', error);
+    console.error('Error al crear la reserva', error);
 
     // ROLLBACK MANUAL
     try {
@@ -210,11 +210,11 @@ async function createClienteYReserva(req, res) {
         await modelos.clientes.destroy({ where: { codigocliente: clienteCreado.codigocliente } });
       }
     } catch (errRB) {
-      console.error('Error al hacer rollback manual:', errRB);
+      console.error('Error al hacer :', errRB);
     }
 
     return res.status(500).json({
-      message: 'Ocurrió un error al crear el cliente/reserva (rollback manual).',
+      message: 'Ocurrió un error al crear el cliente.',
       error: error.message
     });
   }
@@ -420,6 +420,152 @@ async function getOne(req, res) {
     return res.status(500).json({ message: 'Error al obtener la reserva', error: err.message });
   }
 }
+
+// Procesar el primer pago
+// Procesar el primer pago
+async function procesarPrimerPago(req, res) {
+  const { idreserva, montoPago } = req.body;
+
+  try {
+    // Buscar la reserva por ID
+    const reserva = await modelos.reservas.findOne({ where: { idreserva } });
+    if (!reserva) {
+      return res.status(404).json({ message: 'Reserva no encontrada.' });
+    }
+
+    let saldopendiente = 0;
+    let estadoReserva = reserva.idestado;
+
+    // Verificamos si el primer pago es igual al total de la reserva
+    if (montoPago === reserva.total) {
+      // Si el pago es igual al total, el saldo pendiente se pone a 0 y el estado cambia a "Pagada"
+      saldopendiente = 0;
+      estadoReserva = 'Pagada';
+    } else if (montoPago < reserva.total) {
+      // Si el pago es menor, el saldo pendiente se deja en 0 y se mantiene el estado "Aceptada"
+      saldopendiente = reserva.total - montoPago;
+      estadoReserva = 'Aceptada';
+    }
+
+    // Actualizar la reserva
+    const updatedReserva = await reserva.update({
+      pagorealizado: montoPago,
+      saldopendiente: saldopendiente,
+      idestado: estadoReserva,
+    });
+
+    return res.status(200).json({
+      message: 'Primer pago procesado exitosamente.',
+      reserva: updatedReserva,
+    });
+
+  } catch (err) {
+    console.error('Error al procesar el primer pago:', err);
+    return res.status(500).json({
+      message: 'Hubo un error al procesar el primer pago.',
+      error: err.message,
+    });
+  }
+}
+
+
+
+// Procesar el segundo pago
+async function procesarSegundoPago(req, res) {
+  const { idreserva, montoPago } = req.body;
+
+  try {
+    // Buscar la reserva por ID
+    const reserva = await modelos.reservas.findOne({ where: { idreserva } });
+    if (!reserva) {
+      return res.status(404).json({ message: 'Reserva no encontrada.' });
+    }
+
+    // Verificamos si el segundo pago cubre el saldo pendiente
+    if (montoPago !== reserva.saldopendiente) {
+      return res.status(400).json({ message: 'El segundo pago no cubre el saldo pendiente.' });
+    }
+
+    // Actualizamos el saldo pendiente con el segundo pago y el pago realizado
+    const totalPagado = reserva.pagorealizado + montoPago;
+    let estadoReserva = reserva.idestado;
+
+    // Si la suma de pagorealizado y saldopendiente es igual al total, actualizamos el estado a "Pagada"
+    if (totalPagado === reserva.total) {
+      estadoReserva = 'Pagada';
+    }
+
+    // Actualizar la reserva
+    const updatedReserva = await reserva.update({
+      pagorealizado: totalPagado,  // Sumar el segundo pago
+      saldopendiente: 0,           // El saldo pendiente se pone en 0
+      idestado: estadoReserva,
+    });
+
+    return res.status(200).json({
+      message: 'Segundo pago procesado exitosamente.',
+      reserva: updatedReserva,
+    });
+
+  } catch (err) {
+    console.error('Error al procesar el segundo pago:', err);
+    return res.status(500).json({
+      message: 'Hubo un error al procesar el segundo pago.',
+      error: err.message,
+    });
+  }
+}
+
+
+
+
+async function procesarPagoConTarjeta(req, res) {
+  const { idreserva } = req.params;
+  const { montoPago, detallesTarjeta } = req.body;  // Recibimos montoPago y los detalles de la tarjeta
+
+  // Simular la verificación del pago con tarjeta (aquí iría la integración con tu sistema de pago real)
+  try {
+    // Verificar los datos de la tarjeta (se puede integrar con una API externa como Stripe, por ejemplo)
+    const { numeroTarjeta, fechaExpiracion, cvc, titular, pais } = detallesTarjeta;
+    
+    // Simulación de verificación del pago (esto sería donde haces una llamada a un sistema de pago real)
+    const pagoExitoso = true;  // Simulando un pago exitoso
+
+    if (!pagoExitoso) {
+      return res.status(400).json({ message: 'Error al procesar el pago con tarjeta' });
+    }
+
+    // Obtener la reserva
+    const reserva = await modelos.reservas.findOne({ where: { idreserva } });
+    if (!reserva) {
+      return res.status(404).json({ message: 'Reserva no encontrada' });
+    }
+
+    // Actualizar la reserva con el pago realizado
+    await reserva.update({
+      pagorealizado: montoPago,  // Actualiza el pago realizado
+      saldopendiente: reserva.total - montoPago,  // Actualiza el saldo pendiente
+    });
+
+    return res.status(200).json({
+      message: 'Pago con tarjeta procesado exitosamente',
+      reserva
+    });
+
+  } catch (err) {
+    console.error('Error al procesar el pago con tarjeta:', err);
+    return res.status(500).json({
+      message: 'Hubo un error al procesar el pago con tarjeta',
+      error: err.message
+    });
+  }
+}
+
+
+
+
+
+
 module.exports = {
     create,
     update,
@@ -427,6 +573,11 @@ module.exports = {
     getAll,
     getByCliente,
     createClienteYReserva,
-    getOne
+    getOne,
+    procesarPrimerPago,
+    procesarSegundoPago,
+    procesarPagoConTarjeta
+
+    
     
   };
