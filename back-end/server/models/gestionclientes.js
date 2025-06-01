@@ -36,6 +36,12 @@ module.exports = (sequelize, DataTypes) => {
         idprecliente: {
             type: DataTypes.STRING
         },
+        rol: {
+            type: DataTypes.INTEGER
+        },
+        contrasenia: {
+            type: DataTypes.STRING
+        },
     });
 
     cliente.associate = (models) => {

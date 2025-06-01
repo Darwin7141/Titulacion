@@ -20,7 +20,9 @@ export class InicioClienteComponent implements OnInit{
     private _auth:AuthService,
     private _router:Router){}
     logout(){
+      
       this._auth.logOut();
+      
       this._router.navigate(['login']);
 
     }

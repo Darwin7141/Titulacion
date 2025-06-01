@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
         contrasenia: {
             type: DataTypes.STRING
         },
+        rol: {
+            type: DataTypes.INTEGER
+        },
 
     }, {
         tableName: 'preclientes',  // Especificar el nombre de la tabla como 'cargo'

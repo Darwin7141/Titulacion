@@ -68,10 +68,10 @@ export class ListaadministradorComponent implements OnInit {
   }
 
   eliminarAdmin(codigoadmin: string, ci: string): void {
-    if (ci === '0302687488') {
-      alert('No se permite eliminar al administrador principal.');
-      return;
-    }
+    //if (ci === '0302687488') {
+    //  alert('No se permite eliminar al administrador principal.');
+    //  return;
+  //  }
   
     if (confirm('¿Está seguro de que desea eliminar este administrador?')) {
       this.adminService.eliminarAdministrador(codigoadmin).subscribe({

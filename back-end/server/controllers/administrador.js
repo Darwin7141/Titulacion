@@ -5,8 +5,13 @@ const bcrypt = require('bcrypt');
 async function create(req, res) {
   const { ci, nombre, direccion, e_mail, telefono, contrasenia } = req.body;
   console.log(req.body);
+  const { sequelize } = modelos;
+
+  let t;
 
   try {
+
+    t = await sequelize.transaction();
       // Validar datos antes de la inserción
       if (!validarCedulaEcuador(ci)) {
           return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
@@ -21,54 +26,69 @@ async function create(req, res) {
       }
 
       // Obtener el último valor de codigoempleado
-      const lastAdministrador = await modelos.administrador.findOne({
-          order: [['codigoadmin', 'DESC']],
-      });
+      const lastAdmin = await modelos.administrador.findOne({
+      order: [['codigoadmin', 'DESC']],
+      transaction: t
+    });
+    let nextCodigo = 'A001';
+    if (lastAdmin?.codigoadmin) {
+      const num = parseInt(lastAdmin.codigoadmin.slice(1), 10) + 1;
+      nextCodigo = `A${String(num).padStart(3, '0')}`;
+    }
 
-      // Generar el siguiente código
-      let nextCodigo = 'A001'; // Valor inicial por defecto
-      if (lastAdministrador && lastAdministrador.codigoadmin) {
-          const lastNumber = parseInt(lastAdministrador.codigoadmin.slice(1), 10); // Extraer número
-          nextCodigo = `A${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
-      }
+    // 3) Hashear contraseña
+    const hashedPassword = await bcrypt.hash(contrasenia, 10);
 
-       const hashedPassword = await bcrypt.hash(contrasenia, 10);
-      
+    // 4) Crear administrador con rol = 1
+    const admin = await modelos.administrador.create({
+      codigoadmin: nextCodigo,
+      ci,
+      nombre,
+      direccion,
+      e_mail,
+      telefono,
+      contrasenia: hashedPassword,
+      rol: 1
+    }, { transaction: t });
 
-      // Crear el nuevo empleado con el código generado
-      const admin = await modelos.administrador.create({
-          codigoadmin: nextCodigo,
-          ci,
-          nombre,
-          direccion,
-          e_mail,
-          telefono, 
-          contrasenia
-          
-      });
+    // 5) Generar nextIdCuenta para cuentasusuarios
+    const lastUser = await modelos.cuentasusuarios.findOne({
+      order: [['idcuenta', 'DESC']],
+      transaction: t
+    });
+    let nextIdCuenta = 'CU001';
+    if (lastUser?.idcuenta) {
+      const num = parseInt(lastUser.idcuenta.slice(2), 10) + 1;
+      nextIdCuenta = `CU${String(num).padStart(3, '0')}`;
+    }
 
-      const lastUser = await modelos.cuentasusuarios.findOne({
-                  order: [['idcuenta', 'DESC']],
-              });
-      
-              let nextIdCuenta = 'CU001'; // Valor inicial por defecto
-              if (lastUser && lastUser.idcuenta) {
-                  const lastNumber = parseInt(lastUser.idcuenta.slice(2), 10); // Extraer número
-                  nextIdCuenta = `CU${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
-              }
-      
-              // Ahora, insertamos el usuario en la tabla cuentasusuarios
-              await modelos.cuentasusuarios.create({
-                  idcuenta: nextIdCuenta, // Usamos el id generado
-                  correo: admin.e_mail,
-                  contrasenia: hashedPassword, // La contraseña ya encriptada
-                  rol: admin.codigoadmin // Asignamos el 'idprecliente' como 'rol' en cuentasusuarios
-              });
+    // 6) Crear cuenta de usuario copiando el mismo rol del admin
+    const cuenta = await modelos.cuentasusuarios.create({
+      idcuenta: nextIdCuenta,
+      correo: admin.e_mail,
+      contrasenia: hashedPassword,
+      rol: admin.rol     // <-- aquí aseguramos que rol en cuentasusuarios = rol de administrador
+    }, { transaction: t });
 
-      res.status(201).send(admin); // Enviar el empleado creado
+    // 7) Crear la relación en cuenta_administrador
+    await modelos.cuenta_administrador.create({
+      id_admin: admin.codigoadmin,
+      id_cuenta: cuenta.idcuenta
+    }, { transaction: t });
+
+    // 8) Commit de la transacción
+    await t.commit();
+
+    // 9) Responder con el admin creado
+    res.status(201).send(admin);
+
   } catch (err) {
-      console.error('Error al crear adminstrador:', err);
-      res.status(500).send({ message: 'Ocurrió un error al ingresar el administrador.', error: err.message });
+    await t.rollback();
+    console.error('Error al crear administrador:', err);
+    res.status(500).send({
+      message: 'Ocurrió un error al ingresar el administrador.',
+      error: err.message
+    });
   }
 }
 

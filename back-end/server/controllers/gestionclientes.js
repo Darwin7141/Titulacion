@@ -1,10 +1,14 @@
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); // Importar la función de validación
 const modelos = require('../models'); // Importar los modelos
-
+const bcrypt = require('bcrypt');
 async function create(req, res) {
   const { ci, nombre, direccion, e_mail, telefono, idprecliente } = req.body;
-
+    const { sequelize } = modelos;
+    
+      let t;
   try {
+
+    t = await sequelize.transaction();
       // Validar datos antes de la inserción
       if (!validarCedulaEcuador(ci)) {
           return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
@@ -21,31 +25,75 @@ async function create(req, res) {
       // Obtener el último valor de codigoempleado
       const lastProv = await modelos.clientes.findOne({
           order: [['codigocliente', 'DESC']],
+          transaction: t
       });
 
       // Generar el siguiente código
-      let nextCodigo = 'CL001'; // Valor inicial por defecto
-      if (lastProv && lastProv.codigocliente) {
-          const lastNumber = parseInt(lastProv.codigocliente.slice(2), 10); // Extraer número
-          nextCodigo = `CL${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
-      }
+      const nextCodigo = lastProv
+      ? 'CL' + String(parseInt(lastProv.codigocliente.slice(2), 10) + 1).padStart(3, '0')
+      : 'CL001';
 
-      // Crear el nuevo empleado con el código generado
-      const proveedor = await modelos.clientes.create({
-          codigocliente: nextCodigo,
-          ci,
-          nombre,
-          direccion,
-          e_mail,
-          telefono,
-          idprecliente
-          
-      });
+    /* ── 3. OBTENER la cuenta (CUxxx) asociada al PRExxx ─────────── */
+    let idCuenta = null;
 
-      res.status(201).send(proveedor); // Enviar el empleado creado
+   if (idprecliente) {                    /* ← flujo A: viene de un PRE */
+     const enlacePre = await modelos.cuenta_preclientes.findByPk(
+       idprecliente,
+       { transaction: t }
+     );
+     idCuenta = enlacePre ? enlacePre.idcuenta : null;
+
+     if (!idCuenta) {                     /* seguridad extra */
+       await t.rollback();
+       return res.status(400).send({ message: 'El pre-cliente no tiene cuenta asociada.' });
+     }
+
+   } else {                               /* ← flujo B: lo crea un ADMIN */
+     /* Generar nuevo CUxxx */
+     const lastCU = await modelos.cuentasusuarios.findOne({
+       order: [['idcuenta', 'DESC']],
+       transaction: t
+     });
+     idCuenta = lastCU
+       ? 'CU' + String(parseInt(lastCU.idcuenta.slice(2), 10) + 1).padStart(3,'0')
+       : 'CU001';
+
+     /* Crear la cuenta con rol = 3 (cliente) */
+
+     const hash = await bcrypt.hash(req.body.contrasenia, 10);
+     await modelos.cuentasusuarios.create({
+       idcuenta    : idCuenta,
+       correo      : e_mail,
+       contrasenia : hash ,  // o la clave que envíes en body
+       rol         : 3
+     }, { transaction: t });
+   }
+    /* ── 4. CREAR el cliente ─────────────────────────────────────── */
+    const clienteCreado = await modelos.clientes.create({
+      codigocliente: nextCodigo,
+      ci,
+      nombre,
+      direccion,
+      e_mail,
+      telefono,
+      idprecliente,
+      rol: 3
+    }, { transaction: t });
+
+    /* ── 5. VINCULAR cuenta ↔ cliente ───────────────────────────── */
+    await modelos.cuenta_clientes.create({
+      id_cliente: clienteCreado.codigocliente,  // 'CLxxx'
+      id_cuenta : idCuenta                      // 'CUxxx'
+    }, { transaction: t });
+
+    /* ── 6. CONFIRMAR ───────────────────────────────────────────── */
+    await t.commit();
+    return res.status(201).send(clienteCreado);
+
   } catch (err) {
-      console.error('Error al crear cliente:', err);
-      res.status(500).send({ message: 'Ocurrió un error al ingresar el cliente.', error: err.message });
+    if (t) await t.rollback();
+    console.error('Error al crear cliente:', err);
+    return res.status(500).send({ message: 'Ocurrió un error al ingresar el cliente.', error: err.message });
   }
 }
 

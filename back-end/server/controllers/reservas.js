@@ -1,5 +1,6 @@
 const modelos = require('../models');
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); 
+const sequelize = modelos.sequelize; 
 
 async function create(req, res) {
   const {
@@ -92,6 +93,8 @@ async function create(req, res) {
 }
 
 async function createClienteYReserva(req, res) {
+
+  const t = await sequelize.transaction();
   let clienteCreado = null;
   let reservaCreada = null;
 
@@ -99,8 +102,19 @@ async function createClienteYReserva(req, res) {
     // ================ CREACIÓN DE CLIENTE ================
     const { ci, nombre, telefono, direccion, e_mail, idprecliente } = req.body;
 
+    const enlacePre = await modelos.cuenta_preclientes.findByPk(
+     idprecliente,
+     { transaction: t }
+   );
+   if (!enlacePre) {
+     await t.rollback();
+     return res.status(400).json({ message: 'El pre-cliente no tiene cuenta asociada.' });
+   }
+   const idCuenta = enlacePre.idcuenta;
     // Generar un nuevo codigocliente
-    const lastCliente = await modelos.clientes.findOne({ order: [['codigocliente','DESC']] });
+    const lastCliente = await modelos.clientes.findOne({ order: [['codigocliente','DESC']],
+      transaction: t
+     });
     let nextCodigoCliente = 'CL001';
     if (lastCliente && lastCliente.codigocliente) {
       const lastNum = parseInt(lastCliente.codigocliente.slice(2), 10);
@@ -115,8 +129,14 @@ async function createClienteYReserva(req, res) {
       direccion,
       e_mail,
       telefono,
-      idprecliente
-    });
+      idprecliente,
+      rol: 3
+    }, { transaction: t });
+
+    await modelos.cuenta_clientes.create({
+     id_cliente: clienteCreado.codigocliente,   // 'CLxxx'
+     id_cuenta : idCuenta                       // 'CUxxx'
+   }, { transaction: t });
 
     // ================ CREACIÓN DE RESERVA ================
     const {
@@ -135,6 +155,7 @@ async function createClienteYReserva(req, res) {
     if (!estadoParaInsertar) {
       const estadoSolicitada = await modelos.estado_reserva.findOne({
         where: { estado_reserva: 'Solicitada' }
+        , transaction: t
       });
       if (!estadoSolicitada) {
         return res.status(400).json({
@@ -145,7 +166,9 @@ async function createClienteYReserva(req, res) {
     }
 
     // Generar un nuevo id de reserva
-    const lastReserva = await modelos.reservas.findOne({ order: [['idreserva','DESC']] });
+    const lastReserva = await modelos.reservas.findOne({ order: [['idreserva','DESC']],
+      transaction: t
+     });
     let nextCodigoReserva = 'R001';
     if (lastReserva && lastReserva.idreserva) {
       const lastNumber = parseInt(lastReserva.idreserva.slice(1), 10);
@@ -163,7 +186,7 @@ async function createClienteYReserva(req, res) {
       pagorealizado,
       saldopendiente,
       idestado: estadoParaInsertar
-    });
+    },{ transaction: t });
 
     // 2) Insertar los detalles
     if (Array.isArray(detalle)) {
@@ -174,15 +197,17 @@ async function createClienteYReserva(req, res) {
           cantpersonas: d.cantpersonas,
           preciounitario: d.preciounitario,
           subtotal: d.subtotal
-        });
+        },{ transaction: t });
       }
     }
 
     // ================ Actualizar rol en cuentasusuarios ================
     await modelos.cuentasusuarios.update(
-      { rol: nextCodigoCliente },           // Nuevo rol
-      { where: { rol: idprecliente } }
+      { rol: 3 },                       // 3 = cliente
+      { where: { idcuenta: idCuenta } , transaction: t }
     );
+
+    await t.commit();
 
     return res.status(201).json({
       message: 'Cliente y reserva creados exitosamente ',
@@ -199,6 +224,8 @@ async function createClienteYReserva(req, res) {
     });
 
   } catch (error) {
+
+    await t.rollback();
     console.error('Error al crear la reserva', error);
 
     // ROLLBACK MANUAL

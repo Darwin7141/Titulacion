@@ -64,14 +64,14 @@ export class AgendarReservaComponent implements OnInit {
   console.log('DEBUG: Datos del usuario cargados desde localStorage:', usuario);
   
     // Cargar datos del precliente desde localStorage
-    if (usuario && usuario.rol.startsWith('P')) {  // Verifica si es precliente
+    if (usuario && usuario.rol===2) {  // Verifica si es precliente
       this.formReserva.ci = usuario.ci || '';
       this.formReserva.nombre = usuario.nombre || '';
       this.formReserva.telefono = usuario.telefono || '';
       this.formReserva.direccion = usuario.direccion || '';
       this.formReserva.e_mail = usuario.correo || '';
       this.formReserva.idprecliente = usuario.idprecliente || '';
-    } else if (usuario && usuario.rol.startsWith('CL')) {  // Verifica si es cliente
+    } else if (usuario && usuario.rol===3) {  // Verifica si es cliente
       this.formReserva.ci = usuario.ci || '';
       this.formReserva.nombre = usuario.nombre || '';
       this.formReserva.telefono = usuario.telefono || '';
@@ -81,7 +81,7 @@ export class AgendarReservaComponent implements OnInit {
     } 
    
   }
-  // ================== BOTÓN "AGREGAR" ==================
+  
   agregarMenuDesdeSelect(selectedIdMenu: string, cantStr: string) {
     const menuEncontrado = this.menus.find(m => m.idmenu === selectedIdMenu);
     if (!menuEncontrado) {

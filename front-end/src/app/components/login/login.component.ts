@@ -84,8 +84,7 @@ export class LoginComponent implements OnInit {
             // Si el login es exitoso, se restablece el contador de intentos
             this.intentos = 0;
 
-            // Guardar los datos del usuario en el almacenamiento local (si es necesario)
-            localStorage.setItem('identity_user', JSON.stringify(response.usuario));
+            
 
             Swal.fire({
                 icon: 'success',
@@ -96,21 +95,23 @@ export class LoginComponent implements OnInit {
                 // Redirigir según el valor del rol
                 const rol = response.usuario.rol;
 
-                if (rol.startsWith('A')) {
-                    this._router.navigate(['/admin/list/']);
-                } else if (rol.startsWith('E')) {
-                    this._router.navigate(['/inicioEmpleado/']);
-                } else if (rol.startsWith('P')) {
-                    this._router.navigate(['/inicioCliente/']);
-                } else if (rol.startsWith('C')) {
-                    this._router.navigate(['/inicioCliente/']);
-                }  
-                else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Rol desconocido',
-                        text: 'No se reconoce el rol del usuario. Contacte al administrador.',
-                    });
+               if (rol ===1) {
+            // administrador
+            this._router.navigate(['/admin/list/']);
+          } else if (rol === 2) {
+            // cliente
+            this._router.navigate(['/inicioCliente/']);
+            
+          } else if (rol === 3) {
+            // cliente
+            this._router.navigate(['/inicioCliente/']);
+          }else {
+            // otros roles (empleado, precliente, etc.)
+            Swal.fire({
+              icon: 'error',
+              title: 'Rol desconocido',
+              text: 'No se reconoce el rol del usuario. Contacte al administrador.',
+            });
                 }
             });
         },

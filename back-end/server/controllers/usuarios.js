@@ -130,83 +130,90 @@ function eliminar(req, res) {
 
 
 async function login(req, res) {
-    try {
-      // 1. Buscar el usuario (cuentasusuarios) por correo
-      const usuario = await modelos.cuentasusuarios.findOne({
-        where: { correo: req.body.correo }
-      });
-  
-      // 2. Validar si el usuario existe
-      if (!usuario) {
-        return res.status(401).json({ message: "Correo no encontrado" });
-      }
-  
-      // 3. Comparar la contraseña
-      const isMatch = await bcrypt.compare(req.body.contrasenia, usuario.contrasenia);
-      if (!isMatch) {
-        return res.status(400).json({ error: "Contraseña incorrecta" });
-      }
-  
-      // 4. Si el rol comienza con "PRE" (ej. "PRE001"), buscar datos en la tabla preclientes
-      let datosPrecliente = {};
-      if (usuario.rol.startsWith('P')) {
-        const precliente = await modelos.preclientes.findOne({
-          where: { idprecliente: usuario.rol }  // Asumiendo que "rol" = "PRE001" coincide con "idprecliente"
-        });
-  
-        if (precliente) {
-          datosPrecliente = {
-            ci: precliente.ci,
-            nombre: precliente.nombre,
-            telefono: precliente.telefono,
-            direccion: precliente.direccion,
-            // Y todo lo que necesites:
-            // correo: precliente.correo, // si hace falta
-            idprecliente: precliente.idprecliente
-          };
-        }
-      }
+  try {
+    /* 1. Buscar la cuenta --------------------------- */
+    const cuenta = await modelos.cuentasusuarios.findOne({
+    where: { correo: req.body.correo }
+  });
+  if (!cuenta) return res.status(401).json({ message: 'Correo no encontrado' });
 
-      let datosCliente = {};
-      if (usuario.rol.startsWith('CL')) {
-        const cliente = await modelos.clientes.findOne({
-          where: { codigocliente: usuario.rol }  // Asumiendo que "rol" = "PRE001" coincide con "idprecliente"
-        });
-  
-        if (cliente) {
-          datosCliente = {
-            ci: cliente.ci,
-            nombre: cliente.nombre,
-            telefono: cliente.telefono,
-            direccion: cliente.direccion,
-            // Y todo lo que necesites:
-            // correo: precliente.correo, // si hace falta
-            codigocliente: cliente.codigocliente
-          };
-        }
-      }
-  
-      // 5. Respuesta exitosa, adjuntando campos del precliente si existe
-      //    Observa que "usuario" es de la tabla cuentasusuarios, y "datosPrecliente" son los datos personales
-      return res.status(200).send({
-        message: "Login exitoso",
-        usuario: {
-          idcuenta: usuario.idcuenta,
-          correo: usuario.correo,
-          rol: usuario.rol,
-          // OPCIONAL: contrasenia (quizá no lo quieras devolver)
-          // Añade los campos del precliente, si existen
-          ...datosPrecliente,
-          ...datosCliente
-        }
-      });
+  /* 2. Contraseña -------------------------------------------------- */
+  const ok = await bcrypt.compare(req.body.contrasenia, cuenta.contrasenia);
+  if (!ok) return res.status(400).json({ message: 'Contraseña incorrecta' });
 
-      
-    } catch (err) {
-      // Manejo de errores
-      res.status(500).json({ error: "Error en el servidor", details: err.message });
+  /* 3. Traer datos personales segun rol --------------------------- */
+  let datosPersona = {};
+
+  if (cuenta.rol === 1) {                      // PRE-cliente
+    const enlace = await modelos.cuenta_administrador.findOne({
+      where: { id_cuenta: cuenta.idcuenta }     // FK en la tabla puente
+    });
+    if (enlace) {
+      const admin = await modelos.administrador.findByPk(enlace.codigoadmin);
+      if (admin) datosPersona = {
+        codigoadmin: admin.ci,
+        ci: admin.ci,
+        nombre: admin.nombre,
+        direccion: admin.direccion,
+        e_mail: admin.e_mail,
+        telefono: admin.telefono,
+        
+                              // o cuenta.correo
+      };
     }
   }
+
+  if (cuenta.rol === 2) {                      // PRE-cliente
+    const enlace = await modelos.cuenta_preclientes.findOne({
+      where: { idcuenta: cuenta.idcuenta }     // FK en la tabla puente
+    });
+    if (enlace) {
+      const pre = await modelos.preclientes.findByPk(enlace.idprecliente);
+      if (pre) datosPersona = {
+        idprecliente: pre.idprecliente,
+        ci: pre.ci,
+        nombre: pre.nombre,
+        telefono: pre.telefono,
+        direccion: pre.direccion,
+        correo: pre.correo                       // o cuenta.correo
+      };
+    }
+  }
+
+  if (cuenta.rol === 3) {                      // Cliente
+    const enlace = await modelos.cuenta_clientes.findOne({
+      where: { id_cuenta: cuenta.idcuenta }
+    });
+    if (enlace) {
+      const cli = await modelos.clientes.findByPk(enlace.id_cliente);
+      if (cli) datosPersona = {
+        codigocliente: cli.codigocliente,
+        ci: cli.ci,
+        nombre: cli.nombre,
+        telefono: cli.telefono,
+        direccion: cli.direccion,
+        correo: cli.e_mail                       // campo en tabla clientes
+      };
+    }
+  }
+
+    /* 4. Respuesta completa ------------------------- */
+    return res.status(200).json({
+      message: 'Login exitoso', 
+      usuario: {
+        idcuenta: cuenta.idcuenta,
+        rol: cuenta.rol,
+        correo:  cuenta.correo,
+        ...datosPersona                               // ← aquí van ci, nombre, etc.
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error en el servidor', error: err.message });
+  }
+}
+
 function getAll(req, res) {
     modelos.cuentasusuarios.findAll({
       order: [['idcuenta', 'ASC']] // Ordenar por codigocliente en orden ascendente

@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: false,
     },
+    cuenta: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
   }, {
     tableName: 'tokens_recuperacion',
     timestamps: false,

@@ -5,7 +5,13 @@ const bcrypt = require('bcrypt');
 async function create(req, res) {
     const { ci, nombre, telefono, direccion, correo, contrasenia } = req.body;
 
+    const { sequelize } = modelos;
+    
+      let t;
+
     try {
+
+        t = await sequelize.transaction();
         // Validar datos antes de la inserción
         if (!validarCedulaEcuador(ci)) {
             return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
@@ -22,6 +28,7 @@ async function create(req, res) {
         // Obtener el último valor de idprecliente
         const lastProv = await modelos.preclientes.findOne({
             order: [['idprecliente', 'DESC']],
+            transaction: t
         });
 
         // Generar el siguiente código para idprecliente
@@ -35,7 +42,7 @@ async function create(req, res) {
         const hashedPassword = await bcrypt.hash(contrasenia, 10);
 
         // Crear el nuevo precliente con la contraseña encriptada
-        const proveedor = await modelos.preclientes.create({
+        const precliente = await modelos.preclientes.create({
             idprecliente: nextCodigo,
             ci,
             nombre,
@@ -43,31 +50,43 @@ async function create(req, res) {
             telefono,
             direccion,
             correo,
-            contrasenia: hashedPassword // Usar la contraseña encriptada aquí
-        });
+            contrasenia: hashedPassword, // Usar la contraseña encriptada aquí
+       rol: 2
+    }, { transaction: t });
+
 
         // Generar el siguiente idcuenta para la tabla cuentasusuarios
         const lastUser = await modelos.cuentasusuarios.findOne({
-            order: [['idcuenta', 'DESC']],
-        });
-
-        let nextIdCuenta = 'CU001'; // Valor inicial por defecto
-        if (lastUser && lastUser.idcuenta) {
-            const lastNumber = parseInt(lastUser.idcuenta.slice(2), 10); // Extraer número
-            nextIdCuenta = `CU${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
-        }
-
-        // Ahora, insertamos el usuario en la tabla cuentasusuarios
-        await modelos.cuentasusuarios.create({
-            idcuenta: nextIdCuenta, // Usamos el id generado
-            correo,
-            contrasenia: hashedPassword, // La contraseña ya encriptada
-            rol: proveedor.idprecliente // Asignamos el 'idprecliente' como 'rol' en cuentasusuarios
-        });
-
-        // Responder con el proveedor creado
-        res.status(201).send(proveedor); // Enviar el registro creado
+              order: [['idcuenta', 'DESC']],
+              transaction: t
+            });
+            let nextIdCuenta = 'CU001';
+            if (lastUser?.idcuenta) {
+              const num = parseInt(lastUser.idcuenta.slice(2), 10) + 1;
+              nextIdCuenta = `CU${String(num).padStart(3, '0')}`;
+            }
+        
+            // 6) Crear cuenta de usuario copiando el mismo rol del admin
+            const cuenta = await modelos.cuentasusuarios.create({
+              idcuenta: nextIdCuenta,
+              correo: precliente.correo,
+              contrasenia: hashedPassword,
+              rol: precliente.rol     // <-- aquí aseguramos que rol en cuentasusuarios = rol de administrador
+            }, { transaction: t });
+        
+            // 7) Crear la relación en cuenta_administrador
+            await modelos.cuenta_preclientes.create({
+              idprecliente: precliente.idprecliente,
+              idcuenta: cuenta.idcuenta
+            }, { transaction: t });
+        
+            // 8) Commit de la transacción
+            await t.commit();
+        
+            // 9) Responder con el admin creado
+            res.status(201).send(precliente);
     } catch (err) {
+        await t.rollback();
         console.error('Error al registrarse:', err);
         res.status(500).send({ message: 'Ocurrió un error al registrarse.', error: err.message });
     }

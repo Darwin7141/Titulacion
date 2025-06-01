@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { GLOBAL } from './global';
+import { tap } from 'rxjs/operators';  
 
 @Injectable({
   providedIn: 'root'
@@ -13,15 +14,19 @@ export class LoginService {
     this.url=GLOBAL.url;
   }
 
-  login(usuario: any): Observable<any> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json'
-      })
-    };
+  login(credentials: any): Observable<any> {
+  const httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
 
-    return this.http.post<any>(this.url +"login", usuario, httpOptions);
-  }
+  return this.http.post<any>(this.url + 'login', credentials, httpOptions).pipe(
+    tap((resp) => {
+      /* 1. Vaciar lo anterior */
+      localStorage.removeItem('identity_user');
 
- 
+      /* 2. Guardar TODO el objeto que te devuelva el back-end */
+      localStorage.setItem('identity_user', JSON.stringify(resp.usuario));
+    })
+  );
+}
 }

@@ -18,6 +18,7 @@ export class ClientesComponent implements OnInit {
     direccion: '',
     e_mail: '',
     telefono: '',
+    contrasenia: '',
     
   };
     constructor(

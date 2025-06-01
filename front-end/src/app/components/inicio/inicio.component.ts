@@ -38,11 +38,11 @@ export class InicioComponent implements OnInit{
             localStorage.setItem('identity_user', JSON.stringify(response.usuario));
             this._router.navigate(['/admin/list/']);
           
-          // Aquí puedes manejar la respuesta, como guardar un token o redirigir al usuario
+          // Para manejar la respuesta, como guardar un token o redirigir al usuario
         },
         error: (err) => {
           console.error('Error en el inicio de sesión:', err);
-          // Aquí puedes manejar el error, como mostrar un mensaje al usuario
+          // Para manejar el error, como mostrar un mensaje al usuario
         },
       });
     }
