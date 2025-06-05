@@ -13,4 +13,5 @@ module.exports = (app) => {
     app.get('/api/cliente/poremail/:email', clientesController.getClientePorEmail);
     
     app.get('/api/cliente/portelefono/:telefono', clientesController.getClientePorTelefono);
+    app.get('/api/cliente/:codigocliente', clientesController.getOneByCodigo);
 };

@@ -184,3 +184,14 @@ button i {
   background-color: #f44336;
   color: white;
 }
+
+::ng-deep .paypal-modal {
+  overflow-x: hidden;     /* elimina la barra inferior */
+  text-align: center;     /* centra el div de PayPal */
+}
+
+/* opcional: ajusta ancho máximo del botón para que no desborde */
+::ng-deep .paypal-hosted {
+  max-width: 400px;
+  margin: 0 auto;
+}

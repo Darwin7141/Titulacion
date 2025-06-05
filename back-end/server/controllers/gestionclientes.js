@@ -203,6 +203,10 @@ function getAll(req, res) {
     });
 }
 
+
+
+
+
 async function verificarCedula(req, res) {
     const { ci } = req.params;
     try {
@@ -286,7 +290,24 @@ async function getClientePorCedula(req, res) {
     }
   }
 
-  
+  async function getOneByCodigo(req, res) {
+  const codigocliente = req.params.codigocliente;
+  try {
+    // Busca cliente por su clave primaria (codigocliente)
+    const cliente = await modelos.clientes.findByPk(codigocliente);
+    if (!cliente) {
+      return res.status(404).json({ message: 'Cliente no encontrado.' });
+    }
+    // En este punto `cliente` es un objeto con todos sus campos (nombre, ci, direccion, telefono, etc.)
+    return res.status(200).json(cliente);
+  } catch (err) {
+    console.error('Error al obtener cliente por código:', err);
+    return res.status(500).json({
+      message: 'Ocurrió un error al buscar el cliente.',
+      error: err.message
+    });
+  }
+}
 
 module.exports = {
     create,
@@ -298,5 +319,6 @@ module.exports = {
     verificarTelefono,
     getClientePorCedula,
     getClientePorEmail,
-    getClientePorTelefono
+    getClientePorTelefono,
+    getOneByCodigo
 };

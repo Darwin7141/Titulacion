@@ -1,5 +1,6 @@
 const modelos = require('../models');
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); 
+const { enviarNotificacionReserva } = require('../controllers/contacto');
 const sequelize = modelos.sequelize; 
 
 async function create(req, res) {
@@ -9,9 +10,10 @@ async function create(req, res) {
     direccionevento,
     cantpersonas,
     total,
-    pagorealizado,
-    saldopendiente,
-    idestado,  // puede venir vacío
+    primer_pago,
+    segundo_pago,
+    idestado,
+    saldo_pendiente,  // puede venir vacío
     detalle
   } = req.body;
 
@@ -48,8 +50,9 @@ async function create(req, res) {
       direccionevento,
       cantpersonas,
       total,
-      pagorealizado,
-      saldopendiente,
+      primer_pago,
+      segundo_pago,
+      saldo_pendiente,
       idestado: estadoParaInsertar
     });
 
@@ -65,6 +68,43 @@ async function create(req, res) {
         });
       }
     }
+
+
+    setImmediate(async () => {
+      try {
+        // 1) Cargar datos del cliente (solo campos necesarios)
+        const cliente = await modelos.clientes.findOne({
+          where: { codigocliente },
+          attributes: ['ci', 'nombre', 'telefono', 'direccion', 'e_mail']
+        });
+
+        // 2) Cargar detalles de menú para esta reserva
+        const detallesReservas = await modelos.detalle_reserva.findAll({
+          where: { idreserva: nextCodigo },
+          include: [{ model: modelos.menu, as: 'menu', attributes: ['nombre'] }]
+        });
+
+        const menusDetalle = detallesReservas.map(dr => ({
+          nombre:         dr.menu.nombre,
+          cantpersonas:   dr.cantpersonas,
+          precioUnitario: dr.preciounitario,
+          subtotal:       dr.subtotal
+        }));
+
+        // 3) Llamar a la función que envía correo + WhatsApp
+        await enviarNotificacionReserva({
+          idreserva:    nextCodigo,
+          codigocliente,
+          fechaevento,
+          direccionevento,
+          total,
+          menusDetalle,
+          datosCliente: cliente  // { ci, nombre, telefono, direccion, e_mail }
+        });
+      } catch (errNotif) {
+        console.error('Error al notificar empresa (create):', errNotif);
+      }
+    });
 
     return res.status(201).json({
       message: 'Reserva creada con detalle',
@@ -144,9 +184,10 @@ async function createClienteYReserva(req, res) {
       direccionevento,
       cantpersonas,
       total,
-      pagorealizado,
-      saldopendiente,
-      idestado,  // puede venir vacío
+      primer_pago,
+      segundo_pago,
+      idestado,
+      saldo_pendiente,  // puede venir vacío
       detalle
     } = req.body;
 
@@ -183,8 +224,9 @@ async function createClienteYReserva(req, res) {
       direccionevento,
       cantpersonas,
       total,
-      pagorealizado,
-      saldopendiente,
+      primer_pago,
+      segundo_pago,
+      saldo_pendiente,
       idestado: estadoParaInsertar
     },{ transaction: t });
 
@@ -208,6 +250,43 @@ async function createClienteYReserva(req, res) {
     );
 
     await t.commit();
+
+    setImmediate(async () => {
+      try {
+        // 1) Los datos del cliente que acabamos de crear:
+        const datosCliente = {
+          ci:       ci,
+          nombre:   nombre,
+          telefono: telefono,
+          direccion:direccion,
+          e_mail:   e_mail
+        };
+
+        // 2) Obtener detalles del menú recién guardados:
+        const detallesReservas = await modelos.detalle_reserva.findAll({
+          where: { idreserva: nextCodigoReserva },
+          include: [{ model: modelos.menu, as: 'menu', attributes: ['nombre'] }]
+        });
+        const menusDetalle = detallesReservas.map(dr => ({
+          nombre:         dr.menu.nombre,
+          cantpersonas:   dr.cantpersonas,
+          precioUnitario: dr.preciounitario,
+          subtotal:       dr.subtotal
+        }));
+
+        await enviarNotificacionReserva({
+          idreserva:    nextCodigoReserva,
+          codigocliente: nextCodigoCliente,
+          fechaevento,
+          direccionevento,
+          total,
+          menusDetalle,
+          datosCliente
+        });
+      } catch (errNotif) {
+        console.error('Error al notificar empresa (createClienteYReserva):', errNotif);
+      }
+    });
 
     return res.status(201).json({
       message: 'Cliente y reserva creados exitosamente ',
@@ -258,9 +337,10 @@ async function update(req, res) {
     direccionevento,
     cantpersonas, 
     total,
-    pagorealizado, 
-    saldopendiente, 
+    primer_pago, 
+    segundo_pago, 
     idestado, 
+    saldo_pendiente,
     detalle 
   } = req.body;
 
@@ -277,8 +357,9 @@ async function update(req, res) {
       direccionevento: direccionevento ?? reserva.direccionevento,
       cantpersonas: cantpersonas ?? reserva.cantpersonas,
       total: total ?? reserva.total,
-      pagorealizado: pagorealizado ?? reserva.pagorealizado,
-      saldopendiente: saldopendiente ?? reserva.saldopendiente,
+      primer_pago: primer_pago ?? reserva.primer_pago,
+      segundo_pago: segundo_pago ?? reserva.segundo_pago,
+      saldo_pendiente: saldo_pendiente?? reserva.saldo_pendiente,
       idestado: idestado ?? reserva.idestado
     });
 
@@ -451,99 +532,83 @@ async function getOne(req, res) {
 // Procesar el primer pago
 // Procesar el primer pago
 async function procesarPrimerPago(req, res) {
-  const { idreserva, montoPago } = req.body;
+  // ✅ Extraemos idreserva de los parámetros de la URL:
+  const idreserva = req.params.idreserva;
+  // ✅ Y montoPago lo extraemos del body:
+  const { montoPago } = req.body;
+
+  console.log('Llegó una petición a procesarPrimerPago. idreserva en req.params:', idreserva);
+  console.log('Monto a pagar:', montoPago);
 
   try {
-    // Buscar la reserva por ID
-    const reserva = await modelos.reservas.findOne({ where: { idreserva } });
+    // Ahora sí buscamos correctamente:
+    const reserva = await modelos.reservas.findByPk(idreserva);
     if (!reserva) {
       return res.status(404).json({ message: 'Reserva no encontrada.' });
     }
 
-    let saldopendiente = 0;
-    let estadoReserva = reserva.idestado;
-
-    // Verificamos si el primer pago es igual al total de la reserva
-    if (montoPago === reserva.total) {
-      // Si el pago es igual al total, el saldo pendiente se pone a 0 y el estado cambia a "Pagada"
-      saldopendiente = 0;
-      estadoReserva = 'Pagada';
-    } else if (montoPago < reserva.total) {
-      // Si el pago es menor, el saldo pendiente se deja en 0 y se mantiene el estado "Aceptada"
-      saldopendiente = reserva.total - montoPago;
-      estadoReserva = 'Aceptada';
+    // ── calcular nuevo saldo pendiente ──
+    const saldoPendiente = reserva.total - montoPago;
+    if (saldoPendiente < 0) {
+      return res.status(400).json({ message: 'Monto mayor que el total de la reserva.' });
     }
 
-    // Actualizar la reserva
-    const updatedReserva = await reserva.update({
-      pagorealizado: montoPago,
-      saldopendiente: saldopendiente,
-      idestado: estadoReserva,
+    // ── actualizar la fila en BD ──
+    const updated = await reserva.update({
+      primer_pago:     montoPago,             // guardamos el primer pago
+      saldo_pendiente: saldoPendiente,        // lo que falta aún
+     
     });
 
-    return res.status(200).json({
-      message: 'Primer pago procesado exitosamente.',
-      reserva: updatedReserva,
-    });
+    console.log('>> Reserva actualizada en BD:', updated);
 
+    return res.status(200).json({ message: 'Primer pago registrado.', reserva: updated });
   } catch (err) {
-    console.error('Error al procesar el primer pago:', err);
+    console.error(err);
     return res.status(500).json({
-      message: 'Hubo un error al procesar el primer pago.',
-      error: err.message,
+      message: 'Error al procesar el primer pago',
+      error: err.message
     });
   }
 }
-
-
 
 // Procesar el segundo pago
 async function procesarSegundoPago(req, res) {
-  const { idreserva, montoPago } = req.body;
+  // ✅ idreserva viene en los parámetros, no en el body:
+  const idreserva = req.params.idreserva;
+  const { montoPago } = req.body; 
+
+  console.log('Llegó una petición a procesarSegundoPago. idreserva:', idreserva, 'montoPago:', montoPago);
 
   try {
-    // Buscar la reserva por ID
-    const reserva = await modelos.reservas.findOne({ where: { idreserva } });
+    const reserva = await modelos.reservas.findByPk(idreserva);
     if (!reserva) {
       return res.status(404).json({ message: 'Reserva no encontrada.' });
     }
 
-    // Verificamos si el segundo pago cubre el saldo pendiente
-    if (montoPago !== reserva.saldopendiente) {
-      return res.status(400).json({ message: 'El segundo pago no cubre el saldo pendiente.' });
+    // Verificar que el montoPago coincida exactamente con el saldo pendiente actual
+    if (montoPago !== reserva.saldo_pendiente) {
+      return res.status(400).json({ message: 'El monto no coincide con el saldo pendiente.' });
     }
 
-    // Actualizamos el saldo pendiente con el segundo pago y el pago realizado
-    const totalPagado = reserva.pagorealizado + montoPago;
-    let estadoReserva = reserva.idestado;
-
-    // Si la suma de pagorealizado y saldopendiente es igual al total, actualizamos el estado a "Pagada"
-    if (totalPagado === reserva.total) {
-      estadoReserva = 'Pagada';
-    }
-
-    // Actualizar la reserva
-    const updatedReserva = await reserva.update({
-      pagorealizado: totalPagado,  // Sumar el segundo pago
-      saldopendiente: 0,           // El saldo pendiente se pone en 0
-      idestado: estadoReserva,
+    // ── guardamos el segundo pago y actualizamos estado ──
+    const updated = await reserva.update({
+      segundo_pago:    montoPago,
+      saldo_pendiente: 0,
+      
     });
 
-    return res.status(200).json({
-      message: 'Segundo pago procesado exitosamente.',
-      reserva: updatedReserva,
-    });
+    
 
+    return res.status(200).json({ message: 'Segundo pago registrado.', reserva: updated });
   } catch (err) {
-    console.error('Error al procesar el segundo pago:', err);
+    console.error(err);
     return res.status(500).json({
-      message: 'Hubo un error al procesar el segundo pago.',
-      error: err.message,
+      message: 'Error al procesar el segundo pago',
+      error: err.message
     });
   }
 }
-
-
 
 
 async function procesarPagoConTarjeta(req, res) {
@@ -570,8 +635,8 @@ async function procesarPagoConTarjeta(req, res) {
 
     // Actualizar la reserva con el pago realizado
     await reserva.update({
-      pagorealizado: montoPago,  // Actualiza el pago realizado
-      saldopendiente: reserva.total - montoPago,  // Actualiza el saldo pendiente
+      primer_pago: montoPago,  // Actualiza el pago realizado
+      segundo_pago: reserva.total - montoPago,  // Actualiza el saldo pendiente
     });
 
     return res.status(200).json({

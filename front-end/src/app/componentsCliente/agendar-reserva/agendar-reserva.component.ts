@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { MenusService } from '../../services/menus.service';
 import { ClientesService } from '../../services/clientes.service';
 import { ReservasService } from '../../services/reservas.service';
@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./agendar-reserva.component.css'],
   standalone: false,
 })
-export class AgendarReservaComponent implements OnInit {
+export class AgendarReservaComponent implements OnInit{
   
   // Campos de la tabla reservas + precliente
   formReserva = {
@@ -280,6 +280,9 @@ export class AgendarReservaComponent implements OnInit {
 
       // 3) Guardar de nuevo en localStorage
       localStorage.setItem('nuevasReservas', JSON.stringify(nuevas));
+
+      window.dispatchEvent(new CustomEvent('nuevasReservasActualizado'));
+
         Swal.fire({
           icon: 'success',
           title: 'Reserva generada',
@@ -340,6 +343,8 @@ export class AgendarReservaComponent implements OnInit {
         const nuevas = JSON.parse(localStorage.getItem('nuevasReservas') || '[]');
       nuevas.push(resp.idreserva);
       localStorage.setItem('nuevasReservas', JSON.stringify(nuevas));
+
+      window.dispatchEvent(new CustomEvent('nuevasReservasActualizado'));
 
         const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
     user.codigocliente = resp.codigocliente;

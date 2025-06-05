@@ -26,7 +26,7 @@ export class AuthService {
   logOut() {
     if (typeof window !== 'undefined' && localStorage) {
       localStorage.removeItem('identity_user');
-      localStorage.clear();
+      
     }
   }
 }

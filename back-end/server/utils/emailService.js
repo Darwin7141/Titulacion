@@ -65,7 +65,27 @@ async function enviarCorreoEmpresa({ nombre, email, celular, serviciosSelecciona
   }
 }
 
+async function enviarCorreoNotificacionReserva({ to, subject, html }) {
+  const mailOptions = {
+    from: 'd.morales1305@gmail.com', // Debe coincidir con auth.user
+    to,        // p. ej. 'd.morales1305@gmail.com'
+    subject,   // p. ej. '🔔 Nueva reserva: R005'
+    html       // el cuerpo HTML que armamos en el controlador de reservas
+  };
+
+  try {
+    const info = await transportador.sendMail(mailOptions);
+    console.log('Correo de notificación de reserva enviado:', info.messageId);
+    return info;
+  } catch (error) {
+    console.error('Error enviando correo de notificación de reserva:', error);
+    throw error;
+  }
+}
+
+
 module.exports = {
   enviarCorreoRecuperacion,
-  enviarCorreoEmpresa, // exporta la nueva función
+  enviarCorreoEmpresa,
+  enviarCorreoNotificacionReserva
 };

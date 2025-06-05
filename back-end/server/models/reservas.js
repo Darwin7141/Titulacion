@@ -23,14 +23,18 @@ module.exports = (sequelize, DataTypes) => {
         total: {
             type: DataTypes.DOUBLE
         },
-        pagorealizado: {
+        primer_pago: {
             type: DataTypes.DOUBLE
         },
-        saldopendiente: {
+        segundo_pago: {
             type: DataTypes.DOUBLE
         },
         idestado: {
             type: DataTypes.INTEGER
+        },
+
+        saldo_pendiente: {
+            type: DataTypes.DOUBLE
         },
 
     }, {

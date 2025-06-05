@@ -54,20 +54,23 @@
       <button (click)="eliminarReserva(reserva.idreserva)" class="delete-button">
         <i class="fa fa-trash"></i> Eliminar
       </button>
-      <button *ngIf="reserva.nombre.estado_reserva === 'Aceptada'" 
-      (click)="pagarReserva(reserva.idreserva, reserva.saldopendiente)" 
-      class="pay-button" 
-      [disabled]="reserva.pagorealizado > 0">
-Realizar Pago Inicial
+      <button *ngIf="reserva.mostrarBotonPagoInicial"
+        (click)="abrirPayPal('inicial', reserva)"
+        class="pay-button">
+  Pago Inicial
 </button>
 
-<button *ngIf="reserva.nombre.estado_reserva === 'Aceptada'" 
-      (click)="pagarReserva(reserva.idreserva, reserva.saldopendiente)" class="pay-button">
-Realizar Pago Final
+<!-- Pago final -->
+<button *ngIf="reserva.mostrarBotonPagoFinal"
+        (click)="abrirPayPal('final', reserva)"
+        class="pay-button">
+  Pago Final
 </button>
 
-<button *ngIf="reserva.nombre.estado_reserva === 'Pagada'" 
-        (click)="descargarComprobante(reserva)" class="download-button">
+<!-- Descargar comprobante -->
+<button *ngIf="reserva.mostrarComprobante"
+        (click)="descargarComprobante(reserva)"
+        class="download-button">
   Descargar Comprobante
 </button>
 

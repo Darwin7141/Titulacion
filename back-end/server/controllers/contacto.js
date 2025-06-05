@@ -1,9 +1,18 @@
 
 
-const { enviarCorreoEmpresa } = require('../utils/emailService');
+const { enviarCorreoEmpresa, enviarCorreoNotificacionReserva } = require('../utils/emailService');
 const twilio = require('twilio');
 
 
+const accountSid = 'AC564a1b6f9290142bc6b92745d09553ab';  // <- Real Account SID de la consola
+const authToken = '53e43b653b9a1395a570ec60106cd080';  // <- El Auth Token correspondiente
+const client = twilio(accountSid, authToken);
+
+// El número de WhatsApp “from” se obtiene de Twilio
+const TWILIO_WHATSAPP_FROM = 'whatsapp:+14155238886';  
+// Ejemplo, es el “sandbox” de Twilio para WhatsApp
+const EMPRESA_WHATSAPP = 'whatsapp:+593992268003'; 
+// El número de WhatsApp de tu empresa
 
 function enviarContacto(req, res) {
   try {
@@ -52,7 +61,66 @@ function enviarContacto(req, res) {
   }
 }
 
+async function enviarNotificacionReserva({ 
+  idreserva,
+  codigocliente,
+  fechaevento,
+  direccionevento,
+  total,
+  menusDetalle,
+  datosCliente
+}) {
+  // 1) Armar cuerpo de correo
+  const serviciosStr = menusDetalle.length
+    ? menusDetalle.map(m => `${m.nombre} (x${m.cantpersonas})`).join(', ')
+    : 'Ninguno';
+
+  const asunto = `🔔 Nueva reserva: ${idreserva}`;
+  const cuerpoHtml = `
+    <h2>Se creó una nueva reserva en el sistema</h2>
+    <p><strong>ID Reserva:</strong> ${idreserva}</p>
+    <p><strong>Cliente:</strong> ${datosCliente.nombre} (Cédula: ${datosCliente.ci})</p>
+    <p><strong>Teléfono:</strong> ${datosCliente.telefono}</p>
+    <p><strong>Email:</strong> ${datosCliente.e_mail}</p>
+    <p><strong>Dirección cliente:</strong> ${datosCliente.direccion}</p>
+    <hr>
+    <p><strong>Fecha de evento:</strong> ${fechaevento}</p>
+    <p><strong>Dirección del evento:</strong> ${direccionevento}</p>
+    <p><strong>Total:</strong> $${total.toFixed(2)}</p>
+    <p><strong>Menús:</strong> ${serviciosStr}</p>
+    <hr>
+    <p>Por favor, gestiona esta reserva desde el panel de administración.</p>
+  `;
+
+  // 2) Envío de correo:
+  const envioCorreo = enviarCorreoNotificacionReserva({
+    to: 'd.morales1305@gmail.com', // correo de la empresa
+    subject: asunto,
+    html: cuerpoHtml
+  });
+
+  // 3) Envío de WhatsApp:
+  const mensajeWA = `
+    NUEVA RESERVA 
+    ID: ${idreserva}
+    Cliente: ${datosCliente.nombre}
+    Tel: ${datosCliente.telefono}
+    Evento: ${fechaevento} en ${direccionevento}
+    Total: $${total.toFixed(2)}
+    Menús: ${serviciosStr}
+  `;
+  const envioWhatsApp = client.messages.create({
+    from: TWILIO_WHATSAPP_FROM,
+    to:   EMPRESA_WHATSAPP,
+    body: mensajeWA.trim()
+  });
+
+  // 4) Esperar ambos envíos en paralelo
+  return Promise.all([envioCorreo, envioWhatsApp]);
+}
+
 
 module.exports = {
-  enviarContacto
+  enviarContacto,
+  enviarNotificacionReserva
 };

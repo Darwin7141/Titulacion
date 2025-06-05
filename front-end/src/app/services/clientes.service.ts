@@ -18,6 +18,10 @@ export class ClientesService {
     
     }
 
+  getClientePorCodigo(codigocliente: string): Observable<any> {
+    return this.http.get<any>(`${this.url}cliente/${codigocliente}`);
+  }
+
     agregar(cliente: any): Observable<any> {
       const httpOptions = {
         headers: new HttpHeaders({

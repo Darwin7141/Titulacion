@@ -19,6 +19,8 @@ export class InicioClienteComponent implements OnInit{
   constructor(
     private _auth:AuthService,
     private _router:Router){}
+
+    
     logout(){
       
       this._auth.logOut();
