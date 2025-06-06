@@ -97,26 +97,62 @@ export class ListarReservasComponent implements OnInit {
         console.log('Estado actualizado correctamente', resp);
         this.cargarReservas();
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Cambios guardados',
-          text: 'Los cambios se han guardado correctamente.',
-          confirmButtonText: 'Aceptar'
-        });
-      },
-      error: (err) => {
-        console.error('Error al actualizar estado:', err);
-        
-        // Mostrar un mensaje de error si la actualización falla
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo guardar los cambios. Inténtelo nuevamente.',
-          confirmButtonText: 'Cerrar'
-        });
+        const codigocliente = itemReserva.cliente.codigocliente;
+      const nombreCliente = itemReserva.cliente.nombre;
+
+      // 2) Determinar el texto según el estado seleccionado (itemReserva.idestado corresponde a un ID numérico,
+      //    así que tal vez necesites traducirlo a texto legible; aquí asumimos que en estadosReserva ya tienes
+      //    una lista de objetos { idestado, estado_reserva }):
+      const estadoObj = this.estadosReserva.find(e => e.idestado === itemReserva.idestado);
+      const textoEstado = estadoObj ? estadoObj.estado_reserva : 'Desconocido';
+
+      let mensajeNotificacion = '';
+      switch (textoEstado) {
+        case 'Aceptada':
+          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} ha sido Aceptada. Por favor realice el abono inicial.`;
+          break;
+        case 'En proceso':
+          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} se encuentra En proceso.`;
+          break;
+        case 'Pagada':
+          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} ha sido Pagada. ¡Gracias por preferirnos!`;
+          break;
+        case 'Cancelada':
+          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} ha sido Cancelada.`;
+          break;
+        default:
+          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} cambió a estado "${textoEstado}".`;
       }
-    });
-  }
+
+      // 3) Leer (o inicializar) el array de notificaciones que guardamos en localStorage para este cliente
+      //    Lo almacenaremos en la clave 'notificacionesCliente_<codigocliente>'
+      const keyNotifs = `notificacionesCliente_${codigocliente}`;
+const actualesJSON = localStorage.getItem(keyNotifs) || '[]';
+const actuales = JSON.parse(actualesJSON) as any[];
+actuales.push({ texto: mensajeNotificacion, reservaId: itemReserva.idreserva, fecha: new Date().toISOString() });
+localStorage.setItem(keyNotifs, JSON.stringify(actuales));
+window.dispatchEvent(new CustomEvent('nuevasNotificacionesClienteActualizado'));
+
+      // ————— FIN CÓDIGO NUEVO —————
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Cambios guardados',
+        text: 'Los cambios se han guardado correctamente.',
+        confirmButtonText: 'Aceptar'
+      });
+    },
+    error: (err) => {
+      console.error('Error al actualizar estado:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo guardar los cambios. Inténtelo nuevamente.',
+        confirmButtonText: 'Cerrar'
+      });
+    }
+  });
+}
   // ===================== Búsqueda ============================
   buscarReserva(): void {
     const searchTermLower = this.searchTerm.trim().toLowerCase();

@@ -75,34 +75,6 @@ li.logout, li.campana-container {
 }
 
 /* Estilo para la campana de notificaciones */
-.campana-container {
-  position: relative;
-  display: inline-block;
-  color: white;
-  text-decoration: none;
-  padding: 14px 16px;
-}
-
-/* El círculo rojo para las notificaciones */
-.notification-icon {
-  position: relative;
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: white;
-}
-
-/* Badge rojo con el número de notificaciones */
-.badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background-color: red;
-  color: white;
-  font-size: 12px;
-  border-radius: 50%;
-  padding: 5px 10px;
-}
 
 /* Estilo de la vista principal */
 .content-admin {
@@ -156,4 +128,29 @@ li.logout, li.campana-container {
   background-position: center;
   z-index: -1;
   filter: blur(8px);
+}
+
+.campana-container {
+  position: relative;
+  display: inline-block;
+  color: white;
+  cursor: pointer;
+}
+.campana-container i {
+  font-size: 24px;
+}
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }

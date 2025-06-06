@@ -4,6 +4,7 @@ const { enviarNotificacionReserva } = require('../controllers/contacto');
 const sequelize = modelos.sequelize; 
 
 async function create(req, res) {
+  const io = req.app.get('io');
   const {
     fechaevento,
     codigocliente,
@@ -104,6 +105,23 @@ async function create(req, res) {
       } catch (errNotif) {
         console.error('Error al notificar empresa (create):', errNotif);
       }
+    });
+
+
+    await modelos.notificaciones.create({
+      codigocliente,
+      tipo: 'RESERVA',
+      mensaje: `Tienes una nueva reserva (ID: ${nextCodigo}).`,
+      idreserva: nextCodigo,
+      leida: false
+    });
+
+    // 6) Emitimos un evento global “nueva-reserva” para que el ADMIN escuchando
+    io.emit('nueva-reserva', {
+      idreserva: nextCodigo,
+      codigocliente,
+      mensaje: `Se creó la reserva ${nextCodigo}`,
+      timestamp: new Date()
     });
 
     return res.status(201).json({
@@ -274,6 +292,14 @@ async function createClienteYReserva(req, res) {
           subtotal:       dr.subtotal
         }));
 
+        const io = req.app.get('io');
+io.to('ADMIN').emit('nueva-reserva', {
+  idreserva:  nextCodigoReserva,
+  codigocliente: nextCodigoCliente,
+  mensaje:    `Nueva reserva ${nextCodigoReserva} por ${nextCodigoCliente}`,
+  timestamp:  new Date().toISOString()
+});
+
         await enviarNotificacionReserva({
           idreserva:    nextCodigoReserva,
           codigocliente: nextCodigoCliente,
@@ -331,6 +357,8 @@ async function createClienteYReserva(req, res) {
 
 // ======================== MÉTODO update ========================
 async function update(req, res) {
+
+  const io = req.app.get('io');
   const { idreserva } = req.params; 
   const { 
     fechaevento, 
@@ -360,11 +388,71 @@ async function update(req, res) {
       primer_pago: primer_pago ?? reserva.primer_pago,
       segundo_pago: segundo_pago ?? reserva.segundo_pago,
       saldo_pendiente: saldo_pendiente?? reserva.saldo_pendiente,
-      idestado: idestado ?? reserva.idestado
+      idestado: idestado !== undefined ? idestado : reserva.idestado
     });
 
-    // 3) Si el front SÍ envía un array "detalle", entonces los reemplazamos.
-    //    Caso contrario, no tocamos los detalles existentes.
+    let textoEstado = null;
+
+    if (idestado !== undefined) {
+      // 3.1) Obtenemos el estado legible desde la tabla estado_reserva
+      const estadoRegistro = await modelos.estado_reserva.findOne({
+        where: { idestado: idestado }
+      });
+
+ 
+    
+    const estadoObj = await modelos.estado_reserva.findOne({ where: { idestado } });
+    const textoEstado = estadoObj ? estadoObj.estado_reserva : 'Desconocido';
+
+       const io = req.app.get('io');
+io.to(`cliente_${reserva.codigocliente}`).emit('cambio-estado', {
+  idreserva:     reserva.idreserva,
+  codigocliente: reserva.codigocliente,
+  mensaje:       `Su reserva ${reserva.idreserva} cambió a "${textoEstado}"`,
+  timestamp:     new Date().toISOString(),
+  idestado:      idestado,       // <-- si quieres llevar el ID
+  nuevoEstado:   textoEstado
+});
+    }
+    // 2) Generar el mensaje según el nuevo estado
+    let mensajeNotificacion;
+    switch (textoEstado) {
+      case 'Aceptada':
+        mensajeNotificacion = `Su reserva ${idreserva} ha sido Aceptada. Por favor realice el abono inicial.`;
+        break;
+      case 'En proceso':
+        mensajeNotificacion = `Su reserva ${idreserva} se encuentra En proceso.`;
+        break;
+      case 'Pagada':
+        mensajeNotificacion = `Su reserva ${idreserva} ha sido Pagada. ¡Gracias por preferirnos!`;
+        break;
+      case 'Cancelada':
+        mensajeNotificacion = `Su reserva ${idreserva} ha sido Cancelada.`;
+        break;
+      default:
+        mensajeNotificacion = `Su reserva ${idreserva} cambió a estado "${textoEstado}".`;
+    }
+
+    // 3) Guardar en tabla notificaciones para el cliente
+    await modelos.notificaciones.create({
+      codigocliente: reserva.codigocliente,
+      tipo: 'ESTADO',
+      mensaje: mensajeNotificacion,
+      idreserva,
+      leida: false
+    });
+
+    // 4) Emitir evento vía Socket.IO para que el CLIENTE (si está conectado) reciba este cambio
+    io.to(`cliente_${reserva.codigocliente}`).emit('cambio-estado', {
+      idreserva,
+      codigocliente: reserva.codigocliente,
+      nuevoEstado: textoEstado,
+      mensaje: mensajeNotificacion,
+      timestamp: new Date()
+    });
+
+
+
     if (Array.isArray(detalle)) {
       // Eliminar detalles anteriores
       await modelos.detalle_reserva.destroy({ where: { idreserva } });
@@ -447,18 +535,12 @@ function getAll(req, res) {
   modelos.reservas.findAll({
     include: [
 
-          {
-            model: modelos.clientes,
-            as: 'cliente', // Este alias debe coincidir con el definido en el modelo
-            attributes: ['nombre'], // Seleccionar solo el campo necesario
-          },  
-
-          {
-            model: modelos.clientes,
-            as: 'cliente', // Este alias debe coincidir con el definido en el modelo
-            attributes: ['ci'], // Seleccionar solo el campo necesario
-          }, 
-
+         {
+          model: modelos.clientes,
+          as: 'cliente',
+          attributes: ['codigocliente', 'nombre', 'ci']
+        },
+        
           {
             model: modelos.estado_reserva,
             as: 'nombre', // Este alias debe coincidir con el definido en el modelo
@@ -532,9 +614,11 @@ async function getOne(req, res) {
 // Procesar el primer pago
 // Procesar el primer pago
 async function procesarPrimerPago(req, res) {
-  // ✅ Extraemos idreserva de los parámetros de la URL:
+  
+
+  const io = req.app.get('io');
   const idreserva = req.params.idreserva;
-  // ✅ Y montoPago lo extraemos del body:
+  // Y montoPago lo extraemos del body:
   const { montoPago } = req.body;
 
   console.log('Llegó una petición a procesarPrimerPago. idreserva en req.params:', idreserva);
@@ -560,6 +644,32 @@ async function procesarPrimerPago(req, res) {
      
     });
 
+
+    await modelos.notificaciones.create({
+      codigocliente: reserva.codigocliente,
+      tipo: 'PAGO',
+      mensaje: `El cliente ${reserva.codigocliente} realizó primer pago de $${montoPago.toFixed(2)} en la reserva ${idreserva}.`,
+      idreserva,
+      leida: false
+    });
+
+    const cliente = await modelos.clientes.findOne({
+      where:      { codigocliente: reserva.codigocliente },
+      attributes: ['nombre']
+    });
+    const nombreCliente = cliente ? cliente.nombre : 'Desconocido';
+
+    // 2) Emitir evento por socket para el ADMIN
+    io.emit('nuevo-pago', {
+      idreserva,
+      codigocliente: reserva.codigocliente,
+      clienteNombre: nombreCliente, 
+      montoPago,
+      tipoPago: 'PRIMER_PAGO',
+       mensaje:       `El cliente "${nombreCliente}" realizó el primer pago de la reserva ${idreserva}.`,
+      timestamp: new Date()
+    });
+
     console.log('>> Reserva actualizada en BD:', updated);
 
     return res.status(200).json({ message: 'Primer pago registrado.', reserva: updated });
@@ -574,7 +684,9 @@ async function procesarPrimerPago(req, res) {
 
 // Procesar el segundo pago
 async function procesarSegundoPago(req, res) {
-  // ✅ idreserva viene en los parámetros, no en el body:
+  
+
+  const io = req.app.get('io');
   const idreserva = req.params.idreserva;
   const { montoPago } = req.body; 
 
@@ -596,6 +708,40 @@ async function procesarSegundoPago(req, res) {
       segundo_pago:    montoPago,
       saldo_pendiente: 0,
       
+    });
+
+    const cliente = await modelos.clientes.findOne({
+      where:      { codigocliente: reserva.codigocliente },
+      attributes: ['nombre']
+    });
+    const nombreCliente = cliente ? cliente.nombre : 'Desconocido';
+
+    io.to('ADMIN').emit('nuevo-pago-final', {
+      idreserva:     idreserva,
+      codigocliente: reserva.codigocliente,
+      clienteNombre: nombreCliente,        // ← Aquí va el nombre
+      tipoPago:      'SEGUNDO_PAGO',
+      montoPago,
+      mensaje:       `El cliente "${nombreCliente}" completó el pago final de la reserva ${idreserva}.`,
+      timestamp:     new Date().toISOString()
+    });
+
+
+    await modelos.notificaciones.create({
+      codigocliente: reserva.codigocliente,
+      tipo: 'PAGO',
+      mensaje: `El cliente ${reserva.codigocliente} realizó segundo pago de $${montoPago.toFixed(2)} en la reserva ${idreserva}.`,
+      idreserva,
+      leida: false
+    });
+
+    // 2) Emitir evento a todos los sockets (admin) de “nuevo-pago-final”
+    io.emit('nuevo-pago-final', {
+      idreserva,
+      codigocliente: reserva.codigocliente,
+      montoPago,
+      tipoPago: 'SEGUNDO_PAGO',
+      timestamp: new Date()
     });
 
     

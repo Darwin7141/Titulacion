@@ -41,12 +41,12 @@
     </li>
 
     <li style="float: right; ">
-      <a  class="campana-container" type="button" (click)="verNotificaciones()">
-        <i class="material-icons" style="vertical-align: middle;">
-        {{ hayNotificaciones ? 'notifications_active' : 'notifications' }}
-      </i>
-      <span *ngIf="hayNotificaciones" class="badge">{{ cantidadNotificaciones }}</span>
-      </a>
+      <a class="campana-container" (click)="verNotificaciones()">
+    <i class="material-icons" style="vertical-align: middle;">
+      {{ hayNotificaciones ? 'notifications_active' : 'notifications' }}
+    </i>
+    <span *ngIf="hayNotificaciones" class="badge">{{ cantidadNotificaciones }}</span>
+  </a>
     </li>
   </ul>
 

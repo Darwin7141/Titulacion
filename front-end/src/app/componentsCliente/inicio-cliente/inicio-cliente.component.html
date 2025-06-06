@@ -21,6 +21,13 @@
     <!-- Sección derecha: Contenedor para íconos de notificación y logout -->
     <li style="float: right; display: flex; align-items: center; padding-right: 10px;">
       <!-- Campana de notificaciones -->
+
+       <a class="campana-container" (click)="verNotificacionesCliente()">
+      <i class="material-icons" style="vertical-align: middle; color: white;">
+        {{ hayNuevasNotificaciones ? 'notifications_active' : 'notifications' }}
+      </i>
+      <span *ngIf="hayNuevasNotificaciones" class="badge">{{ cantidadNotificacionesCliente }}</span>
+    </a>
      
       <!-- Botón de logout -->
       <a class="logout" (click)="logout()">

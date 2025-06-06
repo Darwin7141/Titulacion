@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AfterViewInit } from '@angular/core';
 import { ReservasService } from '../../services/reservas.service'; 
 import Swal from 'sweetalert2';
+import { NotificacionesService, NotifData } from '../../services/notificaciones.service';
 
 @Component({
   selector: 'app-admin',
@@ -21,13 +22,17 @@ export class AdminComponent implements OnInit, OnDestroy{
   hayNuevasReservas = false;
   reservasNuevas: string[] = [];
   pagosPendientes: Array<{ reservaId: string; clienteNombre: string; tipoPago: string; fecha: string }> = [];
-
+  
+  private subscripciones: Array<any> = [];
 
   constructor(
     private _auth:AuthService,
     private reservasService: ReservasService,
     private _router:Router,
-    private _ngZone: NgZone){}
+    private _ngZone: NgZone,
+     private notiSvc: NotificacionesService,
+
+    ){}
 
   private onStorageEvent = (event: StorageEvent) => {
     this._ngZone.run(() => {
@@ -123,38 +128,117 @@ export class AdminComponent implements OnInit, OnDestroy{
   }
 
    ngOnInit() {
-    // 1) Leo el usuario (si hay) o dejo ‘Invitado’
-    const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
-    this.userEmail = user?.correo || 'Invitado';
+  // 1) Leo el usuario (si hay) o dejo ‘Invitado’
+  const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
+  this.userEmail = user?.correo || 'Invitado';
 
-    // 2) Leo el arreglo inicial de nuevasReservas, por si ya existe
-    const arr = localStorage.getItem('nuevasReservas');
-    console.log('ngOnInit > nuevasReservas desde localStorage =', arr);
-    this.reservasNuevas = arr ? JSON.parse(arr) : [];
+  // 2) Leo el arreglo inicial de nuevasReservas, por si ya existe
+  const arr = localStorage.getItem('nuevasReservas');
+  console.log('ngOnInit > nuevasReservas desde localStorage =', arr);
+  this.reservasNuevas = arr ? JSON.parse(arr) : [];
 
-    const pagosJSON = localStorage.getItem('pagosPendientes');
-    this.pagosPendientes = pagosJSON ? JSON.parse(pagosJSON) : [];
+  const pagosJSON = localStorage.getItem('pagosPendientes');
+  this.pagosPendientes = pagosJSON ? JSON.parse(pagosJSON) : [];
 
-    // 3) Me suscribo a ambos eventos
-    window.addEventListener('storage', this.onStorageEvent);
-    window.addEventListener('nuevasReservasActualizado', this.onCustomEvent);
+  // 3) Me suscribo a ambos eventos (almacenamiento local y custom)
+  window.addEventListener('storage', this.onStorageEvent);
+  window.addEventListener('nuevasReservasActualizado', this.onCustomEvent);
+  window.addEventListener('nuevosPagosActualizado', this.onCustomEvent);
 
-    window.addEventListener('nuevasReservasActualizado', this.onCustomEvent);
+ const sub1 = this.notiSvc.onNuevaReserva().subscribe((data: NotifData | null) => {
+      if (!data) return;
+      this._ngZone.run(() => {
+        const idres = data.idreserva;
+        if (idres && !this.reservasNuevas.includes(idres)) {
+          this.reservasNuevas.push(idres);
+          localStorage.setItem('nuevasReservas', JSON.stringify(this.reservasNuevas));
+        }
+      });
+    });
+    this.subscripciones.push(sub1);
 
-    (window as any).verPago = (reservaId: string) => {
-    // Forzamos que Angular sepa que está ocurriendo un evento externo:
+    // ————————————— SUSCRIPCIÓN A “NUEVO PAGO” —————————————
+    const sub2 = this.notiSvc.onNuevoPago().subscribe((data: NotifData | null) => {
+      if (!data) return;
+      this._ngZone.run(() => {
+        const pago = { 
+          reservaId:    data.idreserva, 
+          clienteNombre: data.clienteNombre || 'Desconocido',       // Rellenar con lo que venga en data.mensaje o data.clienteNombre 
+          tipoPago:      data.tipoPago || 'Pago', 
+          fecha:         data.timestamp
+        };
+        // Evitamos duplicados exactos:
+        const yaExiste = this.pagosPendientes.some(
+          p => p.reservaId === pago.reservaId && p.tipoPago === pago.tipoPago
+        );
+        if (!yaExiste) {
+          this.pagosPendientes.push(pago);
+          localStorage.setItem('pagosPendientes', JSON.stringify(this.pagosPendientes));
+        }
+      });
+    });
+    this.subscripciones.push(sub2);
+
+    // ————————————— SUSCRIPCIÓN A “NUEVO PAGO FINAL” (opcional) —————————————
+    const sub3 = this.notiSvc.onNuevoPagoFinal().subscribe((data: NotifData | null) => {
+      if (!data) return;
+      this._ngZone.run(() => {
+        const pago = {
+          reservaId:     data.idreserva,
+          clienteNombre: data.clienteNombre || 'Desconocido',       // data.clienteNombre si viene
+          tipoPago:      data.tipoPago || 'Pago Final',
+          fecha:         data.timestamp
+        };
+        const yaExiste = this.pagosPendientes.some(
+          p => p.reservaId === pago.reservaId && p.tipoPago === pago.tipoPago
+        );
+        if (!yaExiste) {
+          this.pagosPendientes.push(pago);
+          localStorage.setItem('pagosPendientes', JSON.stringify(this.pagosPendientes));
+        }
+      });
+    });
+    this.subscripciones.push(sub3);
+
+    // ————————————— SUSCRIPCIÓN A “CAMBIO DE ESTADO” (opcional) —————————————
+    const sub4 = this.notiSvc.onCambioEstado().subscribe((data: NotifData | null) => {
+      if (!data) return;
+      this._ngZone.run(() => {
+        // data.nuevoEstado, data.idreserva, data.mensaje, data.timestamp
+        // Podés enviarlo, por ejemplo, a reservasNuevas o a un array aparte:
+        const texto = data.mensaje;
+        const idres = data.idreserva;
+        
+        if (idres && !this.reservasNuevas.includes(idres)) {
+          this.reservasNuevas.push(idres);
+          localStorage.setItem('nuevasReservas', JSON.stringify(this.reservasNuevas));
+        }
+      });
+    });
+    this.subscripciones.push(sub4);
+
+  // 5) Defino la función global que llama al modal de pago
+  (window as any).verPago = (reservaId: string) => {
     this._ngZone.run(() => {
       this.abrirModalPago(reservaId);
     });
   };
-  }
+}
 
   ngOnDestroy() {
-    // Importante: quitar listeners al destruir el componente
-    window.removeEventListener('storage', this.onStorageEvent);
-    window.removeEventListener('nuevasReservasActualizado', this.onCustomEvent);
-    window.removeEventListener('nuevosPagosActualizado', this.onCustomEvent);
-  }
+  // Importante: quitar listeners al destruir el componente
+  window.removeEventListener('storage', this.onStorageEvent);
+  window.removeEventListener('nuevasReservasActualizado', this.onCustomEvent);
+  window.removeEventListener('nuevosPagosActualizado', this.onCustomEvent);
+
+  // 7) Cancelar la(s) suscripción(es) a notificaciones WebSocket
+  this.subscripciones.forEach(sub => {
+    if (sub && typeof sub.unsubscribe === 'function') {
+      sub.unsubscribe();
+    }
+  });
+  this.subscripciones = [];
+}
 
   get hayNotificaciones(): boolean {
     return this.reservasNuevas.length + this.pagosPendientes.length > 0;
