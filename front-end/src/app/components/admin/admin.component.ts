@@ -1,3 +1,5 @@
+
+
 import { Component, OnInit, OnDestroy, NgZone} from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
@@ -73,13 +75,20 @@ export class AdminComponent implements OnInit, OnDestroy{
         // reserva es el objeto que incluye { idreserva, fechaevento, direccionevento, total, primer_pago, segundo_pago, saldo_pendiente, detalles: [...] }
         // 2) Armamos contenido HTML para el modal
         let htmlPago = `
-          <h3>Detalles de la Reserva ${reservaId}</h3>
-          <p><strong>Fecha del evento:</strong> ${new Date(reserva.fechaevento).toLocaleDateString()}</p>
-          <p><strong>Dirección del evento:</strong> ${reserva.direccionevento}</p>
-          <p><strong>Total:</strong> $${reserva.total.toFixed(2)}</p>
-          <p><strong>Primer pago:</strong> $${(reserva.primer_pago ?? 0).toFixed(2)}</p>
-          <p><strong>Segundo pago:</strong> $${(reserva.segundo_pago ?? 0).toFixed(2)}</p>
-          <p><strong>Saldo pendiente:</strong> $${(reserva.saldo_pendiente ?? 0).toFixed(2)}</p>
+           <!-- Títulos centrados -->
+         <div style="text-align:center; margin-bottom:16px;">
+           
+           <h4 style="margin:4px 0 0;">Detalles de la Reserva ${reservaId}</h4>
+         </div>
+         <!-- Campos alineados a la izquierda -->
+         <div style="text-align:left; line-height:1.6; margin-bottom:16px;">
+           <p style="margin:4px 0;"><strong>Fecha del evento:</strong> ${new Date(reserva.fechaevento).toLocaleDateString()}</p>
+           <p style="margin:4px 0;"><strong>Dirección del evento:</strong> ${reserva.direccionevento}</p>
+           <p style="margin:4px 0;"><strong>Total:</strong> $${reserva.total.toFixed(2)}</p>
+           <p style="margin:4px 0;"><strong>Primer pago:</strong> $${(reserva.primer_pago ?? 0).toFixed(2)}</p>
+           <p style="margin:4px 0;"><strong>Segundo pago:</strong> $${(reserva.segundo_pago ?? 0).toFixed(2)}</p>
+           <p style="margin:4px 0;"><strong>Saldo pendiente:</strong> $${(reserva.saldo_pendiente ?? 0).toFixed(2)}</p>
+         </div>
           <hr/>
           <p><strong>Menús contratados:</strong></p>
           <table style="width:100%; text-align:left; border-collapse: collapse;">
@@ -248,95 +257,131 @@ export class AdminComponent implements OnInit, OnDestroy{
   }
 
   verNotificaciones() {
-    if (!this.hayNotificaciones) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Sin novedades',
-        text: 'No hay reservas ni pagos nuevos.'
-      });
-      return;
-    }
-
-    // — Construyo una lista combinada en el HTML del modal —
-    let htmlContent = `<p><strong>Notificaciones recientes:</strong></p><ul style="text-align: left; margin-left: 20px;">`;
-
-    // a) Primero las reservas nuevas (solo ID de reserva)
-    if (this.reservasNuevas.length > 0) {
-      htmlContent += `<li><u>Reservas nuevas:</u></li>`;
-      this.reservasNuevas.forEach(id => {
-        htmlContent += `
-          <li style="cursor: pointer; color: blue; margin-left: 10px;"
-              onclick="window.selectReserva('${id}')">
-            Reserva: <strong>${id}</strong>
-          </li>
-        `;
-      });
-    }
-
-    // b) Luego los pagos pendientes
-    if (this.pagosPendientes.length > 0) {
-      htmlContent += `<li style="margin-top: 8px;"><u>Pagos realizados:</u></li>`;
-      this.pagosPendientes.forEach(pago => {
-        htmlContent += `
-        <li style="margin-left: 10px; margin-bottom: 6px;">
-          El cliente “<strong>${pago.clienteNombre}</strong>” ha realizado el <strong>${pago.tipoPago}</strong> 
-          de la reserva <em>${pago.reservaId}</em>
-          &nbsp;
-          <button
-            onclick="window.verPago('${pago.reservaId}')"
-            style="
-              background-color: #007bff;
-              color: white;
-              border: none;
-              border-radius: 4px;
-              padding: 2px 6px;
-              font-size: 0.8rem;
-              cursor: pointer;
-            "
-          >
-            Ver
-          </button>
-        </li>
-      `;
+  if (!this.hayNotificaciones) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Sin novedades',
+      text: 'No hay reservas ni pagos nuevos.'
     });
+    return;
+  }
+
+  let htmlContent = `<ul style="text-align: left; margin-left: 20px;">`;
+
+  // a) Reservas nuevas
+  if (this.reservasNuevas.length > 0) {
+    htmlContent += `<p style="font-weight: bold; margin:0 0 8px;">Reservas nuevas</p>`;
+    htmlContent += `<ul style="list-style: disc; padding-left:20px; margin:0 0 12px;">`;
+    this.reservasNuevas.forEach(id => {
+      htmlContent += `
+         <li style="display:flex; align-items:center; margin-bottom:8px;">
+           <span style="flex:1; color:#000;">
+             Se ha generado una nueva reserva con código: ${id}
+           </span>
+           <button
+             onclick="window.selectReserva('${id}')"
+             style="white-space:nowrap; background:#007bff; color:#fff; border:none; border-radius:4px; padding:6px 12px; margin-left:8px; cursor:pointer;"
+           >
+             Ver
+           </button>
+         </li>`;
+      });
+
+      htmlContent += `</ul>`;
+  }
+
+  // b) Pagos pendientes
+  if (this.pagosPendientes.length > 0) {
+   htmlContent += `<p style="font-weight: bold; margin:12px 0 8px;">Pagos realizados</p>`;
+     htmlContent += `<ul style="list-style: disc; padding-left:20px; margin:0 0 12px;">`;
+    this.pagosPendientes.forEach(p => {
+      const tipo = p.tipoPago.toLowerCase().replace(/_/g, ' ');  
+  htmlContent += `
+    <li style="display:flex;align-items:center;margin-bottom:8px;">
+      <span style="flex:1;color:#000;">
+        El cliente ${p.clienteNombre} ha realizado el ${tipo} de la reserva ${p.reservaId}
+      </span>
+      <button
+        onclick="window.verPago('${p.reservaId}','${p.tipoPago}')"
+        style="margin-left:8px;white-space:nowrap;background:#007bff;color:white;border:none;
+               border-radius:4px;padding:6px 12px;cursor:pointer;"
+      >Ver</button>
+    </li>
+  `;
+    });
+     htmlContent += `</ul>`;
   }
 
   htmlContent += `</ul>`;
 
-    // — Función para seleccionar reserva (solo para clon) —
-    (window as any).selectReserva = (idReserva: string) => {
-      this.irAListaReservas(idReserva);
-    };
-
-
-    (window as any).verPago = (idReserva: string) => {
-    this._ngZone.run(() => this.abrirModalPago(idReserva));
+  // Defino las funciones globales antes de mostrar el modal
+  (window as any).selectReserva = (idReserva: string) => {
+    this.irAListaReservas(idReserva);
   };
+  (window as any).verPago = (idreserva: string, tipoPago: string) => {
+  this.irAPagoPendiente(idreserva, tipoPago);
+};
 
-    Swal.fire({
-      icon: 'info',
-      title: 'Notificaciones',
-      html: htmlContent,
-      showConfirmButton: true,
-      confirmButtonText: 'Marcar todas como vistas'
-    }).then(() => {
-      // — Al cerrar el modal, marcamos TODO como “visto”:
+  Swal.fire({
+    icon: 'info',
+    title: 'Notificaciones',
+    html: htmlContent,
+    showCloseButton: true,      // muestra la “X”
+    focusConfirm: false,
+    confirmButtonText: 'Marcar todas como vistas'
+  })
+  .then((result) => {
+    // Si sólo hizo clic en “Marcar todas como vistas”, result.isConfirmed === true
+    if (result.isConfirmed) {
+      // — Sólo en ese caso borro TODO:
       this.reservasNuevas = [];
       this.pagosPendientes = [];
       localStorage.removeItem('nuevasReservas');
       localStorage.removeItem('pagosPendientes');
-    });
-  }
 
-  // — Al seleccionar una reserva abrimos “listaReservas” y la marcamos como vista —
-  irAListaReservas(idreserva: string) {
-    Swal.close();
-    // Quitamos la reserva del arreglo (marcarla como “vista”):
-    this.reservasNuevas = this.reservasNuevas.filter(r => r !== idreserva);
-    localStorage.setItem('nuevasReservas', JSON.stringify(this.reservasNuevas));
-    // Navegamos a la vista de lista de reservas para resaltarla
-    this._router.navigate(['/listaReservas'], { queryParams: { highlight: idreserva } });
-  }
+      window.dispatchEvent(new Event('nuevasReservasActualizado'));
+      window.dispatchEvent(new Event('nuevosPagosActualizado'));
+    }
+    // Si cerró la X, o clic fuera, o irAListaReservas() llamó a Swal.close(),
+    // result.isConfirmed === false, result.isDismissed === true, y
+    // NO entramos en este if, así que las notificaciones siguen intactas.
+  });
+}
+
+
+// Este método sólo quita la reserva concreta y abre la vista de detalles
+irAListaReservas(idreserva: string) {
+  // 1) Cierro el modal (dispara Swal.then con result.isDismissed=true)
+  Swal.close();
+
+  // 2) Quito esa sola reserva del array:
+  this.reservasNuevas = this.reservasNuevas.filter(r => r !== idreserva);
+  // 3) Actualizo localStorage:
+  localStorage.setItem('nuevasReservas', JSON.stringify(this.reservasNuevas));
+  // 4) Informo al header (u otro componente) del cambio:
+  window.dispatchEvent(new Event('nuevasReservasActualizado'));
+  // 5) Navego a la lista de reservas:
+  this._router.navigate(['/listaReservas'], { queryParams: { highlight: idreserva } });
+}
+
+irAPagoPendiente(reservaId: string, tipoPago: string) {
+  // 1) cerrar el modal
+  Swal.close();
+
+  // 2) filtrar sólo el pago que NO coincide con reservaId + tipoPago
+  this.pagosPendientes = this.pagosPendientes.filter(
+    p => !(p.reservaId === reservaId && p.tipoPago === tipoPago)
+  );
+
+  // 3) actualizar localStorage
+  localStorage.setItem('pagosPendientes', JSON.stringify(this.pagosPendientes));
+
+  // 4) notificar a los listeners (header, badge…)
+  window.dispatchEvent(new Event('nuevosPagosActualizado'));
+
+  // 5) finalmente abrimos el modal de detalle (o navegamos)
+  this._ngZone.run(() => this.abrirModalPago(reservaId));
+}
 
     toggleGestionUsuarios() {
       this.showGestionUsuarios = !this.showGestionUsuarios;

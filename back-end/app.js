@@ -45,6 +45,7 @@ require('./server/routes/reservas')(app);
 require('./server/routes/detalle_reserva')(app);
 require('./server/routes/contacto')(app);
 require('./server/routes/estado_reserva')(app);
+require('./server/routes/notificaciones')(app);
 
 // Ruta catch‐all
 app.get('*', (req, res) => {

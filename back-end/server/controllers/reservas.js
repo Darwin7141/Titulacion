@@ -109,20 +109,20 @@ async function create(req, res) {
 
 
     await modelos.notificaciones.create({
-      codigocliente,
-      tipo: 'RESERVA',
-      mensaje: `Tienes una nueva reserva (ID: ${nextCodigo}).`,
-      idreserva: nextCodigo,
-      leida: false
-    });
+  codigocliente: codigocliente,
+  tipo:          'RESERVA',
+  mensaje:       `Tienes una nueva reserva con código: ${nextCodigo}`,
+  idreserva:     nextCodigo,
+  leida:         false
+});
 
     // 6) Emitimos un evento global “nueva-reserva” para que el ADMIN escuchando
     io.emit('nueva-reserva', {
-      idreserva: nextCodigo,
-      codigocliente,
-      mensaje: `Se creó la reserva ${nextCodigo}`,
-      timestamp: new Date()
-    });
+  idreserva:    nextCodigo,
+  codigocliente,
+  mensaje:      `Se creó la reserva ${nextCodigo}`,
+  timestamp:    new Date()
+});
 
     return res.status(201).json({
       message: 'Reserva creada con detalle',
@@ -356,20 +356,20 @@ io.to('ADMIN').emit('nueva-reserva', {
 
 
 // ======================== MÉTODO update ========================
+// controllers/reservas.js
 async function update(req, res) {
-
   const io = req.app.get('io');
-  const { idreserva } = req.params; 
-  const { 
-    fechaevento, 
+  const { idreserva } = req.params;
+  const {
+    fechaevento,
     direccionevento,
-    cantpersonas, 
+    cantpersonas,
     total,
-    primer_pago, 
-    segundo_pago, 
-    idestado, 
+    primer_pago,
+    segundo_pago,
+    idestado,
     saldo_pendiente,
-    detalle 
+    detalle
   } = req.body;
 
   try {
@@ -379,91 +379,76 @@ async function update(req, res) {
       return res.status(404).json({ message: 'Reserva no encontrada.' });
     }
 
-    // 2) Actualizar cabecera (campos que vienen en el body)
+    // 2) Actualizar los campos básicos
     await reserva.update({
-      fechaevento: fechaevento ?? reserva.fechaevento,
+      fechaevento:     fechaevento     ?? reserva.fechaevento,
       direccionevento: direccionevento ?? reserva.direccionevento,
-      cantpersonas: cantpersonas ?? reserva.cantpersonas,
-      total: total ?? reserva.total,
-      primer_pago: primer_pago ?? reserva.primer_pago,
-      segundo_pago: segundo_pago ?? reserva.segundo_pago,
-      saldo_pendiente: saldo_pendiente?? reserva.saldo_pendiente,
-      idestado: idestado !== undefined ? idestado : reserva.idestado
+      cantpersonas:    cantpersonas    ?? reserva.cantpersonas,
+      total:           total           ?? reserva.total,
+      primer_pago:     primer_pago     ?? reserva.primer_pago,
+      segundo_pago:    segundo_pago    ?? reserva.segundo_pago,
+      saldo_pendiente: saldo_pendiente ?? reserva.saldo_pendiente,
+      idestado:        idestado !== undefined ? idestado : reserva.idestado
     });
 
-    let textoEstado = null;
-
+    // 3) Si cambió el estado, creamos la notificación
     if (idestado !== undefined) {
-      // 3.1) Obtenemos el estado legible desde la tabla estado_reserva
+      // 3.1) Obtener el texto legible del nuevo estado
       const estadoRegistro = await modelos.estado_reserva.findOne({
-        where: { idestado: idestado }
+        where: { idestado }
+      });
+      const textoEstado = estadoRegistro
+        ? estadoRegistro.estado_reserva
+        : 'Desconocido';
+
+      // 3.2) Construir el mensaje según el estado
+      let mensajeNotificacion
+      switch (textoEstado) {
+        case 'Aceptada':
+          mensajeNotificacion = `Su reserva ${idreserva} ha sido aceptada. Por favor realice el abono inicial.`;
+          break;
+        case 'En proceso':
+          mensajeNotificacion = `Su reserva ${idreserva} se encuentra en proceso.`;
+          break;
+        case 'Pagada':
+          mensajeNotificacion = `Su reserva ${idreserva} ha sido pagada. ¡Gracias por preferirnos!`;
+          break;
+        case 'Cancelada':
+          mensajeNotificacion = `Su reserva ${idreserva} ha sido cancelada.`;
+          break;
+        default:
+          mensajeNotificacion = `Su reserva ${idreserva} cambió a estado "${textoEstado}".`;
+      }
+
+      // 3.3) Guardar la notificación y capturar el resultado
+      const nuevaNoti = await modelos.notificaciones.create({
+        codigocliente: reserva.codigocliente,
+        tipo:          'ESTADO',
+        mensaje:       mensajeNotificacion,
+        idreserva,
+        leida:         false
       });
 
- 
-    
-    const estadoObj = await modelos.estado_reserva.findOne({ where: { idestado } });
-    const textoEstado = estadoObj ? estadoObj.estado_reserva : 'Desconocido';
-
-       const io = req.app.get('io');
-io.to(`cliente_${reserva.codigocliente}`).emit('cambio-estado', {
-  idreserva:     reserva.idreserva,
-  codigocliente: reserva.codigocliente,
-  mensaje:       `Su reserva ${reserva.idreserva} cambió a "${textoEstado}"`,
-  timestamp:     new Date().toISOString(),
-  idestado:      idestado,       // <-- si quieres llevar el ID
-  nuevoEstado:   textoEstado
-});
-    }
-    // 2) Generar el mensaje según el nuevo estado
-    let mensajeNotificacion;
-    switch (textoEstado) {
-      case 'Aceptada':
-        mensajeNotificacion = `Su reserva ${idreserva} ha sido Aceptada. Por favor realice el abono inicial.`;
-        break;
-      case 'En proceso':
-        mensajeNotificacion = `Su reserva ${idreserva} se encuentra En proceso.`;
-        break;
-      case 'Pagada':
-        mensajeNotificacion = `Su reserva ${idreserva} ha sido Pagada. ¡Gracias por preferirnos!`;
-        break;
-      case 'Cancelada':
-        mensajeNotificacion = `Su reserva ${idreserva} ha sido Cancelada.`;
-        break;
-      default:
-        mensajeNotificacion = `Su reserva ${idreserva} cambió a estado "${textoEstado}".`;
+      // 3.4) Emitir por Socket.IO usando el id y fecha real de la noti
+      io.to(`cliente_${reserva.codigocliente}`).emit('cambio-estado', {
+        id:            nuevaNoti.id,
+        idreserva:     idreserva,
+        codigocliente: reserva.codigocliente,
+        mensaje:       mensajeNotificacion,
+        timestamp:     nuevaNoti.creado_en
+      });
     }
 
-    // 3) Guardar en tabla notificaciones para el cliente
-    await modelos.notificaciones.create({
-      codigocliente: reserva.codigocliente,
-      tipo: 'ESTADO',
-      mensaje: mensajeNotificacion,
-      idreserva,
-      leida: false
-    });
-
-    // 4) Emitir evento vía Socket.IO para que el CLIENTE (si está conectado) reciba este cambio
-    io.to(`cliente_${reserva.codigocliente}`).emit('cambio-estado', {
-      idreserva,
-      codigocliente: reserva.codigocliente,
-      nuevoEstado: textoEstado,
-      mensaje: mensajeNotificacion,
-      timestamp: new Date()
-    });
-
-
-
+    // 4) (Opcional) Reemplazar detalles si vienen en el body
     if (Array.isArray(detalle)) {
-      // Eliminar detalles anteriores
       await modelos.detalle_reserva.destroy({ where: { idreserva } });
-      // Insertar los nuevos detalles
       for (const d of detalle) {
         await modelos.detalle_reserva.create({
-          idreserva: idreserva,
-          idmenu: d.idmenu,
-          cantpersonas: d.cantpersonas,
-          preciounitario: d.preciounitario,
-          subtotal: d.subtotal,
+          idreserva,
+          idmenu:        d.idmenu,
+          cantpersonas:  d.cantpersonas,
+          preciounitario:d.preciounitario,
+          subtotal:      d.subtotal
         });
       }
     }
@@ -472,6 +457,7 @@ io.to(`cliente_${reserva.codigocliente}`).emit('cambio-estado', {
       message: 'Reserva actualizada exitosamente.',
       reserva
     });
+
   } catch (err) {
     console.error('Error al actualizar la reserva o sus detalles:', err);
     return res.status(500).json({
@@ -480,6 +466,7 @@ io.to(`cliente_${reserva.codigocliente}`).emit('cambio-estado', {
     });
   }
 }
+
 function eliminar(req, res) {
   const { idreserva } = req.params;
 
@@ -799,7 +786,19 @@ async function procesarPagoConTarjeta(req, res) {
   }
 }
 
-
+async function getNotificacionesPorCliente(req, res) {
+  const { codigocliente } = req.params;
+  try {
+    const notis = await modelos.notificaciones.findAll({
+      where: { codigocliente, leida: false },
+      order: [['creado_en', 'ASC']]
+   });
+    return res.status(200).json(notis);
+  } catch (err) {
+    console.error('Error al cargar notificaciones del cliente:', err);
+    return res.status(500).json({ message: 'Error al cargar notificaciones.' });
+  }
+}
 
 
 
@@ -814,7 +813,8 @@ module.exports = {
     getOne,
     procesarPrimerPago,
     procesarSegundoPago,
-    procesarPagoConTarjeta
+    procesarPagoConTarjeta,
+    getNotificacionesPorCliente
 
     
     

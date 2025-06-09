@@ -35,7 +35,8 @@ export class MisReservasComponent implements OnInit {
   mostrarBotonPagoFinal: boolean = false;  // El botón de pago final debe estar oculto inicialmente
   montoPago: number = 0;
   mensajes: { remitente: 'user' | 'bot'; texto: string }[] = [];
-
+  searchTerm: string = '';
+  allReservas: any[] = [];
 
   constructor(
     private reservasService: ReservasService,
@@ -58,6 +59,7 @@ export class MisReservasComponent implements OnInit {
     this.reservasService.getReservasByCliente(codigocliente).subscribe({
       next: (resp) => {
         this.reservas = resp;
+        this.allReservas = resp;
   
         this.reservas.forEach(r => {
 
@@ -91,6 +93,24 @@ export class MisReservasComponent implements OnInit {
     
   }
   
+
+  search(): void {
+  const term = this.searchTerm.trim().toLowerCase();
+  if (!term) {
+    // si está vacío, recargo todo
+    this.reservas = [...this.allReservas];
+  } else {
+    this.reservas = this.allReservas.filter(r =>
+      r.idreserva.toLowerCase().includes(term)
+    );
+  }
+}
+
+/** Limpia el filtro y vuelve a cargar todo */
+clearSearch(): void {
+  this.searchTerm = '';
+  this.reservas   = [...this.allReservas];
+}
 
   descargarComprobante(reserva: any) {
     // 1) Llamamos al backend para obtener datos completos del cliente:

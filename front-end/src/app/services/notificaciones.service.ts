@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../../environments/environment'; // o donde definas la URL
+import { HttpClient } from '@angular/common/http';
+import { GLOBAL } from './global';
 
 export interface NotifData {
   idreserva: string;
@@ -27,7 +29,9 @@ export class NotificacionesService {
   private nuevoPagoFinalSubject = new BehaviorSubject<NotifData | null>(null);
   private cambioEstadoSubject = new BehaviorSubject<NotifData | null>(null);
 
-  constructor() {
+  constructor(private http: HttpClient) {
+
+   
     console.log('[NotificacionesService] Conectando a WebSocket en:', this.WS_URL);
     this.socket = io(this.WS_URL);
 
@@ -82,6 +86,26 @@ export class NotificacionesService {
     return this.cambioEstadoSubject.asObservable();
   }
 
+  fetchNotificacionesCliente(codigocliente: string) {
+    return this.http.get<NotifData[]>(
+      `${environment.apiUrl}/notificaciones/cliente/${codigocliente}`
+    );
+  }
+
+ marcarComoLeida(id: number) {
+    return this.http.put(
+      `${environment.apiUrl}/notificaciones/${id}/leer`, {}
+    );
+  }
+
+  marcarTodasComoLeidas(codigocliente: string) {
+    return this.http.put(
+      `${environment.apiUrl}/notificaciones/cliente/${codigocliente}/leer`, {}
+    );
+  }
+
+
+
   // Opcional: desconectar WS (cuando se cierre sesión, por ejemplo)
   desconectar() {
     if (this.socket) {
@@ -89,3 +113,4 @@ export class NotificacionesService {
     }
   }
 }
+

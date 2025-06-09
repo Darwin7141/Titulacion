@@ -4,118 +4,93 @@ import { Router } from '@angular/router';
 import { NotificacionesService, NotifData } from '../../services/notificaciones.service';
 import Swal from 'sweetalert2';
 
+
+interface ClienteNoti {
+  id: number;              
+  texto: string;
+  idreserva: string;
+  fecha: string;
+}
+
 @Component({
   selector: 'app-inicio-cliente',
   standalone: false,
-  
   templateUrl: './inicio-cliente.component.html',
   styleUrl: './inicio-cliente.component.css'
 })
-export class InicioClienteComponent implements OnInit, OnDestroy{
+export class InicioClienteComponent implements OnInit, OnDestroy {
 
-  userEmail: string = '';
-  hayNuevasNotificaciones: boolean = false;     // true si hay al menos una notificación
-  cantidadNotificacionesCliente: number = 0; 
-   notificaciones: Array<{ texto: string; idreserva: string; fecha: string }> = [];
+  userEmail = '';
+  hayNuevasNotificaciones = false;
+  cantidadNotificacionesCliente = 0;
+  notificaciones: ClienteNoti[] = [];
 
-   private codigocliente: string | null = null;
-
-   private subscripciones: any[] = [];
-
-   
-
+  private codigocliente: string | null = null;
+  private subscripciones: any[] = [];
 
   constructor(
-    private _auth:AuthService,
-    private _router:Router,
+    private _auth: AuthService,
+    private _router: Router,
     private notiSvc: NotificacionesService,
-  
-    private _ngZone: NgZone){}
+    private _ngZone: NgZone
+  ) {}
 
-    
-    logout(){
-      
-      this._auth.logOut();
-      
-      this._router.navigate(['login']);
+  logout() {
+    this._auth.logOut();
+    this._router.navigate(['login']);
+  }
 
-    }
-
-    ngOnInit() {
-
-      const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
-    if (user && user.correo) {
-      this.userEmail = user.correo;
-    } else {
-      this.userEmail = 'Invitado';
-    }
-
+  ngOnInit() {
+    const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
+    this.userEmail = user?.correo ?? 'Invitado';
     this.codigocliente = user?.codigocliente || null;
-    // Aquí podrías realizar una comprobación de nuevas notificaciones
-    // Esto es solo un ejemplo de cómo podrías manejar las notificaciones
-    const subCambioEstado = this.notiSvc.onCambioEstado().subscribe((data: NotifData | null) => {
-      if (!data) return;
-      // Filtrar sólo las notificaciones que correspondan a ESTE cliente
-      if (data.codigocliente === this.codigocliente) {
-        this._ngZone.run(() => {
-          this.notificaciones.push({
-            texto: data.mensaje,
-            idreserva: data.idreserva,
-            fecha: data.timestamp
+
+    // 1) FETCH INICIAL de notificaciones “offline”
+    if (this.codigocliente) {
+      this.notiSvc.fetchNotificacionesCliente(this.codigocliente)
+        .subscribe(initial => {
+          const formatted: ClienteNoti[] = initial.map(d => ({
+            id:             (d as any).id,
+            texto:          d.mensaje,               // ← uso directo de mensaje desde la BD
+            idreserva:      d.idreserva,
+            fecha:          (d as any).creado_en     // ← uso de la fecha real en creado_en
+          }));
+          this._ngZone.run(() => {
+            this.notificaciones = formatted;
+            this.hayNuevasNotificaciones = formatted.length > 0;
+            this.cantidadNotificacionesCliente = formatted.length;
           });
-          this.hayNuevasNotificaciones = this.notificaciones.length > 0;
-          this.cantidadNotificacionesCliente = this.notificaciones.length;
         });
-      }
+    }
+
+    // 2) Suscripción a cambios de estado en tiempo real
+    const subCambioEstado = this.notiSvc.onCambioEstado()
+  .subscribe((data: NotifData & { id?: number } | null) => {
+    if (!data || data.codigocliente !== this.codigocliente) return;
+    // ya que la noti viene con mensaje correcto, no hace falta reconstruirlo:
+    const textoNoti = data.mensaje;
+    this._ngZone.run(() => {
+      this.notificaciones.push({
+        id: data.id!,                 // ← usamos el id real
+        texto: textoNoti,
+        idreserva: data.idreserva!,
+        fecha: data.timestamp
+      });
+      this.hayNuevasNotificaciones = this.notificaciones.length > 0;
+      this.cantidadNotificacionesCliente = this.notificaciones.length;
     });
+  });
     this.subscripciones.push(subCambioEstado);
-
-    // 2) Opcionalmente, suscribirse a pagos si el cliente también debe verlo
-    const subNuevoPago = this.notiSvc.onNuevoPago().subscribe((data: NotifData | null) => {
-      if (!data) return;
-      if (data.codigocliente === this.codigocliente) {
-        this._ngZone.run(() => {
-          this.notificaciones.push({
-            texto: data.mensaje,      // data.mensaje puede contener “Pago realizado…”
-            idreserva: data.idreserva,
-            fecha: data.timestamp
-          });
-          this.hayNuevasNotificaciones = this.notificaciones.length > 0;
-          this.cantidadNotificacionesCliente = this.notificaciones.length;
-        });
-      }
-    });
-    this.subscripciones.push(subNuevoPago);
-
-    // 3) Y, si quisieras recibir también notificaciones del “pago final”:
-    const subPagoFinal = this.notiSvc.onNuevoPagoFinal().subscribe((data: NotifData | null) => {
-      if (!data) return;
-      if (data.codigocliente === this.codigocliente) {
-        this._ngZone.run(() => {
-          this.notificaciones.push({
-            texto: data.mensaje,
-            idreserva: data.idreserva,
-            fecha: data.timestamp
-          });
-          this.hayNuevasNotificaciones = this.notificaciones.length > 0;
-          this.cantidadNotificacionesCliente = this.notificaciones.length;
-        });
-      }
-    });
-    this.subscripciones.push(subPagoFinal);
   }
 
   ngOnDestroy() {
-    // Limpiar todas las suscripciones
-    this.subscripciones.forEach(s => {
-      if (s && typeof s.unsubscribe === 'function') {
-        s.unsubscribe();
-      }
-    });
+    this.subscripciones.forEach(s => s.unsubscribe && s.unsubscribe());
     this.subscripciones = [];
   }
-  verNotificacionesCliente() {
-    if (this.notificaciones.length === 0) {
+
+  /** Botón “campanita” */
+  verNotificacionesCliente(): void {
+    if (!this.notificaciones.length) {
       Swal.fire({
         icon: 'info',
         title: 'Sin notificaciones',
@@ -124,30 +99,77 @@ export class InicioClienteComponent implements OnInit, OnDestroy{
       });
       return;
     }
-    let htmlContent = `<div style="text-align: left;"><ul style="padding-left:20px;">`;
+
+    let html = `<div style="text-align:left;">`;
     this.notificaciones.forEach(n => {
-      htmlContent += `
-        <li style="margin-bottom:8px;">
-          <strong>${new Date(n.fecha).toLocaleString()}:</strong><br>
-          ${n.texto}
-        </li>
+      html += `
+        <div style="
+           display: flex;
+           align-items: flex-start;
+           margin-bottom: 16px;
+           padding-bottom: 16px;
+           border-bottom: 1px solid #eee;
+        ">
+          <div style="flex: 1;">
+            <div style="font-size:0.875rem; color:#555; margin-bottom:4px;">
+              ${new Date(n.fecha).toLocaleString()}
+            </div>
+            <div style="color:#222;">
+              ${n.texto}
+            </div>
+          </div>
+          <button
+            onclick="window.marcarVistoCliente(${n.id}); return false;"
+            style="
+              margin-left: auto;
+              background-color: #007bff;
+              color: #fff;
+              border: none;
+              border-radius: 4px;
+              padding: 6px 12px;
+              cursor: pointer;
+            "
+          >
+            Visto
+          </button>
+        </div>
       `;
     });
-    htmlContent += `</ul></div>`;
+    html += `</div>`;
+
+    (window as any).marcarVistoCliente = (notifId: number) => {
+      this._ngZone.run(() => this.marcarVisto(notifId));
+    };
 
     Swal.fire({
       icon: 'info',
       title: 'Notificaciones',
-      html: htmlContent,
-      showConfirmButton: true,
+      html,
+      showCloseButton: true,
+      focusConfirm: false,
       confirmButtonText: 'Marcar todas como leídas'
-    }).then(() => {
-      this.notificaciones = [];
-      this.hayNuevasNotificaciones = false;
-      this.cantidadNotificacionesCliente = 0;
+    }).then(result => {
+      if (result.isConfirmed && this.codigocliente) {
+        this.notiSvc.marcarTodasComoLeidas(this.codigocliente)
+          .subscribe(() => {
+            this.notificaciones = [];
+            this.hayNuevasNotificaciones = false;
+            this.cantidadNotificacionesCliente = 0;
+          });
+      }
+    });
+  }
+
+  /** Marcar individual como leída */
+  private marcarVisto(id: number) {
+    this.notiSvc.marcarComoLeida(id).subscribe(() => {
+      this.notificaciones = this.notificaciones.filter(n => n.id !== id);
+      this.hayNuevasNotificaciones = this.notificaciones.length > 0;
+      this.cantidadNotificacionesCliente = this.notificaciones.length;
+      Swal.close();
+      if (this.notificaciones.length) {
+        this.verNotificacionesCliente();
+      }
     });
   }
 }
-  
-
-

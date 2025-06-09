@@ -1,10 +1,22 @@
 <div class="container-mis-reservas">
   <h2>Mis Reservas</h2>
 
+  <div class="search-bar">
+  <input
+    type="text"
+    placeholder="Buscar por código"
+    [(ngModel)]="searchTerm"
+    (keyup.enter)="search()"
+  />
+  <button (click)="search()"><i class="fa fa-search"></i></button>
+  <button (click)="clearSearch()"><i class="fa fa-refresh"></i></button>
+</div>
+
   <div *ngFor="let reserva of reservas; let i = index" class="reserva-card">
-    <h3>Reserva: Nro {{ i + 1 }}</h3>
+    
 
     <!-- 1) Etiquetas en negrita -->
+     <p><strong>Reserva:</strong> {{ reserva.idreserva }}</p>
     <p><strong>Fecha:</strong> {{ reserva.fechaevento }}</p>
     <p><strong>Dirección:</strong> {{ reserva.direccionevento }}</p>
 
