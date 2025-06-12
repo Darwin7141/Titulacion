@@ -7,45 +7,47 @@ import { GLOBAL } from './global';
   providedIn: 'root'
 })
 export class ProductosService {
+  private url = GLOBAL.url;
 
-  private url:string;
-  
-  constructor(private http: HttpClient) { 
-    this.url=GLOBAL.url;
-  }
+  // Opciones HTTP reutilizables con headers y credenciales
+  private httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    withCredentials: true    // ← clave para enviar la cookie de sesión
+  };
+
+  constructor(private http: HttpClient) {}
 
   getProducto(): Observable<any[]> {
-    return this.http.get<any[]>(this.url +"productos")
-    
-    }
+    return this.http.get<any[]>(`${this.url}productos`, this.httpOptions);
+  }
 
   agregar(prod: any): Observable<any> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json'
-      })
-    };
-
-    return this.http.post<any>(this.url +"productos", prod, httpOptions);
+    return this.http.post<any>(
+      `${this.url}productos`,
+      prod,
+      this.httpOptions
+    );
   }
 
   editarProducto(prod: any): Observable<any> {
     return this.http.put<any>(
       `${this.url}productos/${prod.idproducto}`,
       prod,
-      {
-        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-      }
+      this.httpOptions
     );
   }
-  
+
   eliminarProducto(idproducto: string): Observable<any> {
-    return this.http.delete<any>(`${this.url}productos/${idproducto}`);
-    
+    return this.http.delete<any>(
+      `${this.url}productos/${idproducto}`,
+      this.httpOptions
+    );
   }
 
   getProductoByCategoria(idcategoria: number | string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.url}productos/categoria/${idcategoria}`);
+    return this.http.get<any[]>(
+      `${this.url}productos/categoria/${idcategoria}`,
+      this.httpOptions
+    );
   }
-  
 }

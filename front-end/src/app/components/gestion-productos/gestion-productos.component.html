@@ -1,0 +1,65 @@
+<h2 mat-dialog-title>Gestionar productos</h2>
+<mat-dialog-content>
+
+  <!-- Buscador -->
+  <mat-form-field style="width:100%">
+    <mat-label>Buscar</mat-label>
+    <input matInput [(ngModel)]="search" (ngModelChange)="filtrar()" placeholder="Código o nombre">
+    <button mat-icon-button matSuffix (click)="filtrar()">
+      <mat-icon>search</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <!-- Lista filtrada -->
+  <mat-selection-list [multiple]="false" style="max-height:200px; overflow:auto">
+    <mat-list-option *ngFor="let p of filtrados" (click)="select(p)">
+      {{p.idproducto}} — {{p.nombre}} (stock: {{p.stock}})
+    </mat-list-option>
+  </mat-selection-list>
+
+  <!-- Cantidad + agregar -->
+  <div *ngIf="seleccionado" style="margin-top:1em">
+    <p>Seleccionado: <strong>{{seleccionado.nombre}}</strong></p>
+    <mat-form-field appearance="outline">
+      <mat-label>Cantidad</mat-label>
+      <input matInput type="number" [(ngModel)]="cantidad" [min]="1" [max]="seleccionado.stock">
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="agregar()">Agregar</button>
+  </div>
+
+  <!-- Tabla de asignados con acciones -->
+  <div *ngIf="asignados.length > 0" style="margin-top:2em;">
+    <h3>Asignados</h3>
+    <table style="width:100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="border:1px solid #ddd; padding:8px">Producto</th>
+          <th style="border:1px solid #ddd; padding:8px; text-align:right">Cant.</th>
+          <th style="border:1px solid #ddd; padding:8px; text-align:center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of asignados">
+          <td style="border:1px solid #ddd; padding:8px">{{ item.producto.nombre }}</td>
+          <td style="border:1px solid #ddd; padding:8px; text-align:right">{{ item.cantidad }}</td>
+          <td style="border:1px solid #ddd; padding:8px; text-align:center">
+            <button mat-icon-button (click)="incrementar(item)">
+              <mat-icon>add</mat-icon>
+            </button>
+            <button mat-icon-button (click)="disminuir(item)">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="eliminar(item)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()"><mat-icon>close</mat-icon> Cancelar</button>
+  <button mat-icon-button color="primary" (click)="save()"><mat-icon>save</mat-icon></button>
+</mat-dialog-actions>

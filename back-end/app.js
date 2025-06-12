@@ -1,8 +1,10 @@
 require('dotenv').config();
-const express = require('express');
-const bodyParser = require('body-parser');
-const http = require('http');
-const socketIO = require('socket.io');
+const express      = require('express');
+const bodyParser   = require('body-parser');
+const http         = require('http');
+const socketIO     = require('socket.io');
+const session      = require('express-session');
+const cors         = require('cors');
 
 const app = express();
 
@@ -12,17 +14,32 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Cabeceras CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method'
-  );
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
-  next();
-});
+// — Nuevos: CORS y sesiones — 
+app.use(cors({
+  origin: 'http://localhost:4200',    // tu front de Angular
+  credentials: true,                  // habilita cookies
+  methods: ['GET','POST','PUT','DELETE','OPTIONS']
+}));
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'cambia_esto_por_un_secreto_real',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    sameSite: 'lax',   // o 'none' si sirves en HTTPS y necesitas cross-site
+    secure: false      // true si usas HTTPS
+  }
+}));
+
+// ——————————————————————————————
+// 1.1) Middleware de autenticación
+// ——————————————————————————————
+function ensureAuth(req, res, next) {
+  if (req.session && req.session.admin) {
+    return next();
+  }
+  return res.status(401).send({ message: 'No autorizado' });
+}
 
 // ——————————————————————————————
 // 2) Rutas REST de tu aplicación
@@ -30,10 +47,23 @@ app.use((req, res, next) => {
 require('./server/routes/usuarios')(app);
 require('./server/routes/gestionclientes')(app);
 require('./server/routes/cargoempleados')(app);
+
+app.use('/api/gestionempleados', ensureAuth);
 require('./server/routes/empleados')(app);
+
+
 require('./server/routes/administrador')(app);
+
+// ——————————————————
+// Protegemos proveedor
+// ——————————————————
+app.use('/api/proveedor', ensureAuth);
 require('./server/routes/proveedor')(app);
+
+app.use('/api/productos', ensureAuth);
 require('./server/routes/productos')(app);
+
+
 require('./server/routes/tipocatering')(app);
 require('./server/routes/serviciocatering')(app);
 require('./server/routes/menus')(app);
@@ -46,6 +76,8 @@ require('./server/routes/detalle_reserva')(app);
 require('./server/routes/contacto')(app);
 require('./server/routes/estado_reserva')(app);
 require('./server/routes/notificaciones')(app);
+require('./server/routes/reserva_producto')(app);
+
 
 // Ruta catch‐all
 app.get('*', (req, res) => {
@@ -64,11 +96,10 @@ const io = new socketIO.Server(server, {
   }
 });
 
-// Hacemos que, desde cualquier controlador, podamos obtener `io` con `req.app.get('io')`
 app.set('io', io);
 
 // ——————————————————————————————
-// 4) Manejo básico de conexiones/desconexiones en Socket.IO
+// 4) Manejo de conexiones Socket.IO
 // ——————————————————————————————
 io.on('connection', (socket) => {
   console.log(`🔌 [Socket.IO] Cliente conectado: ${socket.id}`);
@@ -89,6 +120,14 @@ io.on('connection', (socket) => {
   });
 });
 
-// **Importante**: exportamos `app` y `server`.  
+const { checkExpiracionesYNotificar } = require('./server/controllers/notificaciones');
+
+// Al arrancar el servidor, lanzamos la primera comprobación:
+setImmediate(() => checkExpiracionesYNotificar(io));
+
+// Luego, repetimos cada 24 horas:
+setInterval(() => checkExpiracionesYNotificar(io), 24 * 60 * 60 * 1000);
+
+// **Importante**: exportamos `app` y `server`.
 // www.js se encargará de llamar a `server.listen(...)`.
 module.exports = { app, server };

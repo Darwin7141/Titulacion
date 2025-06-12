@@ -27,9 +27,11 @@ module.exports = (sequelize, DataTypes) => {
         idcargo: {
             type: DataTypes.STRING
         },
-        contrasenia: {
+
+        id_admin: {
             type: DataTypes.STRING
         },
+        
     
     }, {
         tableName: 'empleado',  // Especificar el nombre de la tabla como 'cargo'

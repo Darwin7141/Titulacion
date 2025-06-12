@@ -3,7 +3,9 @@ const modelos = require('../models'); // Importar los modelos
 const bcrypt = require('bcrypt');
 
 async function create(req, res) {
-  const { ci, nombre, direccion, e_mail, telefono, idcargo, contrasenia } = req.body;
+  const { ci, nombre, direccion, e_mail, telefono, idcargo } = req.body;
+
+  const id_admin = req.session.admin.codigoadmin;
 
   try {
       // Validar datos antes de la inserción
@@ -31,7 +33,7 @@ async function create(req, res) {
           nextCodigo = `E${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
       }
 
-      const hashedPassword = await bcrypt.hash(contrasenia, 10);
+      
 
       // Crear el nuevo empleado con el código generado
       const empleado = await modelos.empleado.create({
@@ -42,27 +44,11 @@ async function create(req, res) {
           e_mail,
           telefono,
           idcargo,
-          contrasenia
+          id_admin
+          
       });
 
-      const lastUser = await modelos.cuentasusuarios.findOne({
-                        order: [['idcuenta', 'DESC']],
-                    });
-            
-                    let nextIdCuenta = 'CU001'; // Valor inicial por defecto
-                    if (lastUser && lastUser.idcuenta) {
-                        const lastNumber = parseInt(lastUser.idcuenta.slice(2), 10); // Extraer número
-                        nextIdCuenta = `CU${String(lastNumber + 1).padStart(3, '0')}`; // Incrementar y formatear
-                    }
-            
-                    // Ahora, insertamos el usuario en la tabla cuentasusuarios
-                    await modelos.cuentasusuarios.create({
-                        idcuenta: nextIdCuenta, // Usamos el id generado
-                        correo: empleado.e_mail,
-                        contrasenia: hashedPassword, // La contraseña ya encriptada
-                        rol: empleado.codigoempleado // Asignamos el 'idprecliente' como 'rol' en cuentasusuarios
-                    });
-
+      
       res.status(201).send(empleado); // Enviar el empleado creado
   } catch (err) {
       console.error('Error al crear empleado:', err);

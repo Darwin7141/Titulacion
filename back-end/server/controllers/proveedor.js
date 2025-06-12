@@ -2,7 +2,9 @@ const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../util
 const modelos = require('../models'); // Importar los modelos
 
 async function create(req, res) {
-  const { ci, nombre, direccion, e_mail, telefono } = req.body;
+  const { ci, nombre, direccion, e_mail, telefono} = req.body;
+
+  const id_admin = req.session.admin.codigoadmin;
 
   try {
       // Validar datos antes de la inserción
@@ -37,7 +39,8 @@ async function create(req, res) {
           nombre,
           direccion,
           e_mail,
-          telefono
+          telefono,
+          id_admin
           
       });
 
@@ -50,7 +53,7 @@ async function create(req, res) {
 
 async function update(req, res) {
   const { codigoproveedor } = req.params; // Código del empleado desde los parámetros de la URL
-  const { ci, nombre, direccion, e_mail, telefono } = req.body; // Datos a actualizar
+  const { ci, nombre, direccion, e_mail, telefono, id_admin } = req.body; // Datos a actualizar
 
   try {
       // Validar los campos antes de la actualización
@@ -79,7 +82,8 @@ async function update(req, res) {
           nombre: nombre || proveedor.nombre,
           direccion: direccion || proveedor.direccion,
           e_mail: e_mail || proveedor.e_mail,
-          telefono: telefono || proveedor.telefono
+          telefono: telefono || proveedor.telefono,
+          id_admin: id_admin || proveedor.id_admin
       });
 
       res.status(200).send({ message: 'Proveedor actualizado exitosamente.', proveedor });
@@ -92,49 +96,30 @@ async function update(req, res) {
 function eliminar(req, res) {
   const { codigoproveedor } = req.params;
 
-  // Buscar si el empleado existe
   modelos.proveedor.findOne({
-      where: { codigoproveedor },
+    where: { codigoproveedor },
   })
-      .then((proveedor) => {
-          if (!proveedor) {
-              // Si no existe el empleado, devolver un mensaje de error
-              return res.status(404).send({ message: 'Proveedor no encontrado.' });
-          }
+  .then((proveedor) => {
+    if (!proveedor) {
+      return res.status(404).send({ message: 'Proveedor no encontrado.' });
+    }
 
-          // Eliminar el empleado
-          modelos.proveedor
-              .destroy({
-                  where: { codigoproveedor },
-              })
-              .then(() => {
-                  // Asegurarse de restablecer la secuencia con el valor máximo actual de codigoempleado
-                  modelos.sequelize.query(`
-                      SELECT setval('proveedor_id_seq', COALESCE((SELECT MAX(CAST(SUBSTRING(codigoproveedor FROM 2) AS INT)) FROM public.proveedor), 0), false)
-                  `)
-                      .then(([result]) => {
-                          // Revisar si la consulta tuvo éxito
-                          if (result) {
-                              return res.status(200).send({ message: 'Proveedor eliminado correctamente y secuencia restablecida.' });
-                          } else {
-                              console.error('No se pudo restablecer la secuencia.');
-                              return res.status(500).send({ message: 'Error al restablecer la secuencia del proveedor.' });
-                          }
-                      })
-                      .catch((err) => {
-                          console.error('Error al restablecer la secuencia:', err);
-                          return res.status(500).send({ message: 'Error al restablecer la secuencia del proveedor.' });
-                      });
-              })
-              .catch((err) => {
-                  console.error('Error al eliminar el proveedor:', err);
-                  return res.status(500).send({ message: 'Ocurrió un error al eliminar el proveedor.' });
-              });
-      })
-      .catch((err) => {
-          console.error('Error al buscar el proveedor:', err);
-          return res.status(500).send({ message: 'Ocurrió un error al buscar el proveedor.' });
-      });
+    return modelos.proveedor.destroy({
+      where: { codigoproveedor },
+    });
+  })
+  .then((rowsDeleted) => {
+    if (rowsDeleted === 0) {
+      // por si falla el destroy por alguna razón
+      return res.status(500).send({ message: 'No se pudo eliminar el proveedor.' });
+    }
+    // ¡Listo! No tocamos la secuencia
+    return res.status(200).send({ message: 'Proveedor eliminado correctamente.' });
+  })
+  .catch((err) => {
+    console.error(err);
+    return res.status(500).send({ message: 'Ocurrió un error en la operación.' });
+  });
 }
 
 function getAll(req, res) {

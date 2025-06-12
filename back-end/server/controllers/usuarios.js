@@ -141,27 +141,35 @@ async function login(req, res) {
   const ok = await bcrypt.compare(req.body.contrasenia, cuenta.contrasenia);
   if (!ok) return res.status(400).json({ message: 'Contraseña incorrecta' });
 
+ 
+
   /* 3. Traer datos personales segun rol --------------------------- */
   let datosPersona = {};
 
-  if (cuenta.rol === 1) {                      // PRE-cliente
-    const enlace = await modelos.cuenta_administrador.findOne({
-      where: { id_cuenta: cuenta.idcuenta }     // FK en la tabla puente
-    });
-    if (enlace) {
-      const admin = await modelos.administrador.findByPk(enlace.codigoadmin);
-      if (admin) datosPersona = {
-        codigoadmin: admin.ci,
-        ci: admin.ci,
-        nombre: admin.nombre,
-        direccion: admin.direccion,
-        e_mail: admin.e_mail,
-        telefono: admin.telefono,
-        
-                              // o cuenta.correo
-      };
+  if (cuenta.rol === 1) {
+      const enlace = await modelos.cuenta_administrador.findOne({
+        where: { id_cuenta: cuenta.idcuenta }
+      });
+      if (enlace) {
+        const admin = await modelos.administrador.findByPk(enlace.id_admin);
+        if (admin) {
+          // ← Aquí guardas la sesión
+          req.session.admin = {
+            codigoadmin: admin.codigoadmin,
+            nombre: admin.nombre,
+            // … cualquier otro dato que quieras tener disponible
+          };
+          datosPersona = {
+            codigoadmin: admin.codigoadmin,
+            ci: admin.ci,
+            nombre: admin.nombre,
+            direccion: admin.direccion,
+            e_mail: admin.e_mail,
+            telefono: admin.telefono
+          };
+        }
+      }
     }
-  }
 
   if (cuenta.rol === 2) {                      // PRE-cliente
     const enlace = await modelos.cuenta_preclientes.findOne({

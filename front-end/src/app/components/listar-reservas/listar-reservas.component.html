@@ -1,3 +1,4 @@
+<!-- src/app/components/listar-reservas/listar-reservas.component.html -->
 <div class="clientes-container">
   <h2>Reservas</h2>
 
@@ -6,7 +7,7 @@
     <input
       type="text"
       class="search-input"
-      placeholder="Nombre o código "
+      placeholder="Nombre o código"
       [(ngModel)]="searchTerm"
     />
     <button class="search-button" (click)="buscarReserva()">
@@ -17,67 +18,75 @@
     </button>
   </div>
 
-  <div *ngIf="resFiltrados.length === 0 && searchTerm" class="not-found">
-    <p>No se encontró ningún tipo de reserva con la información proporcionada.</p>
+  <!-- Mensaje de “no hay resultados” -->
+  <div *ngIf="pagedRes.length === 0 && searchTerm" class="not-found">
+    <p>No se encontró ninguna reserva con la información proporcionada.</p>
   </div>
 
-
   <div class="spacer"></div>
-<table>
-  <thead>
-    <tr>
-      <th>Código</th>
-      <th>Cédula</th>
-      <th>Cliente</th>
-      <th>Dirección</th>
-      <th>Fecha Evento</th>
-      <th>Cantidad Personas</th>
-      <th>Total a Pagar</th>
-      <th>Primer Pago</th>
-      <th>Segundo Pago</th>
-      <th>Saldo Pendiente</th>
-      <th>Estado</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let tipo of resFiltrados">
-      <td>{{ tipo.idreserva }}</td>
-      <td>{{ tipo.cliente.ci }}</td>
-      <td>{{ tipo.cliente.nombre }}</td>
-      <td>{{ tipo.direccionevento }}</td>
-      <td>{{ tipo.fechaevento }}</td>
-      <td>{{ tipo.cantpersonas }}</td>
-      <td>{{ tipo.total }}</td>
-      <td>{{ tipo.primer_pago}}</td>
-      <td>{{ tipo.segundo_pago}}</td>
-      <td>{{ tipo.saldo_pendiente}}</td>
 
-      <!-- Select con la lista de estados -->
-      <td>
-        <select [(ngModel)]="tipo.idestado" style="padding: 4px;">
-          <option *ngFor="let est of estadosReserva" [ngValue]="est.idestado">
-            {{ est.estado_reserva }}
-          </option>
-        </select>
-      </td>
+  <!-- Tabla paginada -->
+  <table *ngIf="pagedRes.length > 0">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Cédula</th>
+        <th>Cliente</th>
+        <th>Dirección</th>
+        <th>Fecha Evento</th>
+        <th>Cantidad Personas</th>
+        <th>Total a Pagar</th>
+        <th>Primer Pago</th>
+        <th>Segundo Pago</th>
+        <th>Saldo Pendiente</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tipo of pagedRes">
+        <td>{{ tipo.idreserva }}</td>
+        <td>{{ tipo.cliente.ci }}</td>
+        <td>{{ tipo.cliente.nombre }}</td>
+        <td>{{ tipo.direccionevento }}</td>
+        <td>{{ tipo.fechaevento }}</td>
+        <td>{{ tipo.cantpersonas }}</td>
+        <td>{{ tipo.total }}</td>
+        <td>{{ tipo.primer_pago }}</td>
+        <td>{{ tipo.segundo_pago }}</td>
+        <td>{{ tipo.saldo_pendiente }}</td>
+        <td>
+          <select [(ngModel)]="tipo.idestado" style="padding: 4px;">
+            <option *ngFor="let est of estadosReserva" [ngValue]="est.idestado">
+              {{ est.estado_reserva }}
+            </option>
+          </select>
+        </td>
+        <td>
+          <button mat-icon-button color="primary" (click)="guardarEstadoReserva(tipo)">
+            <mat-icon>save</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="eliminarReserva(tipo.idreserva)">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-icon-button color="accent" (click)="verDetalles(tipo.idreserva)">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-      <!-- Botón para guardar el estado -->
-      <td>
-        <button mat-icon-button color="primary" (click)="guardarEstadoReserva(tipo)">
-          <mat-icon>save</mat-icon>
-        </button>
-
-        <!-- (Opcional) Botón de eliminar -->
-        <button mat-icon-button color="warn" (click)="eliminarReserva(tipo.idreserva)">
-          <mat-icon>delete</mat-icon>
-        </button>
-
-        <button mat-icon-button color="accent" (click)="verDetalles(tipo.idreserva)">
-          <mat-icon>visibility</mat-icon>
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <!-- BLOQUE DE PAGINACIÓN -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+    <button
+      *ngFor="let p of pages"
+      (click)="goToPage(p)"
+      [class.active]="p === currentPage"
+    >
+      {{ p }}
+    </button>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+  </div>
 </div>

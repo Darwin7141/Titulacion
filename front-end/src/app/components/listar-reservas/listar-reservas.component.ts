@@ -3,7 +3,10 @@ import { ReservasService } from '../../services/reservas.service';
 import { ActivatedRoute } from '@angular/router';
 import { EstadoReservaService } from '../../services/estado-reserva.service';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';  
 import Swal from 'sweetalert2';
+import { forkJoin } from 'rxjs';
+import { GestionProductosComponent } from '../gestion-productos/gestion-productos.component';
 @Component({
   selector: 'app-listar-reservas',
   standalone: false,
@@ -17,12 +20,19 @@ export class ListarReservasComponent implements OnInit {
   searchTerm: string = '';
   estadosReserva: any[] = [];
   highlightedReserva: string | null = null;
+  pagedRes: any[] = [];
+
+  pageSize = 10;
+  currentPage = 1;
+  totalPages = 0;
+  pages: number[] = [];
 
   constructor(
     private resService: ReservasService,
     private estadoService: EstadoReservaService,
     private route: ActivatedRoute,
-    private router:Router
+    private router:Router,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -47,31 +57,20 @@ export class ListarReservasComponent implements OnInit {
 
   cargarReservas(): void {
     this.resService.getAllReservas().subscribe({
-      next: (data) => {
+      next: data => {
         this.reserva = data;
-        this.resFiltrados = data;
-  
-        // *** AHORA que ya tenemos la lista, filtramos si hay highlight
+        this.resFiltrados = data;        // asignas todos a resFiltrados…
+
+        // si venimos con highlight, filtras…
         if (this.highlightedReserva) {
-          // Deja SOLO la reserva con el ID highlight
-          this.resFiltrados = this.resFiltrados.filter(
-            r => r.idreserva === this.highlightedReserva
-          );
-  
-          // Remueve el param "highlight" de la URL para que,
-          // si el usuario recarga la página, muestre TODAS las reservas
-          this.route.queryParams.subscribe(() => {
-            this.router.navigate(
-              [],
-              { 
-                queryParams: { },  // Quita todos los query params
-                relativeTo: this.route
-              }
-            );
-          });
+          this.resFiltrados = this.resFiltrados
+            .filter(r => r.idreserva === this.highlightedReserva);
+          this.router.navigate([], { relativeTo: this.route, queryParams: {} });
         }
+
+        this.setupPagination();          // ← y aquí arrancas la paginación
       },
-      error: (err) => console.error('Error al obtener reservas:', err),
+      error: err => console.error(err)
     });
   }
 
@@ -85,6 +84,56 @@ export class ListarReservasComponent implements OnInit {
       },
     });
   }
+
+  private setupPagination() {
+    this.currentPage = 1;
+    this.totalPages = Math.ceil(this.resFiltrados.length / this.pageSize) || 1;
+    this.pages = Array.from({length: this.totalPages}, (_, i) => i + 1);
+    this.updatePagedRes();
+  }
+
+  private updatePagedRes() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.pagedRes = this.resFiltrados.slice(start, start + this.pageSize);
+  }
+
+  goToPage(p: number) {
+    if (p < 1 || p > this.totalPages) return;
+    this.currentPage = p;
+    this.updatePagedRes();
+  }
+
+  prevPage() {
+    this.goToPage(this.currentPage - 1);
+  }
+
+  nextPage() {
+    this.goToPage(this.currentPage + 1);
+  }
+
+  buscarReserva(): void {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) {
+      this.resFiltrados = [...this.reserva];
+    } else {
+      this.resFiltrados = this.reserva.filter(res =>
+        res.cliente.nombre.toLowerCase().includes(term) ||
+        res.idreserva.toLowerCase().includes(term) ||
+        res.cliente.ci.toLowerCase().includes(term)
+      );
+    }
+    this.setupPagination();
+  }
+
+  recargarLista(): void {
+    this.searchTerm = '';
+    this.highlightedReserva = null;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+    this.cargarReservas();
+  }
+
+
+
 
   // ============ Al presionar el botón "Guardar" en la fila ============
   guardarEstadoReserva(itemReserva: any) {
@@ -154,35 +203,7 @@ window.dispatchEvent(new CustomEvent('nuevasNotificacionesClienteActualizado'));
   });
 }
   // ===================== Búsqueda ============================
-  buscarReserva(): void {
-    const searchTermLower = this.searchTerm.trim().toLowerCase();
-    if (!searchTermLower) {
-      this.resFiltrados = this.reserva;
-      return;
-    }
-    this.resFiltrados = this.reserva.filter((res) =>
-      res.cliente.nombre.toLowerCase().includes(searchTermLower) ||
-      res.idreserva.toLowerCase().includes(searchTermLower) ||
-      res.cliente.ci.toLowerCase().includes(searchTermLower) 
-    );
-  }
-
-  recargarLista(): void {
-    // Limpia el campo de búsqueda
-    this.searchTerm = '';
-    // Quita el valor de highlightedReserva si lo tienes
-    this.highlightedReserva = null;
   
-    // Elimina todos los queryParams de la URL
-    this.router.navigate([], {
-      queryParams: {},
-      relativeTo: this.route,
-    });
-  
-    // Vuelve a cargar todas las reservas
-    this.cargarReservas();
-  }
-
   // (Opcional) Método para eliminar la reserva, si todavía lo necesitas
   eliminarReserva(idreserva: string): void {
     if (confirm('¿Está seguro de que desea eliminar esta reserva?')) {
@@ -194,92 +215,129 @@ window.dispatchEvent(new CustomEvent('nuevasNotificacionesClienteActualizado'));
   }
 
   verDetalles(idreserva: string) {
-    // 1) Llamar al servicio para obtener la reserva con todos sus detalles
-    this.resService.getReservaById(idreserva).subscribe({
-      next: (resCompleta) => {
-        // resCompleta => { fechaevento, direccionevento, total, nombre: { estado_reserva }, detalles: [...] }
+    forkJoin({
+      reserva: this.resService.getReservaById(idreserva),
+      asignados: this.resService.getProductosDeReserva(idreserva)
+    }).subscribe({
+      next: ({ reserva: resCompleta, asignados }) => {
+        // ——— 1) Agrupo duplicados en un Map ———
+        const map = new Map<string, { producto: any, cantidad: number }>();
+        asignados.forEach(item => {
+          const key = item.producto.idproducto;
+          if (map.has(key)) {
+            map.get(key)!.cantidad += item.cantidad;
+          } else {
+            map.set(key, { producto: item.producto, cantidad: item.cantidad });
+          }
+        });
+        const agregados = Array.from(map.values());
 
-        // 2) Construir el HTML sin "Reserva: Nro X", ni Editar/Eliminar
-        let htmlContent = `
-        <div style="font-family: Arial, sans-serif; text-align:left;">
-          <p><strong>Fecha:</strong> ${resCompleta.fechaevento}</p>
-          <p><strong>Dirección:</strong> ${resCompleta.direccionevento}</p>
+        // ——— 2) Construyo el HTML ———
+        let html = `
+          <div style="text-align:left; font-family:Arial,sans-serif;">
+          <p><strong>Reserva:</strong> ${resCompleta.idreserva}</p>
+            <p><strong>Fecha:</strong> ${resCompleta.fechaevento}</p>
+            <p><strong>Dirección:</strong> ${resCompleta.direccionevento}</p>
         `;
-
-        // Estado con badge
         if (resCompleta.nombre?.estado_reserva) {
-          htmlContent += `
-          <p><strong>Estado:</strong>
-            <span style="
-              background-color: #d1ecf1; 
-              color: #0c5460; 
-              padding: 4px 8px; 
-              border-radius: 12px; 
-              font-weight: bold;
-              display: inline-block;">
-              ${resCompleta.nombre.estado_reserva}
-            </span>
-          </p>
+          html += `
+            <p><strong>Estado:</strong>
+              <span style="
+                background:#d1ecf1; color:#0c5460;
+                padding:4px 8px; border-radius:12px;
+                font-weight:bold; display:inline-block;">
+                ${resCompleta.nombre.estado_reserva}
+              </span>
+            </p>
           `;
         }
-
-        // Tabla de detalles
-        htmlContent += `
-          <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+        // tabla de detalles de menú
+        html += `
+          <table style="width:100%; border-collapse:collapse; margin-top:16px;">
             <thead>
-              <tr style="background-color: #f1f1f1; font-weight: bold;">
-                <th style="border: 1px solid #ddd; padding: 8px;">Menú</th>
-                <th style="border: 1px solid #ddd; padding: 8px;">Precio Unit.</th>
-                <th style="border: 1px solid #ddd; padding: 8px;">Cant.</th>
-                <th style="border: 1px solid #ddd; padding: 8px;">Subtotal</th>
+              <tr style="background:#f1f1f1; font-weight:bold;">
+                <th style="border:1px solid #ddd; padding:8px;">Menú</th>
+                <th style="border:1px solid #ddd; padding:8px;">Precio Unit.</th>
+                <th style="border:1px solid #ddd; padding:8px;">Cant.</th>
+                <th style="border:1px solid #ddd; padding:8px;">Subtotal</th>
               </tr>
             </thead>
             <tbody>
         `;
-
-        resCompleta.detalles.forEach((det: any) => {
-          htmlContent += `
+        resCompleta.detalles.forEach((d: any) => {
+          html += `
             <tr>
-              <td style="border: 1px solid #ddd; padding: 8px;">${det.menu?.nombre || ''}</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${det.preciounitario}</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${det.cantpersonas}</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${det.subtotal}</td>
+              <td style="border:1px solid #ddd; padding:8px;">${d.menu?.nombre}</td>
+              <td style="border:1px solid #ddd; padding:8px;">${d.preciounitario}</td>
+              <td style="border:1px solid #ddd; padding:8px;">${d.cantpersonas}</td>
+              <td style="border:1px solid #ddd; padding:8px;">${d.subtotal}</td>
             </tr>
           `;
         });
-
-        // Fila final para el total
-        htmlContent += `
+        html += `
             <tr>
-              <td colspan="3" style="border: 1px solid #ddd; padding: 8px; text-align: right; font-weight: bold;">
+              <td colspan="3" style="border:1px solid #ddd; padding:8px; text-align:right; font-weight:bold;">
                 Total:
               </td>
-              <td style="border: 1px solid #ddd; padding: 8px;">
+              <td style="border:1px solid #ddd; padding:8px;">
                 ${resCompleta.total ?? '0.00'}
               </td>
             </tr>
             </tbody>
           </table>
-        </div>
         `;
 
-        // 3) Mostrar la ventana emergente con SweetAlert2
+        // tabla de productos asignados (agrupados)
+        html += `
+          <h4 style="margin-top:24px;">Productos asignados</h4>
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="border:1px solid #ddd; padding:8px;">Producto</th>
+                <th style="border:1px solid #ddd; padding:8px;">Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+        agregados.forEach(item => {
+          html += `
+            <tr>
+              <td style="border:1px solid #ddd; padding:8px;">${item.producto.nombre}</td>
+              <td style="border:1px solid #ddd; padding:8px;">${item.cantidad}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+
+        // ——— 3) Muestro SweetAlert2 ———
         Swal.fire({
-          title: '',  // Sin "Reserva: Nro X"
-          html: htmlContent,
+          title: '',
+          html,
           icon: 'info',
-          confirmButtonText: 'Cerrar',  // Botón "Cerrar"
-          width: '600px'                // Ajusta si quieres más ancho
+          width: 600,
+          showDenyButton: true,
+          denyButtonText: 'Gestionar',
+          confirmButtonText: 'Cerrar'
+        })
+        .then(res => {
+          if (res.isDenied) {
+            const ref = this.dialog.open(GestionProductosComponent, {
+  width: '800px',
+  data: { idreserva }
+});
+
+ref.afterClosed().subscribe(saved => {
+  if (saved) {
+    // el usuario pulsó Guardar → recarga tu lista de reservas
+    this.cargarReservas();
+  }
+});
+          }
         });
       },
-      error: (err) => {
-        console.error('Error al obtener detalles de reserva:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo obtener la información de la reserva.'
-        });
-      }
+      error: () => Swal.fire('Error', 'No se pudo cargar la reserva', 'error')
     });
   }
+
+  
 }

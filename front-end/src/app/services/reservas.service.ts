@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { GLOBAL } from './global';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -87,5 +88,49 @@ export class ReservasService {
     });
   }
   
+  solicitarCancelacion(idreserva: string, codigocliente: string): Observable<any> {
+  return this.http.post(
+    `${this.url}notificaciones/solicitar-cancelacion`,
+    { idreserva, codigocliente }
+  );
 }
+
+getProductosDeReserva(idreserva: string):
+      Observable<{ producto: { idproducto: string, nombre: string }, cantidad: number }[]> {
+    return this.http.get< { producto: any, cantidad: number }[] >(
+      `${this.url}reservas/${idreserva}/productos`
+    );
+  }
+
+agregarProductoReserva(
+    idreserva: string,
+    body: { idproducto: string, cantidad: number }
+  ): Observable<{ producto: any, cantidad: number }> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    };
+    return this.http.post<{ producto: any, cantidad: number }>(
+      `${this.url}reservas/${idreserva}/productos`,
+      body,
+      httpOptions
+    );
+  }
+
+  restarProductoReserva(idreserva: string, body: { idproducto: string, cantidad: number }): Observable<{ producto: any, cantidad: number }> {
+  return this.http.post<any>(
+    `${this.url}reservas/${idreserva}/productos/restar`,
+    body,
+    { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+  );
+}
+
+/** Elimina por completo un producto de la reserva */
+eliminarProductoReserva(idreserva: string, idproducto: string): Observable<void> {
+  return this.http.delete<void>(`${this.url}reservas/${idreserva}/productos/${idproducto}`);
+}
+
+
+}
+
+
 

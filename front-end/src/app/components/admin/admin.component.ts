@@ -7,6 +7,7 @@ import { AfterViewInit } from '@angular/core';
 import { ReservasService } from '../../services/reservas.service'; 
 import Swal from 'sweetalert2';
 import { NotificacionesService, NotifData } from '../../services/notificaciones.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
@@ -24,7 +25,10 @@ export class AdminComponent implements OnInit, OnDestroy{
   hayNuevasReservas = false;
   reservasNuevas: string[] = [];
   pagosPendientes: Array<{ reservaId: string; clienteNombre: string; tipoPago: string; fecha: string }> = [];
-  
+  cancelaciones:   string[]   = [];
+
+  expiraciones: string[] = [];
+
   private subscripciones: Array<any> = [];
 
   constructor(
@@ -138,6 +142,8 @@ export class AdminComponent implements OnInit, OnDestroy{
 
    ngOnInit() {
   // 1) Leo el usuario (si hay) o dejo ‘Invitado’
+
+  
   const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
   this.userEmail = user?.correo || 'Invitado';
 
@@ -232,6 +238,34 @@ export class AdminComponent implements OnInit, OnDestroy{
       this.abrirModalPago(reservaId);
     });
   };
+
+   this.notiSvc.getCancelacionesAdmin().subscribe(list => {
+    this.cancelaciones = list.map(c => c.mensaje);
+  });
+
+  this.notiSvc.getExpiracionesAdmin().subscribe(list => {
+    this.expiraciones = list.map(e => e.mensaje);
+  });
+
+  // 2) suscripción al WebSocket para nuevas cancelaciones
+  const subCancel = this.notiSvc.onNuevaNotificacion().subscribe(noti => {
+    if (noti) {
+      this._ngZone.run(() => {
+        this.cancelaciones.push(noti.mensaje);
+      });
+    }
+  });
+  this.subscripciones.push(subCancel);
+
+  const subExp = this.notiSvc.onNuevaNotificacion()
+    .subscribe(noti => {
+      if (noti && noti.mensaje.startsWith('El producto') /* solo expiraciones */) {
+        this._ngZone.run(() => {
+          this.expiraciones.push(noti.mensaje);
+        });
+      }
+    });
+  this.subscripciones.push(subExp);
 }
 
   ngOnDestroy() {
@@ -250,11 +284,21 @@ export class AdminComponent implements OnInit, OnDestroy{
 }
 
   get hayNotificaciones(): boolean {
-    return this.reservasNuevas.length + this.pagosPendientes.length > 0;
-  }
+  return (
+    this.reservasNuevas.length +
+    this.pagosPendientes.length +
+    this.cancelaciones.length +
+    this.expiraciones.length 
+  ) > 0;
+}
   get cantidadNotificaciones(): number {
-    return this.reservasNuevas.length + this.pagosPendientes.length;
-  }
+  return (
+    this.reservasNuevas.length +
+    this.pagosPendientes.length +
+    this.cancelaciones.length +
+    this.expiraciones.length
+  );
+}
 
   verNotificaciones() {
   if (!this.hayNotificaciones) {
@@ -265,6 +309,8 @@ export class AdminComponent implements OnInit, OnDestroy{
     });
     return;
   }
+
+ 
 
   let htmlContent = `<ul style="text-align: left; margin-left: 20px;">`;
 
@@ -288,6 +334,22 @@ export class AdminComponent implements OnInit, OnDestroy{
       });
 
       htmlContent += `</ul>`;
+  }
+
+  if (this.cancelaciones.length) {
+    htmlContent += `<p><strong>Solicitudes de cancelación</strong></p><ul>`;
+    this.cancelaciones.forEach(msg => {
+      htmlContent += `<li>${msg}</li>`;   // aquí sale **solo** el mensaje puro
+    });
+    htmlContent += `</ul>`;
+  }
+
+  if (this.expiraciones.length) {
+    htmlContent += `<p style="font-weight:bold;margin:12px 0 8px;">Productos a punto de expirar</p><ul>`;
+    this.expiraciones.forEach(msg => {
+      htmlContent += `<li>${msg}</li>`;
+    });
+    htmlContent += `</ul>`;
   }
 
   // b) Pagos pendientes
@@ -330,22 +392,28 @@ export class AdminComponent implements OnInit, OnDestroy{
     focusConfirm: false,
     confirmButtonText: 'Marcar todas como vistas'
   })
-  .then((result) => {
-    // Si sólo hizo clic en “Marcar todas como vistas”, result.isConfirmed === true
+  .then(result => {
     if (result.isConfirmed) {
-      // — Sólo en ese caso borro TODO:
-      this.reservasNuevas = [];
-      this.pagosPendientes = [];
-      localStorage.removeItem('nuevasReservas');
-      localStorage.removeItem('pagosPendientes');
-
-      window.dispatchEvent(new Event('nuevasReservasActualizado'));
-      window.dispatchEvent(new Event('nuevosPagosActualizado'));
+      forkJoin({
+        cancel: this.notiSvc.markAllCancelacionesAdminAsRead(),
+        exp:    this.notiSvc.markAllExpiracionesAdminAsRead()
+      }).subscribe({
+        next: () => {
+          // limpio UI
+          this.reservasNuevas  = [];
+          this.pagosPendientes = [];
+          this.cancelaciones   = [];
+          this.expiraciones    = [];
+          localStorage.removeItem('nuevasReservas');
+          localStorage.removeItem('pagosPendientes');
+          window.dispatchEvent(new Event('nuevasReservasActualizado'));
+          window.dispatchEvent(new Event('nuevosPagosActualizado'));
+        },
+        error: err => console.error('No se pudo marcar notificaciones como leídas', err)
+      });
     }
-    // Si cerró la X, o clic fuera, o irAListaReservas() llamó a Swal.close(),
-    // result.isConfirmed === false, result.isDismissed === true, y
-    // NO entramos en este if, así que las notificaciones siguen intactas.
   });
+  
 }
 
 

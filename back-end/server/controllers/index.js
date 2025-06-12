@@ -16,7 +16,8 @@ const reservas = require('./reservas');
 const detallereservas = require('./detalle_reserva');
 const correoContacto = require('./contacto');
 const estadoReserva = require('./estado_reserva');
-
+const notificaciones = require('./notificaciones');
+const reservaProducto = require('./reserva_producto');
 
 module.exports={
     usuarios,
@@ -36,7 +37,9 @@ module.exports={
     reservas,
     detallereservas,
     correoContacto,
-    estadoReserva
+    estadoReserva,
+    notificaciones,
+    reservaProducto
     
 
 

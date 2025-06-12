@@ -158,4 +158,23 @@
   .spacer {
     margin: 20px 0;}
 
- 
+ .pagination {
+  display: flex;
+  gap: 0.5em;
+  justify-content: center;
+  margin: 1em 0;
+}
+.pagination button {
+  border: none;
+  background: #eee;
+  padding: 0.5em 0.75em;
+  cursor: pointer;
+}
+.pagination button.active {
+  background: #007bff;
+  color: white;
+}
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

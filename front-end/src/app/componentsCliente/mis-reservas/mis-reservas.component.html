@@ -66,6 +66,15 @@
       <button (click)="eliminarReserva(reserva.idreserva)" class="delete-button">
         <i class="fa fa-trash"></i> Eliminar
       </button>
+
+      <button
+  class="cancel-button"
+  (click)="cancelarReserva(reserva)"
+>
+  Cancelar
+</button>
+
+
       <button *ngIf="reserva.mostrarBotonPagoInicial"
         (click)="abrirPayPal('inicial', reserva)"
         class="pay-button">

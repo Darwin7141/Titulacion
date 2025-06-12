@@ -53,45 +53,60 @@ export class MisReservasComponent implements OnInit {
     }
 
     
+    
   }
 
   cargarReservasCliente(codigocliente: string): void {
-    this.reservasService.getReservasByCliente(codigocliente).subscribe({
-      next: (resp) => {
-        this.reservas = resp;
-        this.allReservas = resp;
-  
-        this.reservas.forEach(r => {
+  this.reservasService.getReservasByCliente(codigocliente).subscribe({
+    next: (resp) => {
+      this.reservas = resp;
+      this.allReservas = resp;
 
-          const pagado = Number(r.primer_pago)        || 0;
-  const saldo  = Number(r.saldo_pendiente)    || 0;
-  const estado = r.nombre?.estado_reserva;    // por si llega undefined
+      this.reservas.forEach(r => {
+        const pagado = Number(r.primer_pago)    || 0;
+        const saldo  = Number(r.saldo_pendiente)|| 0;
+        const estado = r.nombre?.estado_reserva;
 
-  r.mostrarBotonPagoInicial = false;
-  r.mostrarBotonPagoFinal   = false;
-  r.mostrarComprobante      = false;
+        // 1) Inicializo todo a false
+        r.mostrarBotonPagoInicial = false;
+        r.mostrarBotonPagoFinal   = false;
+        r.mostrarComprobante      = false;
 
-  if (estado === 'Aceptada' || estado === 'En proceso') {
+        // 2) Segun el estado:
+        switch (estado) {
+          case 'Aceptada':
+            // Solo inicial
+            r.mostrarBotonPagoInicial = true;
+            break;
 
-    if (pagado === 0) {                       
-      r.mostrarBotonPagoInicial = true;
+          case 'En proceso':
+            // Solo final
+            r.mostrarBotonPagoFinal = true;
+            break;
 
-    } else if (saldo > 0) {
-      r.mostrarBotonPagoFinal = true;
-      r.mostrarComprobante   = true;
-    }
+          case 'Pagada':
+            // Solo comprobante
+            r.mostrarComprobante = true;
+            break;
 
-  } else if (estado === 'Pagada') {
-    r.mostrarComprobante = true;
-  }
-});
-      },
-      error: (err) => {
-        console.error('Error al obtener reservas del cliente:', err);
-      }
-    });
-    
-  }
+          case 'Cancelada':
+            // Ningún botón
+            break;
+
+          default:
+            // Si quisieras contemplar el caso en que hayan hecho el primer pago
+            // y saldo > 0 pero sigan en 'Aceptada', podrías activar final aquí:
+            if (saldo > 0) {
+              r.mostrarBotonPagoFinal = true;
+            }
+            break;
+        }
+      });
+    },
+    error: (err) => console.error('Error al obtener reservas del cliente:', err)
+  });
+}
+
   
 
   search(): void {
@@ -545,7 +560,81 @@ abrirPayPal(tipo: 'inicial' | 'final', reserva: any) {
     }
   });
 }
+
+cancelarReserva(reserva: any) {
+  const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
+  const nombre = user.nombre;
+  const codigocliente = user.codigocliente;
+  const fechaEvento = new Date(reserva.fechaevento);
+  const ahora = new Date();
+  const diffHrs = (fechaEvento.getTime() - ahora.getTime()) / (1000 * 60 * 60);
+
+  if (diffHrs < 48) {
+    // CASO < 48h: dejamos tu flujo original
+    Swal.fire({
+      icon: 'warning',
+      title: '¿Continuar cancelación?',
+      text: `Estimado/a ${nombre}, para solicitar cancelar su reserva 
+             debe hacerlo 48 hrs antes de la fecha programada, caso contrario 
+             perderá el abono inicial realizado. ¿Desea continuar con la 
+             cancelación de su reserva?`,
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'No'
+    }).then(result => {
+      if (!result.isConfirmed) {
+        // “No”: volvemos a la lista
+        this.router.navigate(['/misReservas']);
+        return;
+      }
+      // “Sí”: enviamos y mostramos modal éxito
+      this.enviarSolicitudCancelacion(reserva.idreserva, codigocliente);
+    });
+  } else {
+    // CASO ≥ 48h: primer modal de confirmación genérico
+    Swal.fire({
+      icon: 'question',
+      title: '¿Está seguro que desea cancelar su reserva?',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'No'
+    }).then(result => {
+      if (!result.isConfirmed) {
+        // “No”: volvemos a la lista
+        this.router.navigate(['/misReservas']);
+        return;
+      }
+      // “Sí”: enviamos y mostramos modal éxito
+      this.enviarSolicitudCancelacion(reserva.idreserva, codigocliente);
+    });
+  }
 }
+
+// Extraigo el envío + modal de éxito en un método para no repetir
+private enviarSolicitudCancelacion(idreserva: string, codigocliente: string) {
+  this.reservasService.solicitarCancelacion(idreserva, codigocliente)
+    .subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Enviado',
+          text: 'Su solicitud para cancelar su reserva ha sido enviada.',
+          confirmButtonText: 'OK'
+        });
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo enviar la solicitud. Intente más tarde.',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+}
+
+}
+
 
 
 

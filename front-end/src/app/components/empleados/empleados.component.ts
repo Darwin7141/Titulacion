@@ -17,7 +17,7 @@ export class EmpleadosComponent implements OnInit {
     e_mail: '',
     telefono: '',
     idcargo: '',
-    contrasenia: ''
+    
     
   };
 

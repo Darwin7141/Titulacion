@@ -18,6 +18,8 @@ export class ProductosComponent implements OnInit {
     stock: '',
     codigoproveedor: '',
     idcategoria: '',
+    id_admin:  '',
+    fecha_caducidad: '',
    
   };
   categoriaFijaId: string | null = null;

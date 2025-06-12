@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { CommonModule }   from '@angular/common';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { MatIconModule } from '@angular/material/icon';
 import { provideHttpClient, withFetch } from '@angular/common/http';
@@ -12,6 +13,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatListModule } from '@angular/material/list';
+import { MatTableModule } from '@angular/material/table'; 
 
 
 
@@ -61,6 +64,7 @@ import { EditarReservaComponent } from './componentsCliente/editar-reserva/edita
 import { ListarReservasComponent } from './components/listar-reservas/listar-reservas.component';
 import { ContactoComponent } from './componentsCliente/contacto/contacto.component';
 import { AsistenteVirtualComponent } from './componentsCliente/asistente-virtual/asistente-virtual.component';
+import { GestionProductosComponent } from './components/gestion-productos/gestion-productos.component';
 
 
 
@@ -108,6 +112,7 @@ import { AsistenteVirtualComponent } from './componentsCliente/asistente-virtual
     ListarReservasComponent,
     ContactoComponent,
     AsistenteVirtualComponent,
+    GestionProductosComponent,
     
     
   
@@ -129,7 +134,10 @@ import { AsistenteVirtualComponent } from './componentsCliente/asistente-virtual
     MatSelectModule,
     MatOptionModule,
     MatDialogModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatListModule,
+    CommonModule,
+    MatTableModule
     
     
     

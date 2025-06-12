@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const modelos = require('../models');
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); 
 const { enviarNotificacionReserva } = require('../controllers/contacto');
@@ -790,9 +791,14 @@ async function getNotificacionesPorCliente(req, res) {
   const { codigocliente } = req.params;
   try {
     const notis = await modelos.notificaciones.findAll({
-      where: { codigocliente, leida: false },
+      where: {
+        codigocliente,
+        leida: false,
+        // ⇣ excluimos las cancelaciones ⇣
+        tipo: { [Op.ne]: 'CANCELACION' }
+      },
       order: [['creado_en', 'ASC']]
-   });
+    });
     return res.status(200).json(notis);
   } catch (err) {
     console.error('Error al cargar notificaciones del cliente:', err);
@@ -800,9 +806,59 @@ async function getNotificacionesPorCliente(req, res) {
   }
 }
 
+async function solicitarCancelacion(req, res) {
+  const io = req.app.get('io');
+  const { idreserva, codigocliente } = req.body;
 
+  try {
+    // 1) Obtenemos nombre del cliente
+    const cliente = await modelos.clientes.findOne({
+      where: { codigocliente },
+      attributes: ['nombre']
+    });
+    const nombreCliente = cliente?.nombre || 'Cliente desconocido';
 
+    // 2) Construimos el mensaje
+    const mensaje = `El cliente ${nombreCliente} ha solicitado cancelar la reserva con código ${idreserva}.`;
 
+    // 3) **Volvemos a persistirlo** en la BD
+    await modelos.notificaciones.create({
+      codigocliente,      // eso no le llega al cliente porque él no consulta cancelaciones
+      tipo: 'CANCELACION',
+      mensaje,
+      idreserva,
+      leida: false
+    });
+
+    // 4) Emitimos sólo al canal ADMIN
+    io.to('ADMIN').emit('nueva-notificacion', {
+      id:        idreserva,          // aquí podrías usar el id real de la fila si prefieres
+      mensaje,
+      timestamp: new Date().toISOString()
+    });
+
+    // 5) Respondemos OK al cliente
+    return res.status(200).json({ ok: true, message: 'Solicitud de cancelación enviada.' });
+  }
+  catch (err) {
+    console.error('ERROR solicitarCancelacion:', err);
+    return res.status(500).json({ ok: false, message: 'Error interno al procesar la solicitud.' });
+  }
+}
+
+async function getCancelacionesAdmin(req, res) {
+  try {
+    const cancelaciones = await modelos.notificaciones.findAll({
+      where: { tipo: 'CANCELACION', leida: false },
+      attributes: ['id','mensaje','creado_en'],
+      order: [['creado_en','ASC']]
+    });
+    return res.status(200).json(cancelaciones);
+  } catch (err) {
+    console.error('Error al cargar cancelaciones:', err);
+    return res.status(500).json({ message: 'Error interno al cargar cancelaciones.' });
+  }
+}
 module.exports = {
     create,
     update,
@@ -814,7 +870,9 @@ module.exports = {
     procesarPrimerPago,
     procesarSegundoPago,
     procesarPagoConTarjeta,
-    getNotificacionesPorCliente
+    getNotificacionesPorCliente,
+    solicitarCancelacion,
+    getCancelacionesAdmin,
 
     
     

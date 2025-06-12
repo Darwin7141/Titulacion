@@ -2,7 +2,10 @@
 const modelos = require('../models'); // Importar los modelos
 
 async function create(req, res) {
-  const { nombre, stock, codigoproveedor, idcategoria} = req.body;
+
+  const { nombre, stock, codigoproveedor, idcategoria, fecha_caducidad} = req.body;
+
+   const id_admin = req.session.admin.codigoadmin;
   if (stock == null || isNaN(stock)) {
     return res.status(400).send({ message: 'El campo "stock" es requerido y debe ser un número.' });
 
@@ -35,7 +38,9 @@ if (!regex.test(nextCodigo)) {
           nombre,
           stock,
           codigoproveedor,
-          idcategoria
+          idcategoria,
+          id_admin, 
+          fecha_caducidad
          
       });
 
@@ -50,7 +55,7 @@ if (!regex.test(nextCodigo)) {
 
 async function update(req, res) {
   const { idproducto } = req.params; // Código del empleado desde los parámetros de la URL
-  const { nombre, stock, codigoproveedor, idcategoria} = req.body; // Datos a actualizar
+  const { nombre, stock, codigoproveedor, idcategoria, id_admin, fecha_caducidad} = req.body; // Datos a actualizar
 
   try {
       
@@ -66,6 +71,8 @@ async function update(req, res) {
           stock : stock || productos. stock,
           codigoproveedor : codigoproveedor || productos.codigoproveedor,
           idcategoria : idcategoria || productos. idcategoria,
+          id_admin: id_admin || productos. id_admin,
+          fecha_caducidad :fecha_caducidad|| productos. fecha_caducidad,
           
       });
 

@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
         idcategoria: {
             type: DataTypes.INTEGER
         },
+        id_admin: {
+            type: DataTypes.STRING
+        },
+        fecha_caducidad: {
+            type: DataTypes.DATE
+        },
     }, {
         tableName: 'productos',// Especificar el nombre de la tabla como 'cargo'
         timestamps: false

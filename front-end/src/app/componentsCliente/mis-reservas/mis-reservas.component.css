@@ -210,3 +210,11 @@ button i {
   max-width: 400px;
   margin: 0 auto;
 }
+
+.cancel-button {
+  background-color: #ffc107;
+  color: #212529;
+}
+.cancel-button:hover {
+  background-color: #e0a800;
+}

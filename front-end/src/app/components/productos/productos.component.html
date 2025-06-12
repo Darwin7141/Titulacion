@@ -65,6 +65,21 @@
       </mat-form-field>
     </ng-container>
 
+
+     <mat-form-field class="col-xs-12">
+      <input
+        matInput
+        type="date"
+        #stockField="ngModel"
+        name="stock"
+        [(ngModel)]="productos.fecha_caducidad"
+        required
+        placeholder="Fecha expiración"
+        autofocus
+      />
+      <mat-error *ngIf="stockField.invalid">Fecha requerida</mat-error>
+    </mat-form-field>
+
     <!-- Botón Cancelar -->
     <button
       type="button"

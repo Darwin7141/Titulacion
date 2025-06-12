@@ -22,12 +22,16 @@ export interface NotifData {
 export class NotificacionesService {
   private socket: Socket;
   private readonly WS_URL = environment.wsUrl // tu backend con WS
+  private baseUrl = environment.apiUrl;
 
   // Subjects para emitir internamente los datos recibidos
   private nuevaReservaSubject = new BehaviorSubject<NotifData | null>(null);
   private nuevoPagoSubject = new BehaviorSubject<NotifData | null>(null);
   private nuevoPagoFinalSubject = new BehaviorSubject<NotifData | null>(null);
   private cambioEstadoSubject = new BehaviorSubject<NotifData | null>(null);
+
+   private nuevaNotiSubject = new BehaviorSubject<{ id: number; mensaje: string; timestamp: string } | null>(null);
+
 
   constructor(private http: HttpClient) {
 
@@ -43,6 +47,8 @@ export class NotificacionesService {
     this.socket.on('disconnect', () => {
       console.log('[NotificacionesService] Socket.IO desconectado');
     });
+
+    
   
 
     // 1) Si el usuario es cliente, debe identificarse:
@@ -70,6 +76,10 @@ export class NotificacionesService {
     this.socket.on('cambio-estado', (data: NotifData) => {
       this.cambioEstadoSubject.next(data);
     });
+
+    this.socket.on('nueva-notificacion', (data: { id: number; mensaje: string; timestamp: string }) => {
+  this.nuevaNotiSubject.next(data);
+});
   }
 
   // Observables que exponen los datos a los componentes
@@ -85,6 +95,12 @@ export class NotificacionesService {
   onCambioEstado(): Observable<NotifData | null> {
     return this.cambioEstadoSubject.asObservable();
   }
+
+  onNuevaNotificacion(): Observable<{ id: number; mensaje: string; timestamp: string } | null> {
+    return this.nuevaNotiSubject.asObservable();
+  }
+
+  
 
   fetchNotificacionesCliente(codigocliente: string) {
     return this.http.get<NotifData[]>(
@@ -104,9 +120,34 @@ export class NotificacionesService {
     );
   }
 
+  getCancelacionesAdmin(): Observable<{ id: string; mensaje: string; creado_en: string }[]> {
+  return this.http.get<{ id: string; mensaje: string; creado_en: string }[]>(
+    `${this.baseUrl}/reservas/cancelaciones/admin`
+  );
+}
+
+  markAllCancelacionesAdminAsRead(): Observable<void> {
+  return this.http.put<void>(
+    `${this.baseUrl}/reservas/cancelaciones/admin/leer`,
+    {}
+  );
+}
+
+markAllExpiracionesAdminAsRead(): Observable<void> {
+  return this.http.put<void>(
+    `${this.baseUrl}/notificaciones/expiraciones/admin/leer`,
+    {}
+  );
+}
+
+ getExpiracionesAdmin(): Observable<{ id: number, mensaje: string, timestamp: string }[]> {
+    return this.http.get<{ id: number, mensaje: string, timestamp: string }[]>(
+      `${environment.apiUrl}/notificaciones/expiraciones/admin`
+    );
+  }
 
 
-  // Opcional: desconectar WS (cuando se cierre sesión, por ejemplo)
+ 
   desconectar() {
     if (this.socket) {
       this.socket.disconnect();

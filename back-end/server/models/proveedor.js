@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
         telefono: {
             type: DataTypes.CHAR
         },
+        id_admin: {
+            type: DataTypes.STRING
+        },
     
     }, {
         tableName: 'proveedor',  // Especificar el nombre de la tabla como 'cargo'

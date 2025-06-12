@@ -168,27 +168,52 @@ export class AgendarReservaComponent implements OnInit{
   }
 
   generarReserva() {
-    if (!this.validarCampos()) return;
+  if (!this.validarCampos()) return;
 
-    this.verificarDuplicadosYObtenerCliente()
-      .then((codigoclienteExistente) => {
-        if (codigoclienteExistente) {
-          // (A) Cliente existente => crea la reserva normal
-          this.crearReservaConClienteExistente(codigoclienteExistente);
-        } else {
-          // (B) Cliente NO existe => un solo endpoint (rollback manual)
-          this.crearClienteYReservaEnUnSoloPaso();
-        }
-      })
-      .catch((err) => {
-        console.error('Error al verificar duplicados:', err);
+  // 1) Consulto todas las reservas
+  this.reservasService.getAllReservas().subscribe({
+    next: (all: any[]) => {
+      // ① El datepicker ahora te da "YYYY-MM-DD" directamente
+      const selectedDate = this.formReserva.fechaevento;
+
+      // ② Cuenta cuántas ya existen en esa misma fecha
+      const mismas = all.filter(r => {
+        if (!r.fechaevento) return false;
+        // r.fechaevento suele venir "2025-06-12" o "2025-06-12T00:00:00.000Z"
+        // en ambos casos los primeros 10 chars son la fecha:
+        const fechaDbYmd = String(r.fechaevento).slice(0, 10);
+        return fechaDbYmd === selectedDate;
+      }).length;
+
+      if (mismas >= 3) {
         Swal.fire({
           icon: 'error',
-          title: 'Error',
-          text: 'Ocurrió un error al verificar el cliente.',
+          title: 'Fecha no disponible',
+          text: 'La fecha seleccionada para su reserva no está disponible. Por favor elija otra fecha para su reserva.'
         });
-      });
-  }
+        return;
+      }
+      // 2) Si hay menos de 3, sigo con mi lógica habitual
+      this.verificarDuplicadosYObtenerCliente()
+        .then(codCli => {
+          if (codCli) {
+            this.crearReservaConClienteExistente(codCli);
+          } else {
+            this.crearClienteYReservaEnUnSoloPaso();
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({ icon: 'error', title: 'Error', text: 'Falló la verificación de cliente.' });
+        });
+    },
+    error: err => {
+      console.error(err);
+      Swal.fire({ icon: 'error', title: 'Error', text: 'No pude obtener reservas para verificar fecha.' });
+    }
+  });
+}
+
 
   private verificarDuplicadosYObtenerCliente(): Promise<string | null> {
     // IGUAL que antes, no lo toques
