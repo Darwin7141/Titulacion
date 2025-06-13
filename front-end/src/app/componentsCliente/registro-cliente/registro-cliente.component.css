@@ -1,74 +1,59 @@
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
-  }
-  
-  .registro-container {
-    max-width: 500px;
-    margin: 50px auto;
-    padding: 20px;
-    background: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-  }
-  
-  .registro-container h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  .formulario-registro {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  label {
-    font-weight: bold;
-    color: #555;
-    margin-bottom: 5px;
-    display: block;
-  }
-  
-  input {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    transition: border-color 0.3s;
-  }
-  
-  input:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-  
-  .btn-submit {
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  .btn-submit:hover {
-    background-color: #0056b3;
-  }
-  
-  @media (max-width: 768px) {
-    .registro-container {
-      margin: 20px;
-      padding: 15px;
-    }
-  }
-  
+.login-card {
+  position: absolute;
+  top: 80px;            /* justo bajo la navbar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 360px;
+  z-index: 1000;
+}
+
+.login-card__inner {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.login-card__form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.login-card__form input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  padding: .5rem 0;
+  font-size: 1rem;
+  transition: border-color .3s;
+}
+
+.login-card__form input:focus {
+  outline: none;
+  border-bottom-color: var(--verde);
+}
+
+.btn-submit {
+  background: #259e06;
+  color: #fff;
+  border-radius: 6px;
+  padding: .75rem 1.5rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity .3s;
+}
+
+.btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+.btn-submit:hover:not(:disabled) { opacity: .85; }
+
+.btn-cancel {
+  background: #a09f9f;
+  color: #fff;
+  border-radius: 6px;
+  padding: .75rem 1.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-cancel:hover { background: #606160; }

@@ -9,26 +9,31 @@ async function solicitarRecuperacion(req, res) {
   const { correo } = req.body;
 
   try {
-    console.log('Correo recibido:', correo); // Verifica que el correo se está recibiendo
+    // 1) Busca al usuario por correo
+    const usuario = await modelos.cuentasusuarios.findOne({ where: { correo } });
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
 
-    // Generar un token único
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiraEn = new Date(Date.now() + 30 * 60 * 1000); // Expira en 30 minutos
+    // 2) Genera token y expiración
+    const token     = crypto.randomBytes(32).toString('hex');
+    const expiraEn  = new Date(Date.now() + 30 * 60 * 1000); // 30 min
 
-    console.log('Token generado:', token); // Verifica que el token se genera correctamente
+    // 3) Guarda el token incluyendo “cuenta”
+    await modelos.tokens_recuperacion.create({
+      correo, 
+      token,
+      expira_en: expiraEn,
+      cuenta: usuario.idcuenta  // <-- aquí enlazas con tu usuario
+    });
 
-    // Guardar el token en la base de datos
-    await modelos.tokens_recuperacion.create({ correo, token, expira_en: expiraEn });
-    console.log('Token guardado en la base de datos');
-
-    // Enviar el correo de recuperación
+    // 4) Envía el correo
     await enviarCorreoRecuperacion(correo, token);
-    console.log('Correo enviado exitosamente');
+    return res.status(200).json({ mensaje: 'Correo enviado exitosamente' });
 
-    res.status(200).json({ mensaje: 'Correo enviado exitosamente' });
   } catch (error) {
     console.error('Error en el proceso de recuperación:', error);
-    res.status(500).json({ error: 'No se pudo procesar la solicitud' });
+    return res.status(500).json({ error: 'No se pudo procesar la solicitud' });
   }
 }
 

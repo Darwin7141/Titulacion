@@ -15,6 +15,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table'; 
+import {MatDividerModule} from '@angular/material/divider';
+import { MatCardModule } from '@angular/material/card';
 
 
 
@@ -137,7 +139,9 @@ import { GestionProductosComponent } from './components/gestion-productos/gestio
     MatProgressSpinnerModule,
     MatListModule,
     CommonModule,
-    MatTableModule
+    MatTableModule,
+    MatDividerModule,
+    MatCardModule
     
     
     

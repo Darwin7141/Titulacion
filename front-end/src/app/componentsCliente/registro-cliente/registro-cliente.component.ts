@@ -3,6 +3,7 @@ import { PreclientesService } from '../../services/preclientes.service';
 import { Router } from '@angular/router';
 import { ValidacionesService } from '../../services/validaciones.service'; // Importar el servicio de validaciones
 import Swal from 'sweetalert2';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-registro-cliente',
@@ -10,8 +11,11 @@ import Swal from 'sweetalert2';
   
   templateUrl: './registro-cliente.component.html',
   styleUrl: './registro-cliente.component.css'
+  
 })
 export class RegistroClienteComponent implements OnInit {
+
+
   registro = {
     ci: '',
     nombre: '',
@@ -23,6 +27,7 @@ export class RegistroClienteComponent implements OnInit {
   };
 
   constructor(
+    private dialogRef: MatDialogRef<RegistroClienteComponent>,
       private serviceRegistro: PreclientesService,
       private validaciones: ValidacionesService, // Inyectar el servicio de validaciones
       private _router: Router
@@ -32,7 +37,7 @@ export class RegistroClienteComponent implements OnInit {
       
     }
 
-    agregar() {
+     onSubmit() {
         if (!this.validaciones.validarCedulaEcuador(this.registro.ci)) {
           Swal.fire({
             icon: 'error',
@@ -125,7 +130,8 @@ export class RegistroClienteComponent implements OnInit {
                     title: 'Éxito',
                     text: 'Su registro se ha realizado exitosamente.',
                   }).then(() => {
-                    this._router.navigate(['/login']);
+                    this._router.navigate(['/login']),
+                    this.dialogRef.close()
                   });
                 },
                 error: (err) => {
@@ -141,6 +147,9 @@ export class RegistroClienteComponent implements OnInit {
           });
         });
       }
-    
+
+    onCancel() {
+    this.dialogRef.close();
+  }
 }
 

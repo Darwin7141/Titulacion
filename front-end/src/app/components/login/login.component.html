@@ -1,9 +1,8 @@
-<!-- Contenedor principal (imagen de fondo, etc.) -->
+<!-- Contenedor principal -->
 <div class="login-page-bg">
 
-  <!-- HEADER: Barra de navegación -->
+  <!-- ============ NAVBAR ============ -->
   <header class="navbar">
-    <!-- Menú a la izquierda -->
     <nav class="nav-menu">
       <ul>
         <li><a href="#" (click)="scrollTo('home', $event)">INICIO</a></li>
@@ -13,293 +12,383 @@
       </ul>
     </nav>
 
-    <!-- Logo a la derecha -->
     <div class="nav-logo">
-      <img
-        src="https://scontent.fuio3-1.fna.fbcdn.net/v/t39.30808-6/244667863_115293174241931_2042471049205914810_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHt82VWEgrM4ytjCUsx9-_UDr2Nm1PJqrQOvY2bU8mqtIBQYglZ1F4zT6F5e7yAEcFFKQmNqzPN2TU0SgzjofAl&_nc_ohc=4GdecVpnr0IQ7kNvwGydAVq&_nc_oc=Adn4w83e6EEMeAQe0EfbZGUtqOlal0pNQ3TYPCKkjJv3VHWxRAK0P6koG7NuE_tsGN1b24WzcXsSJAFDj4MAApDG&_nc_zt=23&_nc_ht=scontent.fuio3-1.fna&_nc_gid=Q8dkxy6GsRgROa8Tb3z8qw&oh=00_AfJs718Ihf5inKl2_kuopy9m88GGaqCY-RSVadS3a6xPcQ&oe=683ED962"
-        alt="Logo"
-      />
+    <button class="inicio-sesion" (click)="toggleLogin()">
+      Iniciar Sesión
+    </button>
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGmF2tVAOMb7f7xMEnizI-Dqvdas2KlFDLeg&s" 
+    alt="Logo" class="logo-nav" />
+  </div>
+
+
+<!-- FORMULARIO INLINE -->
+<div *ngIf="showLoginForm" class="login-card">
+  <div class="login-card__inner">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGmF2tVAOMb7f7xMEnizI-Dqvdas2KlFDLeg&s"
+         alt="Logo" class="login-card__logo" />
+    <h2 class="login-card__title">Inicia Sesión</h2>
+
+    <form #loginForm="ngForm" (ngSubmit)="login()" autocomplete="on" class="login-card__form">
+      <div class="form-group">
+        <input
+          type="email"
+          name="correo"
+          [(ngModel)]="usuario.correo"
+          placeholder="Correo electrónico"
+          required
+        />
+        <div class="error" *ngIf="loginForm.submitted && !usuario.correo">
+          El correo es obligatorio
+        </div>
+      </div>
+
+      <div class="form-group">
+        <input
+          type="password"
+          name="contrasenia"
+          [(ngModel)]="usuario.contrasenia"
+          placeholder="Contraseña"
+          required
+        />
+        <div class="error" *ngIf="loginForm.submitted && !usuario.contrasenia">
+          La contraseña es obligatoria
+        </div>
+      </div>
+
+      <button class="btn-submit" type="submit" [disabled]="bloquearCampos">
+        {{ bloquearCampos ? 'Espere…' : 'INGRESAR' }}
+      </button>
+    </form>
+
+    <div class="login-card__links">
+    <a (click)="abrirRecuperar()" style="cursor:pointer">¿Olvidaste tu contraseña?</a>
+      <span>·</span>
+       <a (click)="abrirRegistro()" style="cursor:pointer">Regístrate</a>
     </div>
+
+    <div class="lock-info" *ngIf="bloquearCampos">
+      Intenta nuevamente en {{ tiempoBloqueo }} s.
+    </div>
+  </div>
+</div>
+
   </header>
 
+  <!-- ============ HERO (banner) ============ -->
+  <section id="home" class="hero-container" style="display:flex;flex-direction:row;">
 
-  <!-- Sección principal Hero + Login (flex row: login izquierda, hero derecha) -->
-  <section id="home" class="hero-container" style="display: flex; flex-direction: row;">
+    <!-- diálogo de login -->
     
-    <!-- Panel de Login a la izquierda -->
-    <div class="login-panel" style="flex: 1;">
-      <div class="login-panel-content">
-        <div class="logo-sesion">
-          <img
-            src="https://scontent.fuio3-1.fna.fbcdn.net/v/t39.30808-6/244667863_115293174241931_2042471049205914810_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHt82VWEgrM4ytjCUsx9-_UDr2Nm1PJqrQOvY2bU8mqtIBQYglZ1F4zT6F5e7yAEcFFKQmNqzPN2TU0SgzjofAl&_nc_ohc=4GdecVpnr0IQ7kNvwGydAVq&_nc_oc=Adn4w83e6EEMeAQe0EfbZGUtqOlal0pNQ3TYPCKkjJv3VHWxRAK0P6koG7NuE_tsGN1b24WzcXsSJAFDj4MAApDG&_nc_zt=23&_nc_ht=scontent.fuio3-1.fna&_nc_gid=Q8dkxy6GsRgROa8Tb3z8qw&oh=00_AfJs718Ihf5inKl2_kuopy9m88GGaqCY-RSVadS3a6xPcQ&oe=683ED962"
-            alt="Logo"
-          />
-        </div>
-        <br> <br>
-        <h3>Inicia Sesión</h3>
-        <!-- Formulario de Login -->
-        <form #loginForm="ngForm" (ngSubmit)="login()" autocomplete="on">
-          <mat-form-field class="col-xs-12">
-            <input
-              matInput
-              type="text"
-              #correoField="ngModel"
-              name="correo"
-              [(ngModel)]="usuario.correo"
-              required
-              placeholder="Correo"
-              [disabled]="bloquearCampos"
-            />
-            <mat-error *ngIf="correoField.invalid">
-              El usuario es requerido
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="col-xs-12">
-            <input
-              matInput
-              type="password"
-              #contraseniaField="ngModel"
-              name="contrasenia"
-              [(ngModel)]="usuario.contrasenia"
-              required
-              placeholder="Contraseña"
-              [disabled]="bloquearCampos"
-            />
-            <mat-error *ngIf="contraseniaField.invalid">
-              La contraseña es requerida
-            </mat-error>
-          </mat-form-field>
-
-          <button
-            mat-raised-button
-            class="btn-ingreso"
-            type="submit"
-            [disabled]="!loginForm.form.valid || bloquearCampos"
-          >
-            INGRESAR
-          </button>
-        </form>
-
-        <!-- Enlaces de ayuda y registro -->
-        <p>
-          <a routerLink="/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
-        </p>
-        <p>
-          ¿No tienes cuenta?
-          <a routerLink="/registroCliente">Regístrate</a>
-        </p>
-
-        <!-- Bloqueo si aplica -->
-        <p *ngIf="bloquearCampos">
-          Intenta nuevamente en {{ tiempoBloqueo }} segundos.
-        </p>
-      </div>
-    </div>
-
-    <!-- Hero-text a la derecha -->
-    <div class="hero-content" style="flex: 1;">
+    <!-- Texto HERO -->
+    <div class="hero-content" style="flex:1;">
       <div class="section-box hero-text">
         <h1>DAAYFOOD</h1>
         <p>
-          Nuestro servicio se caracteriza por conservar 
-          en sus menús nacionales e internacionales altos estándares de calidad, 
-          utilizando productos 100% naturales en elaboración de nuestras recetas
+          Nuestro servicio se caracteriza por conservar en sus menús nacionales e internacionales
+          altos estándares de calidad, utilizando productos&nbsp;100&nbsp;% naturales en la
+          elaboración de nuestras recetas.
         </p>
-      </div>
-    </div>
 
-  </section>
-
-
-  <!-- Sección “SOBRE NOSOTROS” -->
-  <section id="sobre-nosotros" class="sobre-nosotros-container">
-    <div class="section-box sobre-wrapper">
-      <!-- Bloque de texto a la izquierda -->
-      <div class="sobre-text">
-        <h2 class="sobre-titulo">
-          SOBRE NOSOTROS<br />
-        </h2>
-        <br>
-        <h3>Misión</h3>
-        <p>
-          Satisfacer y superar las necesidades y expectativas de nuestros clientes en la Región Amazónica, 
-          brindando un servicio de calidad y excelencia; 
-          con productos, procesos que garanticen la satisfacción y el bienestar de nuestros consumidores, cumpliendo estándares nacionales e internacionales y con personal altamente calificado.
-        </p>
-        <br>
-        <h3>Visión</h3>
-        <p>
-          Ser una empresa lider y reconocida a nivel local y de la región amázonica, 
-          que busca convertirse en el mayor proveedor de servicios de catering y limpieza del mercado, brindando siempre productos que cumplan con estandares de calidad e inocuidad y con un servicio que demuestre nuestro profesionalismo, excelencia y calidez; 
-          para satisfacer las necesidades y expectativas de nuestros clientes.
-        </p>
-      </div>
-
-      <!-- Imagen a la derecha -->
-      <div class="sobre-image">
-        <img
-          src="https://scontent.fuio3-1.fna.fbcdn.net/v/t39.30808-6/480385819_646573151232692_690587218624320056_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGYFG76uKpjF4uwP6BHQ-firWwEh8Z045-tbASHxnTjn1ElYXypYv-vDDfs4EZY_cGu2QRohL24VwoAdoq9cpSn&_nc_ohc=uR8u2Qgp4RIQ7kNvwGnfmue&_nc_oc=AdkzSJ2FnU9jvbUmw7A-ihr7UWDS0Z0YOscyhNBNyygBjQTxwKzrxfjP8FO7J1Vt9hCF9VJMLPwbULGeZkw_IGvd&_nc_zt=23&_nc_ht=scontent.fuio3-1.fna&_nc_gid=XtsPipUrsaC8lgczXrOBaA&oh=00_AfI4NcBgnX7bDI4HjsU4t7SdjDuxKzMmIqM1A6q5PzdykA&oe=683EE68C"
-          alt="Sobre Nosotros"
-        />
-      </div>
-    </div>
-  </section>
-
-
-  <!-- Sección “SERVICIOS” -->
-  <section id="servicios" class="servicios-container">
-    <div class="section-box servicios-overlay">
-      <h2 class="servicios-titulo">SERVICIOS</h2>
-      <p class="servicios-descripcion">
-        Actualmente en DAAYFOOD contamos con los siguientes servicios.
-      </p>
-
-      <!-- Tarjetas (paginación) -->
-      <div class="servicios-cards">
-        <div
-          class="servicio-card"
-          *ngFor="let serv of servFiltrados | slice: sliceStart : sliceEnd"
-        >
-          <div class="servicio-card-imagen">
-            <img [src]="serv.fotografiaUrl" alt="Imagen de servicio" />
-          </div>
-          <h3>{{ serv.nombre }}</h3>
-          <p>{{ serv.descripcion }}</p>
+        <!-- CTAs opcionales -->
+        <div class="cta-box">
+          <button class="cta-btn" (click)="scrollTo('servicios', $event)">VER SERVICIOS</button>
+          <button class="cta-btn ghost" (click)="scrollTo('planes', $event)">COTIZAR</button>
         </div>
       </div>
-
-      <div class="dots-container">
-        <span
-          class="dot"
-          *ngFor="let page of pagesArray"
-          [class.active]="page === currentPage"
-          (click)="setPage(page)"
-        ></span>
-      </div>
-      <div class="download-pdf-container">
-        <button class="pdf-btn" (click)="generarPDFServiciosMenus()">
-          Obtener Catálogo
-        </button>
-      </div>
     </div>
   </section>
 
+  <!-- ============ SOBRE NOSOTROS ============ -->
+ <section id="sobre-nosotros" class="sobre-nosotros-container">
+  <div class="sobre-wrapper">
+    <!-- Columna de texto -->
+    <div class="sobre-text">
+      <h2 class="sobre-titulo">Sobre Nosotros</h2>
 
-  <!-- Sección “CONTÁCTANOS” -->
-  <section id="planes" class="section-wrapper planes-container">
-    <div class="section-box">
-      <h2>CONTÁCTANOS</h2>
+      <br>
+
+      
       <p>
-        Si deseas información sobre algún servicio, por favor envíanos tus datos
-        para que podamos enviarte más información.
+        Nuestra Organización está fundamentada  en los siguientes valores:
+Calidad en el Servicio, Compromiso, Respeto, Inclusión, Integridad, Trabajo en Equipo,  
+Responsabilidad, Ética profesional, Resiliencia.
       </p>
 
-      <form
-        #planesForm="ngForm"
-        (ngSubmit)="enviarFormulario()"
-        class="form-contacto"
+      
+    </div>
+
+    <!-- Columna de imagen -->
+    <div class="sobre-image">
+      <img
+        src="https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&h=600"
+        alt="Chef emplata un plato gourmet" />
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  <!-- ============ SERVICIOS ============ -->
+  <section id="servicios" class="servicios-container">
+  <!-- quitamos cualquier clase “section-box” aquí -->
+  <div class="servicios-overlay">
+    <h2 class="servicios-titulo">SERVICIOS</h2>
+    <p class="servicios-descripcion">
+      Disfruta de nuestros variados servicios
+    </p>
+
+    <div class="servicios-cards">
+      <div class="servicio-card"
+           *ngFor="let serv of servFiltrados | slice: sliceStart : sliceEnd">
+        <div class="servicio-card-imagen">
+          <img [src]="serv.fotografiaUrl" alt="{{ serv.imagen }}" />
+        </div>
+        <h3>{{ serv.nombre }}</h3>
+        <!-- si no quieres la descripción larga aquí, bórrala -->
+         
+        <p class="servicio-texto">{{ serv.descripcion }}</p>
+      </div>
+    </div>
+
+    <div class="dots-container">
+      <span class="dot"
+            *ngFor="let page of pagesArray"
+            (click)="setPage(page)"
+            [class.active]="page===currentPage"></span>
+    </div>
+
+    <div class="download-pdf-container">
+      <button class="pdf-btn" (click)="generarPDFServiciosMenus()">
+        Obtener Catálogo
+      </button>
+    </div>
+  </div>
+</section>
+
+  <!-- ============ CONTÁCTANOS ============ -->
+  <section id="planes" class="planes-container">
+  <div class="contact-wrapper">
+    <h2>CONTÁCTANOS</h2>
+    <p>Si deseas información sobre algún servicio, por favor envíanos tus datos</p>
+
+    <form #planesForm="ngForm" (ngSubmit)="enviarFormulario()" class="form-contacto">
+      <div class="field">
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          required
+          [(ngModel)]="formData.nombre"
+          placeholder=" "
+        />
+        <label for="nombre">Nombre</label>
+      </div>
+
+      <div class="field">
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          [(ngModel)]="formData.email"
+          placeholder=" "
+        />
+        <label for="email">Correo electrónico</label>
+      </div>
+
+      <div class="field">
+        <input
+          type="tel"
+          id="celular"
+          name="celular"
+          required
+          [(ngModel)]="formData.celular"
+          placeholder=" "
+        />
+        <label for="celular">Celular</label>
+      </div>
+
+      <div class="form-group">
+  <mat-form-field class="servicios-field">
+    <mat-label>Servicios</mat-label>
+    <mat-select
+      multiple
+      [(ngModel)]="formData.serviciosSeleccionados"
+      name="serviciosSeleccionados"
+    >
+      <mat-option *ngFor="let s of servicio" [value]="s.nombre">
+        {{ s.nombre }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+      <button
+        type="submit"
+        class="btn-enviar"
+        [disabled]="!planesForm.form.valid"
       >
-        <!-- Nombre -->
-        <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input
-            type="text"
-            id="nombre"
-            name="nombre"
-            required
-            [(ngModel)]="formData.nombre"
-            placeholder="Tu nombre"
-          />
-        </div>
+        ENVIAR
+      </button>
+    </form>
+  </div>
+</section>
 
-        <!-- Email -->
-        <div class="form-group">
-          <label for="email">Correo electrónico</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            [(ngModel)]="formData.email"
-            placeholder="Tu correo electrónico"
-          />
-        </div>
+  <!-- ============ FOOTER ============ -->
+<footer class="footer-container">
+  <div class="footer-content">
+    <p class="footer-address">
+      DIRECCIÓN: Av. Auca y SN km 34, comunidad San Pedro, Parroquia Dayuma,<br>
+      Cantón Francisco de Orellana – Provincia de Orellana.<br>
+      TELÉFONOS: (+593) 096 297 1709 • 098 059 6056 • 099 522 1821
+    </p>
+    <div class="footer-icons">
+      <a href="https://www.facebook.com/dayfood.ec" target="_blank" rel="noopener">
+        <img src="https://img.icons8.com/?size=100&id=118487&format=png&color=FFFFFF" alt="Facebook" class="social-icon" />
+      </a>
+      <a href="https://wa.me/593992268003" target="_blank" rel="noopener">
+        <img src="https://img.icons8.com/?size=100&id=85192&format=png&color=FFFFFF" alt="WhatsApp" class="social-icon" />
+      </a>
+    </div>
+  </div>
+</footer>
 
-        <!-- Celular -->
-        <div class="form-group">
-          <label for="celular">Celular</label>
-          <input
-            type="tel"
-            id="celular"
-            name="celular"
-            required
-            [(ngModel)]="formData.celular"
-            placeholder="Tu número de celular"
-          />
-        </div>
+<ng-template #registroDialog>
+    <div class="registro-panel">
+      <div class="registro-panel-content">
+        <h3>Regístrate</h3>
+        <form #registroForm="ngForm" (ngSubmit)="onSubmit()" autocomplete="on">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ci">Cédula</label>
+              <input
+                id="ci"
+                name="ci"
+                type="text"
+                [(ngModel)]="registro.ci"
+                placeholder="Ingrese su cédula"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="direccion">Dirección</label>
+              <input
+                id="direccion"
+                name="direccion"
+                type="text"
+                [(ngModel)]="registro.direccion"
+                placeholder="Ingrese su dirección"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="nombre">Nombre</label>
+              <input
+                id="nombre"
+                name="nombre"
+                type="text"
+                [(ngModel)]="registro.nombre"
+                placeholder="Ingrese su nombre"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="correo">Correo Electrónico</label>
+              <input
+                id="correo"
+                name="correo"
+                type="email"
+                [(ngModel)]="registro.correo"
+                placeholder="Ingrese su correo electrónico"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input
+                id="telefono"
+                name="telefono"
+                type="tel"
+                [(ngModel)]="registro.telefono"
+                placeholder="Ingrese su teléfono"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="contrasenia">Contraseña</label>
+              <input
+                id="contrasenia"
+                name="contrasenia"
+                type="password"
+                [(ngModel)]="registro.contrasenia"
+                placeholder="Ingrese su contraseña"
+                required
+              />
+            </div>
+          </div>
 
-        <!-- Checkbox principal para mostrar la lista -->
-        <div *ngIf="mostrarServicios">
-          <mat-form-field appearance="fill" style="width: 100%;">
-          
-            <mat-label>Servicios</mat-label>
-            <mat-select
-              [multiple]="true"
-              [(ngModel)]="formData.serviciosSeleccionados"
-              name="serviciosSeleccionados"
+          <div class="registro-buttons">
+
+              <!-- botón Cancelar -->
+          <button type="button"
+                  class="btn-cancel"
+                  (click)="closeRegistro()">
+            Cancelar
+          </button>
+           
+            <button
+              type="submit"
+              class="btn-register"
+              [disabled]="!registroForm.form.valid"
             >
-              <mat-option
-                *ngFor="let s of servicio"
-                [value]="s.nombre"
-              >
-                {{ s.nombre }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+              Registrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-template>
+
+
+  <ng-template #recuperarDialog>
+  <div class="recuperar-card">
+    <div class="recuperar-card__inner">
+      <h2 class="recuperar-card__title">Recuperar Contraseña</h2>
+      <form #recForm="ngForm"
+            (ngSubmit)="solicitarRecuperacion()"
+            class="recuperar-card__form"
+            autocomplete="off">
+        <div class="form-group">
+          <label for="correoRecuperar">Correo Electrónico</label>
+          <input
+            id="correoRecuperar"
+            type="email"
+            name="correoRecuperar"
+            [(ngModel)]="correoRecuperar"
+            placeholder="ejemplo@correo.com"
+            required />
+          <div class="error" *ngIf="recForm.submitted && !correoRecuperar">
+            El correo es obligatorio
+          </div>
         </div>
 
-        <button
-          [disabled]="!planesForm.form.valid"
-          type="submit"
-          class="btn-enviar"
-        >
-          ENVIAR
-        </button>
+        <div class="recuperar-buttons">
+          <button type="button"
+                  class="btn-cancel"
+                  (click)="closeRecuperar()">
+            Cancelar
+          </button>
+          <button type="submit"
+                  class="btn-submit"
+                  [disabled]="recForm.invalid">
+            Solicitar
+          </button>
+        </div>
       </form>
     </div>
-  </section>
-
-
-  <footer class="footer-container">
-    <div class="footer-content">
-      <p>
-        DIRECCIÓN: Av. Auca y SN, km 34, comunidad San Pedro, Parroquia Dayuma,
-        <br />
-        Cantón Francisco de Orellana, Provincia de Orellana.<br />
-        TELÉFONOS: (+593) 096 297 1709 - 098 059 6056 - 099 522 1821
-      </p>
-
-      <div class="footer-icons">
-        <!-- Iconos redes sociales -->
-        <a href="https://www.facebook.com/dayfood.ec" target="_blank" rel="noopener noreferrer">
-          <img
-            src="https://img.icons8.com/?size=100&id=118487&format=png&color=FFFFFF"
-            alt="Instagram"
-            class="social-icon"
-          />
-        </a>
-        <a href="https://wa.me/593992268003" target="_blank" rel="noopener noreferrer">
-          <img
-            src="https://img.icons8.com/?size=100&id=85192&format=png&color=ffffff"
-            alt="WhatsApp"
-            class="social-icon"
-          />
-        </a>
-      </div>
-    </div>
-  </footer>
-
-</div>
+  </div>
+</ng-template>
 
 <app-asistente-virtual></app-asistente-virtual>

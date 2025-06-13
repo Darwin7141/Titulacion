@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
 import { LoginService } from '../../services/login.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -6,6 +6,11 @@ import { ServiciocateringService } from '../../services/serviciocatering.service
 import { ContactoService } from '../../services/contacto.service'; 
 import jsPDF from 'jspdf';
 import { MenusService } from '../../services/menus.service';
+import { MatDialog, MatDialogRef  } from '@angular/material/dialog';
+
+import { ValidacionesService } from '../../services/validaciones.service';
+import { PreclientesService } from '../../services/preclientes.service';
+import { RecuperarContrasenaService } from '../../services/recuperar-contrasena.service';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +19,13 @@ import { MenusService } from '../../services/menus.service';
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
+    @ViewChild('loginDialog') loginDialog!: TemplateRef<any>;
+    @ViewChild('registroDialog') registroDialog!: TemplateRef<any>;
+    @ViewChild('recuperarDialog') recuperarDialog!: TemplateRef<any>;
+  
+    private registroRef?: MatDialogRef<any>;
+    private recuperarRef?: MatDialogRef<any>;
+   showLoginForm = false;
     servicio: any[] = [];
     servFiltrados: any[] = [];
     currentPage: number = 1;
@@ -22,6 +34,17 @@ export class LoginComponent implements OnInit {
     correo: '', // Para almacenar el valor del nombre de usuario
     contrasenia: '', // Para almacenar el valor de la contraseña
   };
+
+  registro = {
+    ci: '',
+    nombre: '',
+    telefono: '',
+    direccion: '',
+    correo: '',
+    contrasenia: ''
+  };
+
+  correoRecuperar = '';
 
   formData = {
     nombre: '',
@@ -41,11 +64,16 @@ export class LoginComponent implements OnInit {
   menus: any[] = [];
 
   constructor(
+    
     private _serviceLogin: LoginService,
     private _router: Router,
     private cateringService: ServiciocateringService,
     private contactoService: ContactoService,
-    private menusService: MenusService
+    private menusService: MenusService,
+    private dialog: MatDialog,
+    private serviceRegistro: PreclientesService,
+     private validaciones: ValidacionesService,
+      private recuperarService: RecuperarContrasenaService,
   ) {}
 
   ngOnInit() : void {
@@ -65,9 +93,21 @@ export class LoginComponent implements OnInit {
 
       this.cargarServiciosYMenus();
   }
-        
-      
+   
+   abrirModal() {
+    this.dialog.open(this.loginDialog, {
+      width: '420px',
+      // Optional: disableClose: true, autoFocus: false…
+    });
+  }
+    
+abrirRegistro() {
+    this.registroRef = this.dialog.open(this.registroDialog, {
+      width: '640px',
+      autoFocus: false
+    });
   
+  }
 
   login() {
     if (this.bloquearCampos) {
@@ -94,12 +134,15 @@ export class LoginComponent implements OnInit {
             }).then(() => {
                 // Redirigir según el valor del rol
                 const rol = response.usuario.rol;
+                this.dialog.closeAll();
 
                if (rol ===1) {
             // administrador
+             
             this._router.navigate(['/admin/list/']);
           } else if (rol === 2) {
             // cliente
+             
             this._router.navigate(['/inicioCliente/']);
             
           } else if (rol === 3) {
@@ -462,4 +505,155 @@ scrollTo(id: string, event: Event) {
       });
     }
 
-}
+    toggleLogin() {
+    this.showLoginForm = !this.showLoginForm;
+  }
+
+  onSubmit() {
+          if (!this.validaciones.validarCedulaEcuador(this.registro.ci)) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Cédula no válida',
+              text: 'La cédula ingresada no es válida.',
+            });
+            return;
+          }
+        
+          if (!this.registro.nombre.trim()) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Nombre obligatorio',
+              text: 'El nombre es obligatorio.',
+            });
+            return;
+          }
+        
+          if (!this.registro.direccion.trim()) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Dirección obligatoria',
+              text: 'La dirección es obligatoria.',
+            });
+            return;
+          }
+      
+          if (!this.registro.contrasenia.trim()) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Contraseña obligatoria',
+              text: 'La contraseña es obligatoria.',
+            });
+            return;
+          }
+        
+      
+          if (!this.validaciones.validarEmail(this.registro.correo)) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Correo no válido',
+              text: 'El correo electrónico no es válido.',
+            });
+            return;
+          }
+        
+          if (!this.validaciones.validarTelefono(this.registro.telefono)) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Teléfono no válido',
+              text: 'El número de teléfono debe tener 10 dígitos y comenzar con 0.',
+            });
+            return;
+          }
+        
+          // Lógica de verificación y envío
+          this.serviceRegistro.verificarCedula(this.registro.ci).subscribe((resp) => {
+            if (resp.existe) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Cédula duplicada',
+                text: 'La cédula ingresada ya existe en la base de datos.',
+              });
+              return;
+            }
+            this.serviceRegistro.verificarEmail(this.registro.correo).subscribe((resp) => {
+              if (resp.existe) {
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Correo duplicado',
+                  text: 'El correo ingresado ya existe en la base de datos.',
+                });
+                return;
+              }
+              this.serviceRegistro.verificarTelefono(this.registro.telefono).subscribe((resp) => {
+                if (resp.existe) {
+                  Swal.fire({
+                    icon: 'warning',
+                    title: 'Teléfono duplicado',
+                    text: 'El número de teléfono ingresado ya existe en la base de datos.',
+                  });
+                  return;
+                }
+        
+                // Si todo es válido, agregar el administrador
+                this.serviceRegistro.agregar(this.registro).subscribe({
+                  next: (response) => {
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Éxito',
+                      text: 'Su registro se ha realizado exitosamente.',
+                    }).then(() => {
+                      
+                      this._router.navigate(['/login'])
+                      this.registroRef?.close();
+                      
+                      
+                    });
+                  },
+                  error: (err) => {
+                    console.error('Error en enviar datos del registro:', err);
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Error',
+                      text: 'Ocurrió un error al generar el registro.',
+                    });
+                  },
+                });
+              });
+            });
+          });
+        }
+
+   closeRegistro() {
+    this.registroRef?.close();
+    this._router.navigate(['/login']);
+  }
+  
+  abrirRecuperar() {
+    this.recuperarRef = this.dialog.open(this.recuperarDialog, {
+      width: '360px',
+      panelClass: 'recuperar-dialog-container',
+      backdropClass: 'recuperar-dialog-backdrop',
+      autoFocus: false
+    });
+  }
+  closeRecuperar() {
+    this.recuperarRef?.close();
+  }
+
+  solicitarRecuperacion() {
+    if (!this.correoRecuperar) return;
+    this.recuperarService.solicitarRecuperacion({ correo: this.correoRecuperar })
+      .subscribe({
+        next: () => Swal.fire({
+                      icon: 'success',
+                      title: 'Éxito',
+                      text: 'Revisa tu correo para reestablecer tu contraseña.',
+                    })
+                         .then(() => this.closeRecuperar()),
+        error: () => Swal.fire('Error enviando correo','error')
+      });
+  }
+  }
+
+  
+

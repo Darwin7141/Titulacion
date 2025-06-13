@@ -9,9 +9,17 @@
         placeholder="Nombre de administrador"
         [(ngModel)]="searchTerm"
       />
-      <button class="search-button" (click)="buscarAdmin()">
-        <mat-icon>search</mat-icon>
-      </button>
+      <section class="example-buttons">
+  
+  <div class="example-button-row">
+    <!-- éste es el “Basic” -->
+    <button mat-flat-button color="primary" (click)="buscarAdmin()">
+      Buscar
+    </button>
+
+  </div>
+</section>
+<mat-divider></mat-divider>
       <button class="reload-button" (click)="recargarLista()">
         <mat-icon>refresh</mat-icon>
       </button>

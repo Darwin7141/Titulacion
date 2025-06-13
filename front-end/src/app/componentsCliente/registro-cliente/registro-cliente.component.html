@@ -1,35 +1,50 @@
+<div class="login-card">
+  <div class="login-card__inner">
+    <h2>¡Bienvenido!</h2>
+    <p>Completa tus datos para crear tu cuenta</p>
 
-<div class="registro-container">
-    <h1>Registro de Precliente</h1>
-    <form (ngSubmit)="agregar()" class="formulario-registro">
+    <form #regForm="ngForm"
+          (ngSubmit)="onSubmit()"
+          class="login-card__form">
       <div class="form-group">
-        <label for="ci">Cédula</label>
-        <input type="text" id="ci" [(ngModel)]="registro.ci" name="ci" placeholder="Ingrese su cédula" required />
+        <input name="ci"         [(ngModel)]="registro.ci"         placeholder="Cédula" required />
       </div>
       <div class="form-group">
-        <label for="nombre">Nombre</label>
-        <input type="text" id="nombre" [(ngModel)]="registro.nombre" name="nombre" placeholder="Ingrese su nombre" required />
-      </div>
-      
-      <div class="form-group">
-        <label for="telefono">Teléfono</label>
-        <input type="text" id="telefono" [(ngModel)]="registro.telefono" name="telefono" placeholder="Ingrese su teléfono" required />
+        <input name="nombre"     [(ngModel)]="registro.nombre"     placeholder="Nombre" required />
       </div>
       <div class="form-group">
-        <label for="direccion">Dirección</label>
-        <input type="text" id="direccion" [(ngModel)]="registro.direccion" name="direccion" placeholder="Ingrese su dirección" required />
+        <input name="telefono"   [(ngModel)]="registro.telefono"   placeholder="Teléfono" required />
       </div>
       <div class="form-group">
-        <label for="correo">Correo Electrónico</label>
-        <input type="email" id="correo" [(ngModel)]="registro.correo" name="correo" placeholder="Ingrese su correo electrónico" required />
+        <input name="direccion"  [(ngModel)]="registro.direccion"  placeholder="Dirección" required />
       </div>
       <div class="form-group">
-        <label for="contrasenia">Contraseña</label>
-        <input type="password" id="contrasenia" [(ngModel)]="registro.contrasenia" name="contrasenia" placeholder="Ingrese su contraseña" required />
+        <input type="email"
+               name="correo"
+               [(ngModel)]="registro.correo"
+               placeholder="Correo electrónico"
+               required />
       </div>
       <div class="form-group">
-        <button type="submit" class="btn-submit">Registrar</button>
+        <input type="password"
+               name="contrasenia"
+               [(ngModel)]="registro.contrasenia"
+               placeholder="Contraseña"
+               required />
+      </div>
+
+      <div class="login-card__links" style="justify-content: space-between;">
+        <button type="button"
+                class="btn-cancel"
+                (click)="onCancel()">
+          Cancelar
+        </button>
+        <button type="submit"
+                class="btn-submit"
+                [disabled]="regForm.invalid">
+          Registrar
+        </button>
       </div>
     </form>
   </div>
-  
+</div>
