@@ -17,6 +17,15 @@ import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table'; 
 import {MatDividerModule} from '@angular/material/divider';
 import { MatCardModule } from '@angular/material/card';
+import { NgChartsModule } from 'ng2-charts';
+
+
+import { LayoutModule }     from '@angular/cdk/layout';
+import { MatToolbarModule }   from '@angular/material/toolbar';
+import { MatBadgeModule }     from '@angular/material/badge';
+import { MatMenuModule }      from '@angular/material/menu';
+
+
 
 
 
@@ -67,6 +76,7 @@ import { ListarReservasComponent } from './components/listar-reservas/listar-res
 import { ContactoComponent } from './componentsCliente/contacto/contacto.component';
 import { AsistenteVirtualComponent } from './componentsCliente/asistente-virtual/asistente-virtual.component';
 import { GestionProductosComponent } from './components/gestion-productos/gestion-productos.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 
 
@@ -141,7 +151,13 @@ import { GestionProductosComponent } from './components/gestion-productos/gestio
     CommonModule,
     MatTableModule,
     MatDividerModule,
-    MatCardModule
+    MatCardModule,
+    LayoutModule,
+    MatMenuModule,
+    MatToolbarModule,
+    MatBadgeModule,
+    NgChartsModule,
+    MatPaginatorModule
     
     
     

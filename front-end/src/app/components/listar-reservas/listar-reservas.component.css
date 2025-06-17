@@ -1,180 +1,215 @@
-.clientes-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    text-align: center;
-  }
-  
-  h2 {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  table {
-    width: 80%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    text-align: left;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  table th,
-  table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-  }
-  
-  table th {
-    background-color: #f4f4f4;
-    color: #555;
-    font-weight: bold;
-  }
-  
-  table tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  table tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .add-icon {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .add-icon button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-  
-  .search-bar {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-  }
-  .spacer {
-    margin: 20px 0;
-  }
-  
-  .edit-form {
-    margin-top: 20px;
-    border: 1px solid #ccc;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
-  }
-  
-  .edit-form .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .edit-form label {
-    display: block;
-    font-weight: bold;
-  }
-  
-  .edit-form input {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .edit-form .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  
-  .edit-form button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .edit-form button[type='button'] {
-    background-color: #f44336;
-    color: #fff;
-  }
-  
-  .edit-form button[type='submit'] {
-    background-color: #4caf50;
-    color: #fff;
-  }
-  .search-bar {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .search-input {
-    width: 70%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  .search-button,
-.reload-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-  .search-button mat-icon,
-.reload-button mat-icon {
-  font-size: 20px;
-  color: #fff;
+/* —————————————————————————————————————————————
+   CONTENEDOR GENERAL
+   ————————————————————————————————————————————— */
+.tabla-wrapper{
+  max-width:1150px;
+  margin:0 auto;
 }
 
-.not-found {
-  text-align: center;
-  font-size: 16px;
-  color: #d9534f;
-  margin-bottom: 20px;
+/* —————————————————————————————————————————————
+   TARJETA
+   ————————————————————————————————————————————— */
+:host ::ng-deep .mat-card.tabla-card{
+  padding:0;
+  border-radius:14px;
+  box-shadow:0 4px 14px -3px rgba(0,0,0,.15);
 }
 
-  
-  .spacer {
-    margin: 20px 0;}
+/* —————————————————————————————————————————————
+   CABECERA
+   ————————————————————————————————————————————— */
+:host ::ng-deep .mat-card-header{
+  padding:20px 28px;
+  border-bottom:1px solid #eee;
+}
 
- .pagination {
-  display: flex;
-  gap: 0.5em;
-  justify-content: center;
-  margin: 1em 0;
+/* ——— barra principal ——— */
+.toolbar{
+  display:flex;
+  align-items:center;
+  width:100%;
 }
-.pagination button {
-  border: none;
-  background: #eee;
-  padding: 0.5em 0.75em;
-  cursor: pointer;
+
+/* grupo izquierda = buscador + icon-buttons */
+.left-group{
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
-.pagination button.active {
-  background: #007bff;
-  color: white;
+
+/* ——————————————————————————
+   BUSCADOR  (36 px de alto)
+   —————————————————————————— */
+.buscador.slim{ width:260px;margin-top:15px; }
+
+:host ::ng-deep .buscador.slim .mdc-text-field{
+  height:36px!important;
+  padding:0 8px;
+  border:1px solid #b0c6e8;
+  border-radius:18px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  box-sizing:border-box;
 }
-.pagination button:disabled {
-  opacity: 0.5;
-  cursor: default;
+
+:host ::ng-deep .buscador.slim .mat-mdc-form-field-flex,
+:host ::ng-deep .buscador.slim .mat-mdc-form-field-infix{
+  height:36px;
+  padding:0!important;
+  display:flex;
+  align-items:center;
 }
+
+/* quitamos contorno default */
+:host ::ng-deep .buscador.slim .mdc-notched-outline__leading,
+:host ::ng-deep .buscador.slim .mdc-notched-outline__trailing{ border:none; }
+
+/* icono lupa */
+:host ::ng-deep .buscador.slim .mat-mdc-form-field-prefix mat-icon{
+  font-size:20px;color:#607d8b;
+}
+
+/* icon-buttons (🔍  ⟳) */
+.left-group .mat-icon-button{
+  width:36px;height:36px;line-height:36px;margin:0;
+}
+
+/* ——————————————————————————
+   BOTÓN “AGREGAR”
+   —————————————————————————— */
+.btn-add{
+  margin-left:auto;
+  height:36px;line-height:36px;min-width:110px;
+  display:flex;align-items:center;justify-content:center;
+}
+.btn-add mat-icon{ margin-right:4px; }
+
+/* —————————————————————————————————————————————
+   TABLA
+   ————————————————————————————————————————————— */
+.admin-table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:"Roboto",sans-serif;
+  font-size:15px;
+  color:#333;
+}
+
+.admin-table thead th{
+  text-align:left;
+  padding:4px 14px;
+}
+
+.admin-table tbody td{
+  padding:4px 14px!important;
+  line-height:26px!important;
+  text-align:left;
+  white-space:nowrap;
+  font-size:14px;
+  color:#535554;
+}
+
+/* ——— línea divisoria UNIFICADA ——— */
+.admin-table tbody tr{
+  height:64px;                      /* 60 px de imagen + 2 px × padding */
+  border-bottom:1px solid #f0f0f0;  /* línea continua en toda la fila   */
+}
+.admin-table tbody td{ border-bottom:none; }  /* se anula la vieja línea */
+
+/* cabecera */
+.admin-table th{
+  background:#fafafa;
+  font-weight:600;
+  color:#666;
+  padding:12px 18px;
+  white-space:nowrap;
+  font-size:15px;
+}
+
+/* hover fila */
+.admin-table tr:hover{ background:#f9fbff; }
+
+/* descripción con elipsis */
+.admin-table td:nth-child(3){
+  max-width:450px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* imagen */
+.admin-table td img{
+  display:block;        /* quita línea-base extra */
+  max-height:60px;      /* mantiene 60 px exactos */
+}
+
+/* columna acciones */
+.acciones-col{
+  display:flex;
+  align-items:center;   /* centrado vertical perfecto */
+  gap:4px;
+}
+.acciones-col .mat-icon-button{ line-height:24px; }
+
+/* mensaje vacío y botón volver */
+.no-data{ padding:20px;text-align:center;color:#999; }
+.btn-back{ display:block;margin:24px auto 0; }
+
+.tabla-card{ overflow-x:auto; }
+
+/* —————————————————————————————————————————————
+   PAGINADOR (sin cambios funcionales)
+   ————————————————————————————————————————————— */
+:host ::ng-deep .mat-paginator,
+:host ::ng-deep .mat-mdc-paginator{
+  display:flex;
+  justify-content:center;
+  padding:16px 0;
+  border-top:1px solid #eee;
+  box-sizing:border-box;
+}
+
+:host ::ng-deep .mat-paginator-page-size,
+:host ::ng-deep .mat-mdc-paginator-page-size{ display:none!important; }
+
+:host ::ng-deep .mat-paginator-range-actions,
+:host ::ng-deep .mat-mdc-paginator-range-actions{
+  display:flex;align-items:center;gap:16px;
+}
+
+:host ::ng-deep .mat-paginator-navigation-previous,
+:host ::ng-deep .mat-paginator-navigation-next,
+:host ::ng-deep .mat-mdc-paginator-navigation-previous,
+:host ::ng-deep .mat-mdc-paginator-navigation-next{
+  width:36px;height:36px;border-radius:50%;
+  background:#3f51b5;
+  display:inline-flex;justify-content:center;align-items:center;
+  transition:background .25s,transform .25s;
+  padding:0;
+}
+
+:host ::ng-deep .mat-paginator-navigation-previous:not([disabled]):hover,
+:host ::ng-deep .mat-paginator-navigation-next:not([disabled]):hover,
+:host ::ng-deep .mat-mdc-paginator-navigation-previous:not([disabled]):hover,
+:host ::ng-deep .mat-mdc-paginator-navigation-next:not([disabled]):hover{
+  background:#5c6bc0;transform:translateY(-2px);
+  box-shadow:0 4px 10px -2px rgba(0,0,0,.25);
+}
+
+:host ::ng-deep .mat-paginator-navigation-previous[disabled],
+:host ::ng-deep .mat-paginator-navigation-next[disabled],
+:host ::ng-deep .mat-mdc-paginator-navigation-previous[disabled],
+:host ::ng-deep .mat-mdc-paginator-navigation-next[disabled]{
+  background:#cbd1e1;cursor:not-allowed;box-shadow:none;transform:none;
+}
+
+:host ::ng-deep .mat-paginator-navigation-previous .mat-icon,
+:host ::ng-deep .mat-paginator-navigation-next   .mat-icon,
+:host ::ng-deep .mat-mdc-paginator-navigation-previous .mat-mdc-paginator-icon,
+:host ::ng-deep .mat-mdc-paginator-navigation-next   .mat-mdc-paginator-icon{
+  color:#fff!important;fill:#fff!important;opacity:1!important;
+  font-size:20px;line-height:20px;
+}
+
+:host ::ng-deep .mat-paginator-range-label,
+:host ::ng-deep .mat-mdc-paginator-range-label{ display:none!important; }

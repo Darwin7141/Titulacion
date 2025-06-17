@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CargosService } from '../../services/cargos.service';
+import { PageEvent } from '@angular/material/paginator'; 
 
 @Component({
   selector: 'app-listarcargos',
@@ -14,6 +15,17 @@ export class ListarcargosComponent implements OnInit {
   searchTerm: string = '';
   isEditMode: boolean = false;
   cargoSeleccionado: any = null;
+  displayedCargos: any[] = [];
+  pageSize = 10;
+  pageIndex = 0;
+
+   @Output() cerrar = new EventEmitter<void>();
+
+ 
+  volver(): void {
+    this.cerrar.emit();
+  }
+
 
   constructor(private cargoService: CargosService) {}
 
@@ -25,27 +37,39 @@ export class ListarcargosComponent implements OnInit {
 
   obtenerCargos(): void {
     this.cargoService.getCargos().subscribe({
-      next: (data) => {
+      next: data => {
         this.cargo = data;
         this.cargoFiltrados = data;
+        this.updatePagedData();          // ← llena la primera página
       },
-      error: (err) => {
-        console.error('Error al obtener cargos', err);
-      },
+      error: err => console.error('Error al obtener cargos', err)
     });
   }
 
   buscarCargos(): void {
-    const searchTermLower = this.searchTerm.trim().toLowerCase(); // Normalizamos el término de búsqueda
-    if (searchTermLower === '') {
-      this.cargoFiltrados = this.cargo; // Si no hay búsqueda, mostramos todos los productos
-    } else {
-      this.cargoFiltrados = this.cargo.filter((cargo) =>
-        cargo.nombrecargo.toLowerCase().includes(searchTermLower) ||
-        cargo.idcargo.toLowerCase().includes(searchTermLower) // Filtra también por código
-      );
-    }
+    const term = this.searchTerm.trim().toLowerCase();
+    this.cargoFiltrados = term
+      ? this.cargo.filter(c =>
+          c.nombrecargo.toLowerCase().includes(term) ||
+          c.idcargo.toLowerCase().includes(term))
+      : this.cargo;
+
+    this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
   }
+  
+  pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;    // (sigue siendo 10)
+    this.updatePagedData();
+  }
+  
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedCargos = this.cargoFiltrados.slice(start, end);
+  }
+
 
   editarCargos(cargo: any): void {
     this.isEditMode = true;
@@ -90,6 +114,8 @@ export class ListarcargosComponent implements OnInit {
       next: (data) => {
         this.cargo = data;
         this.cargoFiltrados = data;
+        this.pageIndex = 0;          // ← vuelvo a la primera página
+      this.updatePagedData(); 
       },
       error: (err) => {
         console.error('Error al obtener los cargos:', err);

@@ -1,4 +1,4 @@
-import { Component , OnInit } from '@angular/core';
+import { Component , OnInit,EventEmitter, Output  } from '@angular/core';
 import { ReservasService } from '../../services/reservas.service';
 import { ActivatedRoute } from '@angular/router';
 import { EstadoReservaService } from '../../services/estado-reserva.service';
@@ -7,6 +7,8 @@ import { MatDialog } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
 import { GestionProductosComponent } from '../gestion-productos/gestion-productos.component';
+import { PageEvent } from '@angular/material/paginator'; 
+
 @Component({
   selector: 'app-listar-reservas',
   standalone: false,
@@ -22,10 +24,12 @@ export class ListarReservasComponent implements OnInit {
   highlightedReserva: string | null = null;
   pagedRes: any[] = [];
 
-  pageSize = 10;
-  currentPage = 1;
-  totalPages = 0;
-  pages: number[] = [];
+  displayedReservas: any[] = [];
+  pageSize = 5;
+  pageIndex = 0;
+
+  @Output() cerrar = new EventEmitter<void>();
+  volver(){ this.cerrar.emit(); }
 
   constructor(
     private resService: ReservasService,
@@ -68,7 +72,8 @@ export class ListarReservasComponent implements OnInit {
           this.router.navigate([], { relativeTo: this.route, queryParams: {} });
         }
 
-        this.setupPagination();          // ← y aquí arrancas la paginación
+        this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();         // ← y aquí arrancas la paginación
       },
       error: err => console.error(err)
     });
@@ -85,31 +90,7 @@ export class ListarReservasComponent implements OnInit {
     });
   }
 
-  private setupPagination() {
-    this.currentPage = 1;
-    this.totalPages = Math.ceil(this.resFiltrados.length / this.pageSize) || 1;
-    this.pages = Array.from({length: this.totalPages}, (_, i) => i + 1);
-    this.updatePagedRes();
-  }
-
-  private updatePagedRes() {
-    const start = (this.currentPage - 1) * this.pageSize;
-    this.pagedRes = this.resFiltrados.slice(start, start + this.pageSize);
-  }
-
-  goToPage(p: number) {
-    if (p < 1 || p > this.totalPages) return;
-    this.currentPage = p;
-    this.updatePagedRes();
-  }
-
-  prevPage() {
-    this.goToPage(this.currentPage - 1);
-  }
-
-  nextPage() {
-    this.goToPage(this.currentPage + 1);
-  }
+  
 
   buscarReserva(): void {
     const term = this.searchTerm.trim().toLowerCase();
@@ -122,7 +103,20 @@ export class ListarReservasComponent implements OnInit {
         res.cliente.ci.toLowerCase().includes(term)
       );
     }
-    this.setupPagination();
+    this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
+  }
+
+  pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;    // (sigue siendo 10)
+    this.updatePagedData();
+  }
+  
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedReservas = this.resFiltrados.slice(start, end);
   }
 
   recargarLista(): void {

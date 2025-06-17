@@ -8,13 +8,26 @@ import { ReservasService } from '../../services/reservas.service';
 import Swal from 'sweetalert2';
 import { NotificacionesService, NotifData } from '../../services/notificaciones.service';
 import { forkJoin } from 'rxjs';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { ChartConfiguration } from 'chart.js';
+import { ProductosService }      from '../../services/productos.service';
+import { ClientesService }       from '../../services/clientes.service';
+import { ProveedoresService }    from '../../services/proveedores.service';
 
 @Component({
   selector: 'app-admin',
   standalone: false,
   
+  
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.css'
+  styleUrls: ['./admin.component.css'] ,
+  animations: [
+    trigger('slideToggle', [
+      state('true', style({ height: '*', opacity: 1, overflow: 'hidden' })),
+      state('false', style({ height: '0px', opacity: 0, overflow: 'hidden' })),
+      transition('true <=> false', animate('300ms ease-in-out'))
+    ])
+  ]
 })
 export class AdminComponent implements OnInit, OnDestroy{
 
@@ -31,12 +44,34 @@ export class AdminComponent implements OnInit, OnDestroy{
 
   private subscripciones: Array<any> = [];
 
+  totalStock       = 0;
+  totalClientes    = 0;
+  totalProveedores = 0;
+
+  // ───────── Gráfico reservas 6 meses ─────────
+  reservasLabels: string[] = [];         // ej. ['Ene', 'Feb', …]
+  reservasData  : number[] = [];         // totales por mes
+
+  // ───────── Servicios más reservados ─────────
+  topServicios: { nombre: string, total: number }[] = [];
+  activeView: 'dashboard' | 'admin' | 'cliente' | 'cargos' |
+            'empleados' | 'proveedores' |
+            'prod-general' | 'prod-cat' | 'tipos' 
+            | 'servicios' | 'menus' | 'reservas'= 'dashboard';
+
+  selectedCatId: number | null = null;
+  
+
   constructor(
     private _auth:AuthService,
     private reservasService: ReservasService,
     private _router:Router,
     private _ngZone: NgZone,
      private notiSvc: NotificacionesService,
+       private productosSvc:   ProductosService,
+    private clientesSvc:    ClientesService,
+    private proveedoresSvc: ProveedoresService,
+    private reservasSvc:    ReservasService,
 
     ){}
 
@@ -266,6 +301,9 @@ export class AdminComponent implements OnInit, OnDestroy{
       }
     });
   this.subscripciones.push(subExp);
+     this.cargarTarjetas();
+    this.cargarGraficoReservas();
+    this.cargarTopServicios();
 }
 
   ngOnDestroy() {
@@ -462,8 +500,83 @@ irAPagoPendiente(reservaId: string, tipoPago: string) {
     toggleCatering() {
       this.showCatering = !this.showCatering;
     }
-    
+
+     private cargarTarjetas() {
+    this.productosSvc.getProducto().subscribe(p => this.totalStock       = p
+      .reduce((acc: number, prod: any) => acc + (prod.stock ?? 0), 0));
+
+    this.clientesSvc.getClientes().subscribe(c  => this.totalClientes    = c.length);
+    this.proveedoresSvc.getProveedor().subscribe(p => this.totalProveedores = p.length);
   }
+
+  // ——— 2) gráfico reservas últimos 6 meses ———
+  private cargarGraficoReservas() {
+  const mesesTxt = ['Ene','Feb','Mar','Abr','May','Jun',
+                    'Jul','Ago','Sep','Oct','Nov','Dic'];
+
+  this.reservasSvc.getReservasUltimosSeisMeses()
+      .subscribe(resp => {
+
+        /* resp = [{ mes:'YYYY-MM', total:'5' }, … ]  */
+        const mapa = new Map(
+          resp.map(r => [ r.mes, Number(r.total) ])   // → Map<YYYY-MM, nº>
+        );
+
+        const labels : string[] = [];
+        const values : number[] = [];
+
+        const hoy = new Date();               // mes actual
+        for (let i = 5; i >= 0; i--) {
+          const d   = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+          const key = d.toISOString().slice(0,7);   // 'YYYY-MM'
+
+          labels.push( mesesTxt[d.getMonth()] );
+          values.push( mapa.get(key) ?? 0 );        // 0 si no hay datos
+        }
+
+        this.reservasLabels = labels;
+        this.reservasData   = values;
+      });
+}
+  // ——— 3) servicios más reservados ——————————
+private cargarTopServicios() {
+    this.reservasSvc.getServiciosMasReservados().subscribe(lista => {
+      // esperamos algo como [{ nombre:'Buffet', total:89 }, …]
+      this.topServicios = lista.slice(0,5);   // top-5
+    });
+  }
+
+  // ——— Configuración Chart.js (getter) ————————
+  get chartData() {
+  return {
+    labels: this.reservasLabels,
+    datasets: [{
+      data: this.reservasData,
+      label: 'Reservas',
+      tension: .4,
+      fill: 'origin',
+      borderWidth: 2
+    }]
+  };
+}
+
+chartOptions: ChartConfiguration<'line'>['options'] = {
+  responsive: true,
+  plugins: { legend: { display: false } },
+  scales: {
+    y: { beginAtZero: true, grid: { color:'#eee' } },
+    x: { grid: { display:false } }
+  }
+};
+
+
+setView(view: typeof this.activeView, catId?: number): void {
+  this.activeView   = view;
+  this.selectedCatId = catId ?? null;
+}
+}
+    
+  
   
 
 

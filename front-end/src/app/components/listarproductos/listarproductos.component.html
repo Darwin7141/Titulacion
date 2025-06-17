@@ -1,127 +1,173 @@
-<div class="clientes-container">
-    <h2>Listado de Productos</h2>
-  
-    <!-- Campo de búsqueda -->
-    <div class="search-bar">
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Nombre del producto"
-        [(ngModel)]="searchTerm"
-      />
-      <button class="search-button" (click)="buscarProducto()">
-        <mat-icon>search</mat-icon>
-      </button>
-      <button class="reload-button" (click)="recargarLista()">
-        <mat-icon>refresh</mat-icon>
-      </button>
-    </div>
-  
-    <div *ngIf="prodFiltrados.length === 0 && searchTerm" class="not-found">
-      <p>No se encontró ningún producto con el nombre proporcionado.</p>
-    </div>
-  
-  
-    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
-  
-    <!-- Tabla de empleados -->
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Stock</th>
-          <th>Proveedor</th>
-          <th>Categoria</th>
-          <th>Fecha de expiración</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let prod of prodFiltrados">
-          <td>{{ prod.idproducto }}</td>
-          <td>{{ prod.nombre }}</td>
-          <td>{{ prod.stock }}</td>
-          <td>{{ prod.proveedor.nombre }}</td>
-          <td>{{ prod.categorias.categoria }}</td>
-          <td>{{ prod.fecha_caducidad }}</td>
-          
-    
-          <td>
-            <button mat-icon-button color="primary" (click)="editarProducto(prod)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="eliminarProducto(prod.idproducto)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- Formulario de edición -->
-    <div *ngIf="isEditMode" class="edit-form">
-      <h3>Editar Productos</h3>
-      <form (ngSubmit)="guardarEdicion()">
-        <div class="form-group">
-          <label>Código</label>
-          <input
-            type="text"
-            [(ngModel)]="prodSeleccionado.idproducto"
-            name="idproducto"
-            disabled
-          />
-        </div>
-        <div class="form-group">
-          <label>Nombre</label>
-          <input
-            type="text"
-            [(ngModel)]="prodSeleccionado.nombre"
-            name="nombre"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label>Stock</label>
-          <input
-            type="number"
-            [(ngModel)]="prodSeleccionado.stock"
-            name="stock"
-            required
-          />
-        </div>
-        
-        <div class="form-group">
-          <mat-form-field class="col-xs-12">
-            <mat-select #codigoProveedorField="ngModel" name="codigoproveedor" [(ngModel)]="prodSeleccionado.codigoproveedor" required placeholder="Seleccione un proveedor">
-              <mat-option *ngFor="let proveedor of prov" [value]="proveedor.codigoproveedor">
-                {{proveedor.nombre }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="codigoProveedorField.invalid">Debe seleccionar un proveedor</mat-error>
+<!-- ──────────────────────────────────────────────────────────────
+     LISTAR PRODUCTOS – usa los mismos estilos (tabla-wrapper, etc.)
+     ────────────────────────────────────────────────────────────── -->
+<div class="tabla-wrapper">
+  <mat-card class="tabla-card">
+
+    <!-- CABECERA / TOOLBAR ───────────────────────────────────── -->
+    <mat-card-header>
+      <div class="toolbar">
+
+        <!-- ··· grupo izquierda: buscador + icon-buttons ··· -->
+        <div class="left-group">
+          <mat-form-field appearance="outline" class="buscador slim">
+            <mat-icon matPrefix>search</mat-icon>
+            <input  matInput
+                    placeholder="Nombre del producto"
+                    [(ngModel)]="searchTerm"
+                    (keyup.enter)="buscarProducto()">
           </mat-form-field>
+
+          <button mat-icon-button color="primary"
+                  matTooltip="Buscar"
+                  (click)="buscarProducto()">
+            <mat-icon>search</mat-icon>
+          </button>
+
+          <button mat-icon-button color="primary"
+                  matTooltip="Recargar"
+                  (click)="recargarLista()">
+            <mat-icon>refresh</mat-icon>
+          </button>
         </div>
 
-        <div class="form-group">
-          <label>Fecha de expiración</label>
-          <input
-            type="date"
-            [(ngModel)]="prodSeleccionado.fecha_caducidad"
-            name="stock"
-            required
-          />
-        </div>
-        
-  
-        <div class="form-actions">
-          <button type="button"  (click)="cancelarEdicion()">Cancelar</button>
-          <button type="submit">Guardar</button>
-        </div>
-      </form>
-    </div>
-  
-    <!-- Botón para agregar empleado -->
-    <button mat-fab color="primary" [routerLink]="['/productos/categoria', idCatParam]">
-      <mat-icon>add</mat-icon>
-    </button>
+        <!-- ··· botón Agregar (alineado a la derecha) ··· -->
+        <button mat-raised-button color="primary"
+                class="btn-add"
+                [routerLink]="['/productos/categoria', idCatParam]">
+          <mat-icon>add</mat-icon><span>Agregar</span>
+        </button>
+
+      </div>
+    </mat-card-header>
+
+    <!-- TABLA ────────────────────────────────────────────────── -->
+    <mat-card-content>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Stock</th>
+            <th>Proveedor</th>
+            <th>Categoría</th>
+            <th>Fecha de expiración</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- página actual de productos -->
+          <tr *ngFor="let prod of displayedProductos">
+            <td>{{ prod.idproducto }}</td>
+            <td>{{ prod.nombre }}</td>
+            <td>{{ prod.stock }}</td>
+            <td>{{ prod.proveedor.nombre }}</td>
+            <td>{{ prod.categorias.categoria }}</td>
+            <td>{{ prod.fecha_caducidad }}</td>
+
+            <td class="acciones-col">
+              <button mat-icon-button color="primary"
+                      matTooltip="Editar"
+                      (click)="editarProducto(prod)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn"
+                      matTooltip="Eliminar"
+                      (click)="eliminarProducto(prod.idproducto)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- paginador: 10 filas por página -->
+      <mat-paginator
+        [length]="prodFiltrados.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10]"
+        (page)="pageChanged($event)">
+      </mat-paginator>
+
+      <!-- mensaje “sin resultados” -->
+      <p class="no-data"
+         *ngIf="prodFiltrados.length === 0 && searchTerm">
+        No se encontró ningún producto con el nombre proporcionado.
+      </p>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- FORMULARIO DE EDICIÓN ─────────────────────────────────── -->
+  <div *ngIf="isEditMode" class="edit-form">
+    <h3>Editar Productos</h3>
+
+    <form (ngSubmit)="guardarEdicion()">
+
+      <div class="form-group">
+        <label>Código</label>
+        <input type="text"
+               [(ngModel)]="prodSeleccionado.idproducto"
+               name="idproducto" disabled>
+      </div>
+
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text"
+               [(ngModel)]="prodSeleccionado.nombre"
+               name="nombre" required>
+      </div>
+
+      <div class="form-group">
+        <label>Stock</label>
+        <input type="number"
+               [(ngModel)]="prodSeleccionado.stock"
+               name="stock" required>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field class="col-xs-12">
+          <mat-select #codigoProveedorField="ngModel"
+                      name="codigoproveedor"
+                      [(ngModel)]="prodSeleccionado.codigoproveedor"
+                      required
+                      placeholder="Seleccione un proveedor">
+            <mat-option *ngFor="let proveedor of prov"
+                        [value]="proveedor.codigoproveedor">
+              {{ proveedor.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="codigoProveedorField.invalid">
+            Debe seleccionar un proveedor
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <label>Fecha de expiración</label>
+        <input type="date"
+               [(ngModel)]="prodSeleccionado.fecha_caducidad"
+               name="fecha_caducidad" required>
+      </div>
+
+      <div class="form-actions">
+        <button type="button"
+                mat-raised-button color="warn"
+                (click)="cancelarEdicion()">Cancelar</button>
+
+        <button type="submit"
+                mat-raised-button color="primary">Guardar</button>
+      </div>
+
+    </form>
   </div>
+
+  <!-- BOTÓN VOLVER ─────────────────────────────────────────── -->
+  <button mat-icon-button class="btn-back"
+          matTooltip="Volver"
+          (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+</div>

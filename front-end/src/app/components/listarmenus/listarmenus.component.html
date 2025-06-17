@@ -1,165 +1,189 @@
-<div class="clientes-container">
-    <h2>Lista de Menús</h2>
-    <div *ngIf="isLoading" class="loading-overlay">
-      <mat-progress-spinner
-        mode="indeterminate"
-        color="accent"
-        diameter="50">
-      </mat-progress-spinner>
-      <p>Procesando...</p>
-    </div>
-  
-    <!-- Campo de búsqueda -->
-    <div class="search-bar">
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Nombre de Menú"
-        [(ngModel)]="searchTerm"
-      />
-      <button class="search-button" (click)="buscarMenus()">
-        <mat-icon>search</mat-icon>
-      </button>
-      <button class="reload-button" (click)="recargarLista()">
-        <mat-icon>refresh</mat-icon>
-      </button>
-    </div>
-  
-    <div *ngIf="menuFiltrados.length === 0 && searchTerm" class="not-found">
-      <p>No se encontró ningún menú con el nombre proporcionado.</p>
-    </div>
-  
-  
-    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
-  
-    <!-- Tabla de empleados -->
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Precio</th>
-          <th>Servicio</th>
-          <th>Muestra</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let menu of menuFiltrados">
-          <td>{{ menu.idmenu }}</td>
-          <td>{{ menu.nombre }}</td>
-          <td>{{ menu.descripcion }}</td>
-          <td>{{ menu.precio }}</td>
-          <td>{{ menu.servicio.nombre }}</td>
-          <td>
-            <img
-              *ngIf="menu.fotografiaUrl"
-              [src]="menu.fotografiaUrl"
-              alt="Imagen de {{ menu.nombre }}"
-              width="100"
-              height="100"
-            />
-          </td>
-          
-          <td>
-            <button mat-icon-button color="primary" (click)="editarMenus(menu)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <!-- Ícono de eliminar -->
-            <button mat-icon-button color="warn" (click)="eliminarMenus(menu.idmenu)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- Formulario de edición -->
-    <div *ngIf="isEditMode" class="edit-form">
-      <h3>Editar Menú</h3>
-      <form (ngSubmit)="guardarEdicion()">
-        <div class="form-group">
-          <label>Código</label>
-          <input
-            type="text"
-            [(ngModel)]="menuSeleccionado.idmenu"
-            name="idmenu"
-            disabled
-          />
-        </div>
-        
-        <div class="form-group">
-          <label>Nombre</label>
-          <input
-            type="text"
-            [(ngModel)]="menuSeleccionado.nombre"
-            name="nombre"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label>Descripción</label>
-          <input
-            type="text"
-            [(ngModel)]="menuSeleccionado.descripcion"
-            name="descripcion"
-            required
-          />
-        </div>
+<div class="tabla-wrapper">
+  <mat-card class="tabla-card">
 
-        <div class="form-group">
-            <label>Precio</label>
-            <input
-              type="text"
-              [(ngModel)]="menuSeleccionado.precio"
-              name="precio"
-              required
-            />
-          </div>
-        
-        <div class="form-group">
-          <mat-form-field class="col-xs-12">
-            <mat-select #idCargoField="ngModel" name="idservicio" [(ngModel)]="menuSeleccionado.idservicio" required placeholder="Seleccione un servicio">
-              <mat-option *ngFor="let tipo of tipo" [value]="tipo.idservicio">
-                {{ tipo.nombre }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un servicio</mat-error>
+    <!-- ──────────────── CABECERA / TOOLBAR ──────────────── -->
+    <mat-card-header>
+      <div class="toolbar">
+
+        <!-- ··· grupo izquierda: buscador + icon-buttons ··· -->
+        <div class="left-group">
+          <mat-form-field appearance="outline" class="buscador slim">
+            <mat-icon matPrefix>search</mat-icon>
+            <input  matInput
+                    placeholder="Nombre de Menú"
+                    [(ngModel)]="searchTerm"
+                    (keyup.enter)="buscarMenus()">
           </mat-form-field>
+
+          <button mat-icon-button color="primary"
+                  matTooltip="Buscar"
+                  (click)="buscarMenus()">
+            <mat-icon>search</mat-icon>
+          </button>
+
+          <button mat-icon-button color="primary"
+                  matTooltip="Recargar"
+                  (click)="recargarLista()">
+            <mat-icon>refresh</mat-icon>
+          </button>
         </div>
 
-        <div class="form-group">
-          <label>Muestra (imagen actual)</label>
-          <div *ngIf="menuSeleccionado.fotografiaUrl">
-            <img
-              [src]="menuSeleccionado.fotografiaUrl"
-              alt="Imagen de {{ menuSeleccionado.nombre }}"
-              width="120"
-              height="80"
-            />
-          </div>
+        <!-- ··· botón Agregar (alineado a la derecha) ··· -->
+        <button mat-raised-button color="primary"
+                class="btn-add"
+                [routerLink]="['/menus']">
+          <mat-icon>add</mat-icon><span>Agregar</span>
+        </button>
 
-          <!-- Campo para seleccionar una nueva imagen -->
-          <label for="nuevaImagen">Cambiar imagen:</label>
-          <input
-            id="nuevaImagen"
-            type="file"
-            (change)="onNewImageSelected($event)"
-          />
+      </div>
+    </mat-card-header>
+
+    <!-- ───────────────────── TABLA ───────────────────── -->
+    <mat-card-content>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Servicio</th>
+            <th>Muestra</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- arreglo Paginado -->
+          <tr *ngFor="let menu of displayedMenus">
+            <td>{{ menu.idmenu }}</td>
+            <td>{{ menu.nombre }}</td>
+            <td>{{ menu.descripcion }}</td>
+            <td>{{ menu.precio | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ menu.servicio.nombre }}</td>
+
+            <td>
+              <img *ngIf="menu.fotografiaUrl"
+                   [src]="menu.fotografiaUrl"
+                   alt="Imagen de {{ menu.nombre }}"
+                   width="90" height="60">
+            </td>
+
+            <td class="acciones-col">
+              <button mat-icon-button color="primary"
+                      matTooltip="Editar"
+                      (click)="editarMenus(menu)">
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <button mat-icon-button color="warn"
+                      matTooltip="Eliminar"
+                      (click)="eliminarMenus(menu.idmenu)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- paginador: 10 filas por página -->
+      <mat-paginator
+        [length]="menuFiltrados.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10]"
+        (page)="pageChanged($event)">
+      </mat-paginator>
+
+      <!-- mensaje “sin resultados” -->
+      <p class="no-data"
+         *ngIf="menuFiltrados.length === 0 && searchTerm">
+        No se encontró ningún menú con el nombre proporcionado.
+      </p>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ─────────── FORMULARIO DE EDICIÓN (sin cambios de estilo) ─────────── -->
+  <div *ngIf="isEditMode" class="edit-form">
+    <h3>Editar Menú</h3>
+
+    <form (ngSubmit)="guardarEdicion()">
+
+      <div class="form-group">
+        <label>Código</label>
+        <input type="text"
+               [(ngModel)]="menuSeleccionado.idmenu"
+               name="idmenu" disabled>
+      </div>
+
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text"
+               [(ngModel)]="menuSeleccionado.nombre"
+               name="nombre" required>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción</label>
+        <input type="text"
+               [(ngModel)]="menuSeleccionado.descripcion"
+               name="descripcion" required>
+      </div>
+
+      <div class="form-group">
+        <label>Precio</label>
+        <input type="text"
+               [(ngModel)]="menuSeleccionado.precio"
+               name="precio" required>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field class="col-xs-12">
+          <mat-select #idServicioField="ngModel"
+                      name="idservicio"
+                      [(ngModel)]="menuSeleccionado.idservicio"
+                      required placeholder="Seleccione un servicio">
+            <mat-option *ngFor="let t of tipo"
+                        [value]="t.idservicio">
+              {{ t.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="idServicioField.invalid">
+            Debe seleccionar un servicio
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <label>Muestra (imagen actual)</label>
+        <div *ngIf="menuSeleccionado.fotografiaUrl">
+          <img [src]="menuSeleccionado.fotografiaUrl"
+               alt="Imagen de {{ menuSeleccionado.nombre }}"
+               width="120" height="80">
         </div>
-  
-        <div class="form-actions">
-          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
-          <button type="submit">Guardar</button>
-        </div>
-      </form>
-    </div>
-  
-    <!-- Botón para agregar empleado -->
-    <div class="add-icon">
-      <button mat-fab color="primary" [routerLink]="['/menus']">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
+
+        <label for="nuevaImagen">Cambiar imagen:</label>
+        <input id="nuevaImagen" type="file"
+               (change)="onNewImageSelected($event)">
+      </div>
+
+      <div class="form-actions">
+        <button type="button"
+                mat-raised-button color="warn"
+                (click)="cancelarEdicion()">Cancelar</button>
+
+        <button type="submit"
+                mat-raised-button color="primary">Guardar</button>
+      </div>
+
+    </form>
   </div>
+
+  <!-- Botón FAB “Volver” (si lo usas en otros listados) -->
+  <button mat-icon-button class="btn-back"
+          matTooltip="Volver"
+          (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+</div>

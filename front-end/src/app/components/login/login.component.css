@@ -504,7 +504,7 @@ body > header + * {
 }
 
 .pdf-btn:hover {
-  background: var(--verde-osc);
+  background: #c0a50c;
 }
 /* === 7) CONTÁCTANOS ================================================ */
 .planes-container {

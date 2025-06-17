@@ -14,6 +14,8 @@ module.exports = (app) => {
     app.post('/api/reservas/:idreserva/pago/tarjeta', resController.procesarPagoConTarjeta);
     app.post('/api/notificaciones/solicitar-cancelacion', resController.solicitarCancelacion);
     app.get('/api/reservas/cancelaciones/admin', resController.getCancelacionesAdmin);
+    app.get('/api/dashboard/reservas-6m',   resController.getReservasUltimosSeisMeses);
+    app.get('/api/dashboard/top-servicios', resController.getServiciosMasReservados);
     
 
    

@@ -1,45 +1,66 @@
-<div class="clientes-container">
-  <h2>Listado de Empleados</h2>
+<!-- ──────────────────────────────────────────────────────────────
+     LISTAR EMPLEADOS  –  usa el mismo CSS (tabla-wrapper, etc.)
+     ────────────────────────────────────────────────────────────── -->
+<div class="tabla-wrapper">
+  <mat-card class="tabla-card">
 
-  <!-- Campo de búsqueda -->
-  <div class="search-bar">
-    <input
-      type="text"
-      class="search-input"
-      placeholder="Nombre de empleado"
-      [(ngModel)]="searchTerm"
-    />
-    <button class="search-button" (click)="buscarEmpleado()">
-      <mat-icon>search</mat-icon>
-    </button>
-    <button class="reload-button" (click)="recargarLista()">
-      <mat-icon>refresh</mat-icon>
-    </button>
-  </div>
+    <!-- ──────────────── CABECERA / TOOLBAR ──────────────── -->
+    <mat-card-header>
+      <div class="toolbar">
 
-  <div *ngIf="empleadosFiltrados.length === 0 && searchTerm" class="not-found">
-    <p>No se encontró ningún empleado con el nombre proporcionado.</p>
-  </div>
+        <!-- ··· grupo izquierda: buscador + icon-buttons ··· -->
+        <div class="left-group">
+          <mat-form-field appearance="outline" class="buscador slim">
+            <mat-icon matPrefix>search</mat-icon>
+            <input  matInput
+                    placeholder="Nombre de empleado"
+                    [(ngModel)]="searchTerm"
+                    (keyup.enter)="buscarEmpleado()">
+          </mat-form-field>
 
+          <button mat-icon-button color="primary"
+                  matTooltip="Buscar"
+                  (click)="buscarEmpleado()">
+            <mat-icon>search</mat-icon>
+          </button>
 
-  <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
+          <button mat-icon-button color="primary"
+                  matTooltip="Recargar"
+                  (click)="recargarLista()">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
 
-  <!-- Tabla de empleados -->
-  <table>
-    <thead>
-      <tr>
-        <th>Código</th>
-        <th>CI</th>
-        <th>Nombre</th>
-        <th>Dirección</th>
-        <th>Correo Electrónico</th>
-        <th>Teléfono</th>
-        <th>Cargo</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let empleado of empleadosFiltrados">
+        <!-- ··· botón Agregar (alineado a la derecha) ··· -->
+        <button mat-raised-button color="primary"
+                class="btn-add"
+                [routerLink]="['/empleados']">
+          <mat-icon>add</mat-icon><span>Agregar</span>
+        </button>
+
+      </div>
+    </mat-card-header>
+
+    <!-- ───────────────────── TABLA ───────────────────── -->
+    <mat-card-content>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>CI</th>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th>Correo Electrónico</th>
+            <th>Teléfono</th>
+            <th>Cargo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- mostrará tu arreglo filtrado/paginado -->
+         <tr *ngFor="let empleado of displayedEmpleados">
         <td>{{ empleado.codigoempleado }}</td>
         <td>{{ empleado.ci }}</td>
         <td>{{ empleado.nombre }}</td>
@@ -47,12 +68,16 @@
         <td>{{ empleado.e_mail }}</td>
         <td>{{ empleado.telefono }}</td>
         <td>{{ empleado.cargo.nombrecargo }}</td>
-        <td>
-          <button mat-icon-button color="primary" (click)="editarEmpleado(empleado)">
+
+        <td class="acciones-col">
+          <button mat-icon-button color="primary"
+                  matTooltip="Editar"
+                  (click)="editarEmpleado(empleado)">
             <mat-icon>edit</mat-icon>
           </button>
-          <!-- Ícono de eliminar -->
-          <button mat-icon-button color="warn" (click)="eliminarEmpleado(empleado.codigoempleado)">
+          <button mat-icon-button color="warn"
+                  matTooltip="Eliminar"
+                  (click)="eliminarEmpleado(empleado.codigoempleado)">
             <mat-icon>delete</mat-icon>
           </button>
         </td>
@@ -60,86 +85,106 @@
     </tbody>
   </table>
 
-  <!-- Formulario de edición -->
+  <!-- paginador: 10 filas por página -->
+  <mat-paginator
+    [length]="empleadosFiltrados.length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10]"
+    (page)="pageChanged($event)">
+  </mat-paginator>
+
+  <!-- mensaje “sin resultados” -->
+  <p class="no-data"
+     *ngIf="empleadosFiltrados.length === 0 && searchTerm">
+    No se encontró ningún empleado con el nombre proporcionado.
+  </p>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ───────────── FORMULARIO DE EDICIÓN ───────────── -->
   <div *ngIf="isEditMode" class="edit-form">
     <h3>Editar Empleado</h3>
+
     <form (ngSubmit)="guardarEdicion()">
+
       <div class="form-group">
         <label>Código</label>
-        <input
-          type="text"
-          [(ngModel)]="empleadoSeleccionado.codigoempleado"
-          name="codigoempleado"
-          disabled
-        />
+        <input type="text"
+               [(ngModel)]="empleadoSeleccionado.codigoempleado"
+               name="codigoempleado" disabled>
       </div>
+
       <div class="form-group">
         <label>Cédula</label>
-        <input
-          type="text"
-          [(ngModel)]="empleadoSeleccionado.ci"
-          name="ci"
-          required
-        />
+        <input type="text"
+               [(ngModel)]="empleadoSeleccionado.ci"
+               name="ci" required>
       </div>
+
       <div class="form-group">
         <label>Nombre</label>
-        <input
-          type="text"
-          [(ngModel)]="empleadoSeleccionado.nombre"
-          name="nombre"
-          required
-        />
+        <input type="text"
+               [(ngModel)]="empleadoSeleccionado.nombre"
+               name="nombre" required>
       </div>
+
       <div class="form-group">
         <label>Dirección</label>
-        <input
-          type="text"
-          [(ngModel)]="empleadoSeleccionado.direccion"
-          name="direccion"
-          required
-        />
+        <input type="text"
+               [(ngModel)]="empleadoSeleccionado.direccion"
+               name="direccion" required>
       </div>
+
       <div class="form-group">
         <label>Correo Electrónico</label>
-        <input
-          type="email"
-          [(ngModel)]="empleadoSeleccionado.e_mail"
-          name="e_mail"
-          required
-        />
+        <input type="email"
+               [(ngModel)]="empleadoSeleccionado.e_mail"
+               name="e_mail" required>
       </div>
+
       <div class="form-group">
         <label>Teléfono</label>
-        <input
-          type="text"
-          [(ngModel)]="empleadoSeleccionado.telefono"
-          name="telefono"
-          required
-        />
+        <input type="text"
+               [(ngModel)]="empleadoSeleccionado.telefono"
+               name="telefono" required>
       </div>
+
       <div class="form-group">
         <mat-form-field class="col-xs-12">
-          <mat-select #idCargoField="ngModel" name="idcargo" [(ngModel)]="empleadoSeleccionado.idcargo" required placeholder="Seleccione un cargo">
-            <mat-option *ngFor="let cargo of cargo" [value]="cargo.idcargo">
+          <mat-select #idCargoField="ngModel"
+                      name="idcargo"
+                      [(ngModel)]="empleadoSeleccionado.idcargo"
+                      required
+                      placeholder="Seleccione un cargo">
+            <mat-option *ngFor="let cargo of cargo"
+                        [value]="cargo.idcargo">
               {{ cargo.nombrecargo }}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un cargo</mat-error>
+          <mat-error *ngIf="idCargoField.invalid">
+            Debe seleccionar un cargo
+          </mat-error>
         </mat-form-field>
       </div>
 
       <div class="form-actions">
-        <button type="button" (click)="cancelarEdicion()">Cancelar</button>
-        <button type="submit">Guardar</button>
+        <button type="button"
+                mat-raised-button color="warn"
+                (click)="cancelarEdicion()">Cancelar</button>
+
+        <button type="submit"
+                mat-raised-button color="primary">Guardar</button>
       </div>
+
     </form>
   </div>
 
-  <!-- Botón para agregar empleado -->
-  <div class="add-icon">
-    <button mat-fab color="primary" [routerLink]="['/empleados']">
-      <mat-icon>add</mat-icon>
-    </button>
-  </div>
+  <!-- ───────────── BOTÓN VOLVER ───────────── -->
+  <button mat-icon-button
+          class="btn-back"
+          matTooltip="Volver"
+          (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
 </div>

@@ -1,92 +1,130 @@
-<!-- src/app/components/listar-reservas/listar-reservas.component.html -->
-<div class="clientes-container">
-  <h2>Reservas</h2>
+<!-- ═══════════ LISTA DE RESERVAS (unificada al estilo dashboard) ═══════════ -->
+<div class="tabla-wrapper">
+  <mat-card class="tabla-card">
 
-  <!-- Campo de búsqueda -->
-  <div class="search-bar">
-    <input
-      type="text"
-      class="search-input"
-      placeholder="Nombre o código"
-      [(ngModel)]="searchTerm"
-    />
-    <button class="search-button" (click)="buscarReserva()">
-      <mat-icon>search</mat-icon>
-    </button>
-    <button class="reload-button" (click)="recargarLista()">
-      <mat-icon>refresh</mat-icon>
-    </button>
-  </div>
+    <!-- ─────────────── CABECERA / TOOLBAR ─────────────── -->
+    <mat-card-header>
+      <div class="toolbar">
 
-  <!-- Mensaje de “no hay resultados” -->
-  <div *ngIf="pagedRes.length === 0 && searchTerm" class="not-found">
-    <p>No se encontró ninguna reserva con la información proporcionada.</p>
-  </div>
+        <!-- ··· buscador + icon-buttons ··· -->
+        <div class="left-group">
+          <mat-form-field appearance="outline" class="buscador slim">
+            <mat-icon matPrefix>search</mat-icon>
+            <input  matInput
+                    placeholder="Nombre o código"
+                    [(ngModel)]="searchTerm"
+                    (keyup.enter)="buscarReserva()">
+          </mat-form-field>
 
-  <div class="spacer"></div>
-
-  <!-- Tabla paginada -->
-  <table *ngIf="pagedRes.length > 0">
-    <thead>
-      <tr>
-        <th>Código</th>
-        <th>Cédula</th>
-        <th>Cliente</th>
-        <th>Dirección</th>
-        <th>Fecha Evento</th>
-        <th>Cantidad Personas</th>
-        <th>Total a Pagar</th>
-        <th>Primer Pago</th>
-        <th>Segundo Pago</th>
-        <th>Saldo Pendiente</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let tipo of pagedRes">
-        <td>{{ tipo.idreserva }}</td>
-        <td>{{ tipo.cliente.ci }}</td>
-        <td>{{ tipo.cliente.nombre }}</td>
-        <td>{{ tipo.direccionevento }}</td>
-        <td>{{ tipo.fechaevento }}</td>
-        <td>{{ tipo.cantpersonas }}</td>
-        <td>{{ tipo.total }}</td>
-        <td>{{ tipo.primer_pago }}</td>
-        <td>{{ tipo.segundo_pago }}</td>
-        <td>{{ tipo.saldo_pendiente }}</td>
-        <td>
-          <select [(ngModel)]="tipo.idestado" style="padding: 4px;">
-            <option *ngFor="let est of estadosReserva" [ngValue]="est.idestado">
-              {{ est.estado_reserva }}
-            </option>
-          </select>
-        </td>
-        <td>
-          <button mat-icon-button color="primary" (click)="guardarEstadoReserva(tipo)">
-            <mat-icon>save</mat-icon>
+          <button mat-icon-button color="primary"
+                  matTooltip="Buscar"
+                  (click)="buscarReserva()">
+            <mat-icon>search</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="eliminarReserva(tipo.idreserva)">
-            <mat-icon>delete</mat-icon>
-          </button>
-          <button mat-icon-button color="accent" (click)="verDetalles(tipo.idreserva)">
-            <mat-icon>visibility</mat-icon>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
 
-  <!-- BLOQUE DE PAGINACIÓN -->
-  <div class="pagination" *ngIf="totalPages > 1">
-    <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
-    <button
-      *ngFor="let p of pages"
-      (click)="goToPage(p)"
-      [class.active]="p === currentPage"
-    >
-      {{ p }}
-    </button>
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
-  </div>
+          <button mat-icon-button color="primary"
+                  matTooltip="Recargar"
+                  (click)="recargarLista()">
+            <mat-icon>refresh</mat-icon>
+          </button>
+
+        
+        </div>
+
+        
+      </div>
+    </mat-card-header>
+
+    <!-- ───────────────────── TABLA ───────────────────── -->
+    <mat-card-content>
+
+      <table class="admin-table" *ngIf="displayedReservas.length > 0">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Cédula</th>
+            <th>Cliente</th>
+            <th>Dirección</th>
+            <th>Fecha Evento</th>
+            <th>Cant. Personas</th>
+            <th>Total</th>
+            <th>1.º Pago</th>
+            <th>2.º Pago</th>
+            <th>Saldo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let res of displayedReservas">
+            <td>{{ res.idreserva }}</td>
+            <td>{{ res.cliente.ci }}</td>
+            <td>{{ res.cliente.nombre }}</td>
+            <td>{{ res.direccionevento }}</td>
+            <td>{{ res.fechaevento | date:'shortDate' }}</td>
+            <td>{{ res.cantpersonas }}</td>
+            <td>{{ res.total | currency:'USD':'symbol' }}</td>
+            <td>{{ res.primer_pago | currency:'USD':'symbol' }}</td>
+            <td>{{ res.segundo_pago | currency:'USD':'symbol' }}</td>
+            <td>{{ res.saldo_pendiente | currency:'USD':'symbol' }}</td>
+
+            <!-- selector de estado inline -->
+            <td>
+              <mat-form-field appearance="outline" class="estado-select">
+                <mat-select [(ngModel)]="res.idestado">
+                  <mat-option *ngFor="let est of estadosReserva"
+                              [value]="est.idestado">
+                    {{ est.estado_reserva }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+
+            <td class="acciones-col">
+              <button mat-icon-button color="primary"
+                      matTooltip="Guardar cambio de estado"
+                      (click)="guardarEstadoReserva(res)">
+                <mat-icon>save</mat-icon>
+              </button>
+
+              <button mat-icon-button color="warn"
+                      matTooltip="Eliminar reserva"
+                      (click)="eliminarReserva(res.idreserva)">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+              <button mat-icon-button color="accent"
+                      matTooltip="Ver detalles"
+                      (click)="verDetalles(res.idreserva)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- mensaje “sin resultados” -->
+      <p class="no-data"
+         *ngIf="displayedReservas.length === 0 && searchTerm">
+        No se encontró ninguna reserva con la información proporcionada.
+      </p>
+
+      <!-- paginador Material -->
+      <mat-paginator
+        [length]="resFiltrados.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10]"
+        (page)="pageChanged($event)">
+      </mat-paginator>
+
+      <button mat-icon-button
+          class="btn-back"
+          matTooltip="Volver"
+          (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+    </mat-card-content>
+  </mat-card>
 </div>

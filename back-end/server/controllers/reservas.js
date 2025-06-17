@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const modelos = require('../models');
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); 
 const { enviarNotificacionReserva } = require('../controllers/contacto');
+const { fn, col, literal } = require('sequelize');
 const sequelize = modelos.sequelize; 
 
 async function create(req, res) {
@@ -859,6 +860,73 @@ async function getCancelacionesAdmin(req, res) {
     return res.status(500).json({ message: 'Error interno al cargar cancelaciones.' });
   }
 }
+
+
+
+/**
+ * GET  /api/dashboard/reservas-6m
+ * Devuelve [{ mes:'2024-03', total:12 }, … ] (últimos 6 meses)
+ */
+async function getReservasUltimosSeisMeses(req, res) {
+  try {
+    const seisMesesAtras = new Date();
+    seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 5); // incluye mes actual
+
+    const datos = await modelos.reservas.findAll({
+      attributes: [
+        /* YYYY-MM para agrupar */
+        [fn('to_char', col('fechaevento'), 'YYYY-MM'), 'mes'],
+        [fn('COUNT', col('*')),             'total']
+      ],
+      where: { fechaevento: { [Op.gte]: seisMesesAtras } },
+      group: [literal('mes')],
+      order: [literal('mes')]
+    });
+
+    return res.status(200).json(datos);
+  } catch (err) {
+    console.error('Error getReservasUltimosSeisMeses:', err);
+    return res.status(500).json({ message:'Error al obtener datos', error:err.message });
+  }
+}
+
+/**
+ * GET /api/dashboard/top-servicios
+ * Devuelve TOP-N servicios más reservados: [{ nombre:'Buffet', total:89 }, … ]
+ * Cambia N con el query ?limit=5 (por defecto 5)
+ */
+async function getServiciosMasReservados(req, res) {
+  try {
+    const limite = parseInt(req.query.limit || '5', 10);
+
+    const lista = await modelos.detalle_reserva.findAll({
+      attributes:[
+        [col('menu->servicio.nombre'), 'nombre'],
+        [fn('COUNT', col('detalle_reserva.idmenu')), 'total']
+      ],
+      include:[{
+        model: modelos.menu,
+        as:   'menu',
+        attributes:[],
+        include:[{
+          model: modelos.servicios,
+          as:   'servicio',
+          attributes:[]
+        }]
+      }],
+      group:[col('menu->servicio.nombre')],
+      order:[[literal('total'), 'DESC']],
+      limit: limite
+    });
+
+    return res.status(200).json(lista);
+  } catch (err) {
+    console.error('Error getServiciosMasReservados:', err);
+    return res.status(500).json({ message:'Error al obtener top servicios', error:err.message });
+  }
+}
+
+
 module.exports = {
     create,
     update,
@@ -873,6 +941,8 @@ module.exports = {
     getNotificacionesPorCliente,
     solicitarCancelacion,
     getCancelacionesAdmin,
+    getReservasUltimosSeisMeses,
+    getServiciosMasReservados
 
     
     

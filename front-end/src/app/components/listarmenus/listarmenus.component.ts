@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { MenusService } from '../../services/menus.service';
 import { ServiciocateringService } from '../../services/serviciocatering.service';
 import { ActivatedRoute } from '@angular/router';
+import { PageEvent } from '@angular/material/paginator'; 
 
 
 @Component({
@@ -21,6 +22,13 @@ export class ListarmenusComponent implements OnInit {
   isLoading: boolean = false;
 
   idServicioParam: string | null = null;
+
+ displayedMenus: any[] = [];
+  pageSize = 5;
+  pageIndex = 0;
+
+  @Output() cerrar = new EventEmitter<void>();
+  volver(){ this.cerrar.emit(); }
 
   constructor(
     private menuService: MenusService,
@@ -50,37 +58,33 @@ export class ListarmenusComponent implements OnInit {
   }
 
 
-  obtenerMenus(): void {
-    this.menuService.getMenu().subscribe({
-      next: (data) => {
-        // Transformamos cada menú para que tenga 'fotografiaUrl'
-        this.menu = data.map(menu => {
-          const fotografiaUrl = `http://localhost:8010/api/getMenu/${menu.imagen}/true`;
-          return { ...menu, fotografiaUrl };
-        });
+  /* === SOLO este método cambia === */
+obtenerMenus(): void {
+  this.menuService.getMenu().subscribe({
+    next: (data) => {
 
-        // *** FILTRAR si existe un idServicioParam
-        if (this.idServicioParam) {
-          // Filtra localmente por idservicio
-          this.menuFiltrados = this.menu.filter(
-            (m) => m.idservicio === this.idServicioParam
-          );
+      /* 1. map → añades fotografía */
+      this.menu = data.map(menu => ({
+        ...menu,
+        fotografiaUrl: `http://localhost:8010/api/getMenu/${menu.imagen}/true`
+      }));
 
-          // Si no hay menús para ese servicio, podrías mostrar un mensaje, 
-          // o simplemente dejar la tabla vacía
-          if (this.menuFiltrados.length === 0) {
-            console.log('No hay menús para el servicio:', this.idServicioParam);
-          }
-        } else {
-          // Si no hay param, mostramos todos
-          this.menuFiltrados = this.menu;
-        }
-      },
-      error: (err) => {
-        console.error('Error al obtener los menus:', err);
-      },
-    });
-  }
+      /* 2. filtras por servicio (si corresponde) */
+      if (this.idServicioParam) {
+        this.menuFiltrados = this.menu.filter(
+          m => m.idservicio === this.idServicioParam
+        );
+      } else {
+        this.menuFiltrados = this.menu;
+      }
+
+      /* 3. reinicias paginación y ACTUALIZAS la vista */
+      this.pageIndex = 0;          // vuelve a la página 1
+      this.updatePagedData();      // ← ¡¡ aquí estaba el “faltante” !!
+    },
+    error: err => console.error('Error al obtener menús:', err)
+  });
+}
 
   buscarMenus(): void {
     const searchTermLower = this.searchTerm.trim().toLowerCase(); // Normalizamos el término de búsqueda
@@ -92,7 +96,23 @@ export class ListarmenusComponent implements OnInit {
         menu.idmenu.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
+     this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
   }
+
+  pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;    // (sigue siendo 10)
+    this.updatePagedData();
+  }
+  
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedMenus = this.menuFiltrados.slice(start, end);
+  }
+
+
 
   editarMenus(menu: any): void {
     this.isEditMode = true;
@@ -128,21 +148,45 @@ export class ListarmenusComponent implements OnInit {
   }
 
   private actualizarServicio(): void {
-    this.menuService.editarMenu(this.menuSeleccionado).subscribe({
-      next: () => {
-        // Al terminar la actualización, ocultar spinner
-        this.isLoading = false;
-        this.isEditMode = false;
-        this.menuSeleccionado = null;
-        this.nuevaImagen = null;
-        this.obtenerMenus();
-      },
-      error: (err) => {
-        this.isLoading = false; // desactivar spinner en caso de error
-        console.error('Error al actualizar el servicio:', err);
-      },
-    });
-  }
+
+  this.menuService.editarMenu(this.menuSeleccionado).subscribe({
+    next: () => {
+
+      /* 1)  Actualiza el elemento en el array en memoria
+             para que la plantilla cambie de inmediato   */
+      const idx = this.menu.findIndex(
+        m => m.idmenu === this.menuSeleccionado.idmenu
+      );
+
+      if (idx !== -1) {
+        /*  ───── Si cambiaste la imagen, quizá quieras
+            regenerar la URL; de lo contrario conserva la que ya
+            estaba:                                           */
+        const fotoUrl = this.menu[idx].fotografiaUrl;
+        this.menu[idx] = { ...this.menuSeleccionado, fotografiaUrl: fotoUrl };
+      }
+
+      /* 2)  Reaplica búsqueda + paginación actuales          */
+      this.buscarMenus();        //  ← ya llama a updatePagedData()
+
+      /* 3)  Cierra el formulario y quita el spinner          */
+      this.isLoading        = false;
+      this.isEditMode       = false;
+      this.menuSeleccionado = null;
+      this.nuevaImagen      = null;
+
+      /* 4)  (Opcional) refresco silencioso desde el servidor:
+             descomenta si quieres sincronizar luego
+
+      // this.obtenerMenus();
+      */
+    },
+    error: err => {
+      this.isLoading = false;
+      console.error('Error al actualizar menú', err);
+    }
+  });
+}
 
   eliminarMenus(idmenu: string): void {
     if (confirm('¿Está seguro de que desea eliminar este servicio?')) {
@@ -169,6 +213,8 @@ export class ListarmenusComponent implements OnInit {
           return { ...menu, fotografiaUrl };
         });
         this.menuFiltrados = this.menu;
+         this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
       },
     });
   }

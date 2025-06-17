@@ -129,6 +129,18 @@ eliminarProductoReserva(idreserva: string, idproducto: string): Observable<void>
   return this.http.delete<void>(`${this.url}reservas/${idreserva}/productos/${idproducto}`);
 }
 
+getReservasUltimosSeisMeses()
+  : Observable<{ mes:string, total:number }[]> {
+  return this.http.get<any>(this.url + 'dashboard/reservas-6m');
+}
+
+getServiciosMasReservados(limit = 5)
+  : Observable<{ nombre:string, total:number }[]> {
+  return this.http.get<any>(
+    `${this.url}dashboard/top-servicios?limit=${limit}`
+  );
+}
+
 
 }
 

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,  Output, EventEmitter } from '@angular/core';
 import { AdministradorService } from '../../services/administrador.service';
+import { PageEvent } from '@angular/material/paginator'; 
 
 @Component({
   selector: 'app-listaadministrador',
@@ -14,6 +15,16 @@ export class ListaadministradorComponent implements OnInit {
   searchTerm: string = '';
   isEditMode: boolean = false;
   adminSeleccionado: any = null;
+  displayedAdmin: any[] = [];
+  pageSize = 5;
+  pageIndex = 0;
+
+  @Output() cerrar = new EventEmitter<void>();
+
+  
+  volver(): void {
+    this.cerrar.emit();
+  }
 
   constructor(private adminService: AdministradorService) {}
 
@@ -28,6 +39,7 @@ export class ListaadministradorComponent implements OnInit {
       next: (data) => {
         this.admin = data;
         this.adminFiltrados = data;
+        this.updatePagedData();
       },
       error: (err) => {
         console.error('Error al obtener empleados:', err);
@@ -45,7 +57,22 @@ export class ListaadministradorComponent implements OnInit {
         admin.ci.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
+      this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
   }
+
+  pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;    // (sigue siendo 10)
+    this.updatePagedData();
+  }
+  
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedAdmin = this.adminFiltrados.slice(start, end);
+  }
+
 
   editarAdmin(admin: any): void {
     this.isEditMode = true;
@@ -94,6 +121,8 @@ export class ListaadministradorComponent implements OnInit {
       next: (data) => {
         this.admin = data;
         this.adminFiltrados = data;
+        this.pageIndex = 0;          // ← vuelvo a la primera página
+      this.updatePagedData(); 
       },
       error: (err) => {
         console.error('Error al obtener administradores:', err);

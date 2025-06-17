@@ -1,4 +1,4 @@
-/***** Botón flotante *****/
+
 .assistant-btn {
   position: fixed;
   bottom: 20px;
@@ -135,7 +135,7 @@
   margin: 6px 0;
 }
 .user-msg span {
-  background-color: #e3f2fd; 
+  background-color: #747b80; 
   padding: 8px 12px;
   border-radius: 12px;
   display: inline-block;
@@ -145,7 +145,7 @@
   margin: 6px 0;
 }
 .bot-msg span {
-  background-color: #f1f1f1;
+  background-color: #2196f3;
   padding: 8px 12px;
   border-radius: 12px;
   display: inline-block;
@@ -173,4 +173,3 @@
   border-radius: 10px;
   cursor: pointer;
 }
-

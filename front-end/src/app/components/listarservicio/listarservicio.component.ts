@@ -1,6 +1,7 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { ServiciocateringService } from '../../services/serviciocatering.service';
 import { TipocateringService } from '../../services/tipocatering.service';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-listarservicio',
@@ -17,6 +18,23 @@ export class ListarservicioComponent implements OnInit {
   servSeleccionado: any = null;
   tipo: any[] = [];
   estados: any[] = [];
+
+
+   @Output() cerrar = new EventEmitter<void>();
+
+ 
+volver(): void {
+    this.cerrar.emit();
+  }
+
+  
+    /* paginación */
+    displayedServicios: any[] = [];
+    pageSize            = 5;
+    pageIndex           = 0;
+  
+    
+      
 
   isLoading: boolean = false;
 
@@ -46,7 +64,7 @@ export class ListarservicioComponent implements OnInit {
     });
    
     this.obtenerServicios();
-    this.cargarLista();
+    
   }
 
   obtenerServicios(): void {
@@ -58,6 +76,7 @@ export class ListarservicioComponent implements OnInit {
           return { ...serv, fotografiaUrl };
         });
         this.servFiltrados = this.servicio;
+        this.updatePagedData();  
       },
       error: (err) => {
         console.error('Error al obtener los servicios:', err);
@@ -78,6 +97,22 @@ export class ListarservicioComponent implements OnInit {
         servicio.idservicio.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
+
+    this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
+    
+  }
+
+  pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;    // (sigue siendo 10)
+    this.updatePagedData();
+  }
+  
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedServicios = this.servFiltrados.slice(start, end);
   }
 
   editarServicios(servicio: any): void {
@@ -157,6 +192,8 @@ export class ListarservicioComponent implements OnInit {
           return { ...serv, fotografiaUrl };
         });
         this.servFiltrados = this.servicio;
+        this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
       },
       error: (err) => {
         console.error('Error al obtener los servicios:', err);

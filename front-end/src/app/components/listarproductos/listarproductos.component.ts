@@ -1,142 +1,156 @@
-import { Component, OnInit } from '@angular/core';
-import { ProductosService } from '../../services/productos.service';
-import { ProveedoresService } from '../../services/proveedores.service';
-import { CategoriaProductosService } from '../../services/categoria-productos.service';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { PageEvent } from '@angular/material/paginator';
+
+import { ProductosService }        from '../../services/productos.service';
+import { ProveedoresService }      from '../../services/proveedores.service';
+import { CategoriaProductosService } from '../../services/categoria-productos.service';
 
 @Component({
   selector: 'app-listarproductos',
-  
   templateUrl: './listarproductos.component.html',
-
   styleUrls: ['./listarproductos.component.css'],
-  standalone: false,
+  standalone: false
 })
 export class ListarproductosComponent implements OnInit {
-  productos: any[] = [];
-  prodFiltrados: any[] = [];
-  prov: any[] = [];
-  cat: any[] = [];
-  searchTerm: string = '';
-  isEditMode: boolean = false;
-  prodSeleccionado: any = null;
-  idCatParam: string | null = null;
 
+  /* --------- propiedades --------- */
+  productos:        any[] = [];
+  prodFiltrados:    any[] = [];
+  prov:             any[] = [];
+  cat:              any[] = [];
+  searchTerm        = '';
+  isEditMode        = false;
+  prodSeleccionado: any = null;
+
+  /* id de categoría – puede llegar por @Input O por la URL */
+  @Input() idCatParam: number | null = null;
+
+  /* paginación */
+  displayedProductos: any[] = [];
+  pageSize            = 5;
+  pageIndex           = 0;
+
+  /* evento para volver al dashboard */
+  @Output() cerrar = new EventEmitter<void>();
+  volver(): void { this.cerrar.emit(); }
+
+  /* --------- constructor --------- */
   constructor(
-    private proveedorService: ProveedoresService,
-    private productoService: ProductosService,
-    private categoriaService: CategoriaProductosService,
-    private route: ActivatedRoute
+    private proveedorService:  ProveedoresService,
+    private productoService:   ProductosService,
+    private categoriaService:  CategoriaProductosService,
+    private route:             ActivatedRoute
   ) {}
 
+  /* --------- ciclo de vida --------- */
   ngOnInit(): void {
-    this.idCatParam = this.route.snapshot.paramMap.get('idCategoria');
 
-    // Cargar proveedores
+    /* 1) si el padre NO envió idCatParam, lo buscamos en la URL */
+    if (this.idCatParam == null) {
+      const idFromRoute = this.route.snapshot.paramMap.get('idCategoria');
+      this.idCatParam   = idFromRoute ? Number(idFromRoute) : null;
+    }
+
+    /* 2) catálogos auxiliares */
     this.proveedorService.getProveedor().subscribe({
-      next: (data) => {
-        this.prov = data;
-      },
-      error: (err) => {
-        console.error('Error al obtener proveedores:', err);
-      },
+      next: data => (this.prov = data),
+      error: err => console.error('Error al obtener proveedores:', err)
     });
 
-    // Cargar categorías
     this.categoriaService.getCategoria().subscribe({
-      next: (data) => {
-        this.cat = data;
-      },
-      error: (err) => {
-        console.error('Error al obtener categorías:', err);
-      },
+      next: data => (this.cat = data),
+      error: err => console.error('Error al obtener categorías:', err)
     });
 
-    // Cargar productos (filtrados o no)
+    /* 3) productos (general o filtrado) */
     this.loadProducts();
   }
 
-  // Método centralizado para filtrar o no según la categoría
+  /* --------- carga de productos --------- */
   private loadProducts(): void {
     if (this.idCatParam) {
       this.productoService.getProductoByCategoria(this.idCatParam).subscribe({
-        next: (data) => {
-          this.productos = data;
+        next: data => {
+          this.productos     = data;
           this.prodFiltrados = data;
+          this.pageIndex     = 0;
+          this.updatePagedData();
         },
-        error: (err) => {
-          console.error('Error al obtener productos de la categoría:', err);
-        },
+        error: err => console.error('Error al obtener productos por categoría:', err)
       });
     } else {
       this.productoService.getProducto().subscribe({
-        next: (data) => {
-          this.productos = data;
+        next: data => {
+          this.productos     = data;
           this.prodFiltrados = data;
+          this.updatePagedData();
         },
-        error: (err) => {
-          console.error('Error al obtener productos:', err);
-        },
+        error: err => console.error('Error al obtener productos:', err)
       });
     }
   }
 
+  /* --------- buscador --------- */
   buscarProducto(): void {
-    const searchTermLower = this.searchTerm.trim().toLowerCase();
-    if (searchTermLower === '') {
-      this.prodFiltrados = this.productos;
-    } else {
-      this.prodFiltrados = this.productos.filter((producto) =>
-        producto.nombre.toLowerCase().includes(searchTermLower) ||
-        producto.idproducto.toLowerCase().includes(searchTermLower)
-      );
-    }
+    const t = this.searchTerm.trim().toLowerCase();
+    this.prodFiltrados = t
+      ? this.productos.filter(p =>
+          p.nombre.toLowerCase().includes(t) ||
+          p.idproducto.toLowerCase().includes(t))
+      : this.productos;
+
+    this.pageIndex = 0;
+    this.updatePagedData();
   }
 
-  editarProducto(productos: any): void {
+  /* --------- paginación --------- */
+  pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;
+    this.updatePagedData();
+  }
+
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedProductos = this.prodFiltrados.slice(start, end);
+  }
+
+  /* --------- CRUD --------- */
+  editarProducto(p: any): void {
     this.isEditMode = true;
-    this.prodSeleccionado = { ...productos };
+    this.prodSeleccionado = { ...p };
   }
 
   guardarEdicion(): void {
-    if (this.prodSeleccionado) {
-      this.productoService.editarProducto(this.prodSeleccionado).subscribe({
-        next: () => {
-          this.isEditMode = false;
-          this.prodSeleccionado = null;
-          this.loadProducts(); // volver a cargar
-        },
-        error: (err) => {
-          console.error('Error al actualizar producto:', err);
-        },
-      });
-    }
+    if (!this.prodSeleccionado) return;
+    this.productoService.editarProducto(this.prodSeleccionado).subscribe({
+      next: () => {
+        this.isEditMode = false;
+        this.prodSeleccionado = null;
+        this.loadProducts();
+      },
+      error: err => console.error('Error al actualizar producto:', err)
+    });
   }
 
-  eliminarProducto(idproducto: string): void {
-    if (confirm('¿Está seguro de que desea eliminar este producto?')) {
-      this.productoService.eliminarProducto(idproducto).subscribe({
-        next: () => {
-          // Llamamos de nuevo a loadProducts para recargar la lista,
-          // respetando si estamos en categoría o en la lista general
-          this.loadProducts();
-        },
-        error: (err) => {
-          console.error('Error al eliminar producto:', err);
-        },
-      });
-    }
+  eliminarProducto(id: string): void {
+    if (!confirm('¿Eliminar este producto?')) return;
+    this.productoService.eliminarProducto(id).subscribe({
+      next: () => this.loadProducts(),
+      error: err => console.error('Error al eliminar producto:', err)
+    });
   }
 
   cancelarEdicion(): void {
     this.isEditMode = false;
     this.prodSeleccionado = null;
-    this.loadProducts(); // recarga para mostrar la lista sin edición
+    this.loadProducts();
   }
 
   recargarLista(): void {
     this.searchTerm = '';
-    this.loadProducts(); // recarga lista filtrada o general
+    this.loadProducts();
   }
 }
-

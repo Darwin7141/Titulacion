@@ -1,5 +1,6 @@
-import { Component , OnInit} from '@angular/core';
+import { Component , OnInit, Output, EventEmitter } from '@angular/core';
 import { ProveedoresService } from '../../services/proveedores.service';
+import { PageEvent } from '@angular/material/paginator'; 
 
 @Component({
   selector: 'app-listarproveedor',
@@ -14,6 +15,16 @@ export class ListarproveedorComponent implements OnInit {
   searchTerm: string = '';
   isEditMode: boolean = false;
   provSeleccionado: any = null;
+  displayedProveedores: any[] = [];
+  pageSize = 3;
+  pageIndex = 0;
+
+  @Output() cerrar = new EventEmitter<void>();
+
+  
+  volver(): void {
+    this.cerrar.emit();
+  }
 
   constructor(private adminService: ProveedoresService) {}
 
@@ -28,6 +39,7 @@ export class ListarproveedorComponent implements OnInit {
       next: (data) => {
         this.prov = data;
         this.provFiltrados = data;
+        this.updatePagedData();
       },
       error: (err) => {
         console.error('Error al obtener proveedores:', err);
@@ -45,8 +57,20 @@ export class ListarproveedorComponent implements OnInit {
         prov.ci.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
+    this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
   }
-
+  pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;    // (sigue siendo 10)
+    this.updatePagedData();
+  }
+  
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedProveedores = this.provFiltrados.slice(start, end);
+  }
   editarProv(prov: any): void {
     this.isEditMode = true;
     this.provSeleccionado = { ...prov }; // Copia para evitar modificar el original
@@ -89,6 +113,8 @@ export class ListarproveedorComponent implements OnInit {
       next: (data) => {
         this.prov = data;
         this.provFiltrados = data;
+        this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
       },
       error: (err) => {
         console.error('Error al obtener proveedor:', err);

@@ -1,121 +1,144 @@
-<div class="clientes-container">
-    <h2>Listado de Tipos de Catering</h2>
-  
-    <!-- Campo de búsqueda -->
-    <div class="search-bar">
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Nombre o código "
-        [(ngModel)]="searchTerm"
-      />
-      <button class="search-button" (click)="buscarTipos()">
-        <mat-icon>search</mat-icon>
-      </button>
-      <button class="reload-button" (click)="recargarLista()">
-        <mat-icon>refresh</mat-icon>
-      </button>
-    </div>
-  
-    <div *ngIf="tipoFiltrados.length === 0 && searchTerm" class="not-found">
-      <p>No se encontró ningún tipo de catering con la información proporcionada.</p>
-    </div>
-  
-  
-    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
-  
-    <!-- Tabla de empleados -->
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-       <!--   <th>CodEstado</th> -->
-           
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let tipo of tipoFiltrados">
-          <td>{{ tipo.idtipo }}</td>
-          <td>{{ tipo.nombre }}</td>
-          <td>{{ tipo.descripcion }}</td>
-         
-      <!--    <td>{{ tipo.estado.estado }}</td> -->
-         
-          
-          <td>
-            <button mat-icon-button color="primary" (click)="editarTipos(tipo)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <!-- Ícono de eliminar -->
-            <button mat-icon-button color="warn" (click)="eliminarTipos(tipo.idtipo)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- Formulario de edición -->
-    <div *ngIf="isEditMode" class="edit-form">
-      <h3>Editar Tipo</h3>
-      <form (ngSubmit)="guardarEdicion()">
-        <div class="form-group">
-          <label>Código</label>
-          <input
-            type="text"
-            [(ngModel)]="tipoSeleccionado.idtipo"
-            name="idtipo"
-            disabled
-          />
-        </div>
-        
-        <div class="form-group">
-          <label>Nombre</label>
-          <input
-            type="text"
-            [(ngModel)]="tipoSeleccionado.nombre"
-            name="nombre"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label>Descripción</label>
-          <input
-            type="text"
-            [(ngModel)]="tipoSeleccionado.descripcion"
-            name="descripcion"
-            required
-          />
+<!-- ──────────────────────────────────────────────────────────────
+     LISTAR TIPOS DE CATERING  –  usa el mismo CSS global
+     ────────────────────────────────────────────────────────────── -->
+<div class="tabla-wrapper">
+  <mat-card class="tabla-card">
+
+    <!-- ──────────────── CABECERA / TOOLBAR ──────────────── -->
+    <mat-card-header>
+      <div class="toolbar">
+
+        <!-- ··· grupo izquierda: buscador + icon-buttons ··· -->
+        <div class="left-group">
+          <mat-form-field appearance="outline" class="buscador slim">
+            <mat-icon matPrefix>search</mat-icon>
+            <input  matInput
+                    placeholder="Nombre o código"
+                    [(ngModel)]="searchTerm"
+                    (keyup.enter)="buscarTipos()">
+          </mat-form-field>
+
+          <button mat-icon-button color="primary"
+                  matTooltip="Buscar"
+                  (click)="buscarTipos()">
+            <mat-icon>search</mat-icon>
+          </button>
+
+          <button mat-icon-button color="primary"
+                  matTooltip="Recargar"
+                  (click)="recargarLista()">
+            <mat-icon>refresh</mat-icon>
+          </button>
         </div>
 
-     <!--   <div class="form-group">
-          <label>CodEstado</label>
-          <input
-            type="text"
-            [(ngModel)]="tipoSeleccionado.idestado"
-            name="idtipo"
-            disabled
-          />
-        </div> -->
-        
-        
-       
-  
-        <div class="form-actions">
-          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
-          <button type="submit">Guardar</button>
-        </div>
-      </form>
-    </div>
-  
-    <!-- Botón para agregar empleado -->
-    <div class="add-icon">
-      <button mat-fab color="primary" [routerLink]="['/tipocatering']">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
+        <!-- ··· botón Agregar (alineado a la derecha) ··· -->
+        <button mat-raised-button color="primary"
+                class="btn-add"
+                [routerLink]="['/tipocatering']">
+          <mat-icon>add</mat-icon><span>Agregar</span>
+        </button>
+
+      </div>
+    </mat-card-header>
+
+    <!-- ───────────────────── TABLA ───────────────────── -->
+    <mat-card-content>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- arreglo paginado -->
+          <tr *ngFor="let tipo of displayedTipos">
+            <td>{{ tipo.idtipo }}</td>
+            <td>{{ tipo.nombre }}</td>
+            <td>{{ tipo.descripcion }}</td>
+
+            <td class="acciones-col">
+              <button mat-icon-button color="primary"
+                      matTooltip="Editar"
+                      (click)="editarTipos(tipo)">
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <button mat-icon-button color="warn"
+                      matTooltip="Eliminar"
+                      (click)="eliminarTipos(tipo.idtipo)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- paginador: 10 filas por página -->
+      <mat-paginator
+        [length]="tipoFiltrados.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10]"
+        (page)="pageChanged($event)">
+      </mat-paginator>
+
+      <!-- mensaje “sin resultados” -->
+      <p class="no-data"
+         *ngIf="tipoFiltrados.length === 0 && searchTerm">
+        No se encontró ningún tipo de catering con la información proporcionada.
+      </p>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ───────────── FORMULARIO DE EDICIÓN ───────────── -->
+  <div *ngIf="isEditMode" class="edit-form">
+    <h3>Editar Tipo de Catering</h3>
+
+    <form (ngSubmit)="guardarEdicion()">
+
+      <div class="form-group">
+        <label>Código</label>
+        <input type="text"
+               [(ngModel)]="tipoSeleccionado.idtipo"
+               name="idtipo" disabled>
+      </div>
+
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text"
+               [(ngModel)]="tipoSeleccionado.nombre"
+               name="nombre" required>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción</label>
+        <input type="text"
+               [(ngModel)]="tipoSeleccionado.descripcion"
+               name="descripcion" required>
+      </div>
+
+      <div class="form-actions">
+        <button type="button"
+                mat-raised-button color="warn"
+                (click)="cancelarEdicion()">Cancelar</button>
+
+        <button type="submit"
+                mat-raised-button color="primary">Guardar</button>
+      </div>
+
+    </form>
   </div>
+
   
+  <button mat-icon-button class="btn-back"
+          matTooltip="Volver"
+          (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  
+</div>

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit ,Output, EventEmitter} from '@angular/core';
 import { EmpleadosService } from '../../services/empleados.service';
+import { PageEvent } from '@angular/material/paginator'; 
 
 @Component({
   selector: 'app-listadoempleados',
@@ -14,6 +15,16 @@ export class ListadoempleadosComponent implements OnInit {
   searchTerm: string = '';
   isEditMode: boolean = false;
   empleadoSeleccionado: any = null;
+  displayedEmpleados: any[] = [];
+  pageSize = 5;
+  pageIndex = 0;
+
+  @Output() cerrar = new EventEmitter<void>();
+
+  
+  volver(): void {
+    this.cerrar.emit();
+  }
 
   constructor(private empleadosService: EmpleadosService) {}
 
@@ -35,6 +46,7 @@ export class ListadoempleadosComponent implements OnInit {
       next: (data) => {
         this.empleado = data;
         this.empleadosFiltrados = data;
+        this.updatePagedData();
       },
       error: (err) => {
         console.error('Error al obtener empleados:', err);
@@ -52,6 +64,20 @@ export class ListadoempleadosComponent implements OnInit {
         empleado.ci.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
+    this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
+  }
+
+  pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;    // (sigue siendo 10)
+    this.updatePagedData();
+  }
+  
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedEmpleados = this.empleadosFiltrados.slice(start, end);
   }
 
   editarEmpleado(empleado: any): void {
@@ -96,6 +122,8 @@ export class ListadoempleadosComponent implements OnInit {
       next: (data) => {
         this.empleado = data;
         this.empleadosFiltrados = data;
+        this.pageIndex = 0;          // ← vuelvo a la primera página
+      this.updatePagedData(); 
       },
       error: (err) => {
         console.error('Error al obtener empleados:', err);

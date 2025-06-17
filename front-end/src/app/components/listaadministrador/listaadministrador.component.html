@@ -1,74 +1,105 @@
-<div class="clientes-container">
-    <h2>ADMINISTRADORES</h2>
-  
-    <!-- Campo de búsqueda -->
-    <div class="search-bar">
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Nombre de administrador"
-        [(ngModel)]="searchTerm"
-      />
-      <section class="example-buttons">
-  
-  <div class="example-button-row">
-    <!-- éste es el “Basic” -->
-    <button mat-flat-button color="primary" (click)="buscarAdmin()">
-      Buscar
+<!-- listaadministrador.component.html -->
+<div class="tabla-wrapper">
+
+  <!-- Tarjeta contenedora -->
+  <mat-card class="tabla-card">
+
+    <!-- CABECERA ─────────────────────────────────────────────── -->
+   <mat-card-header>
+
+  <div class="toolbar">
+
+    <!-- GRUPO IZQUIERDA  -->
+    <div class="left-group">
+
+      <!-- buscador -->
+      <mat-form-field appearance="outline" class="buscador slim">
+        <mat-icon matPrefix>search</mat-icon>
+        <input  matInput
+                placeholder="Buscar…"
+                [(ngModel)]="searchTerm"
+                (keyup.enter)="buscarAdmin()">
+      </mat-form-field>
+
+      <!-- icon-buttons -->
+      <button mat-icon-button color="primary"
+              matTooltip="Buscar" (click)="buscarAdmin()">
+        <mat-icon>search</mat-icon>
+      </button>
+
+      <button mat-icon-button color="primary"
+              matTooltip="Recargar" (click)="recargarLista()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+
+    </div>
+
+    <!-- BOTÓN AGREGAR (derecha) -->
+    <button mat-raised-button color="primary"
+            class="btn-add"
+            [routerLink]="['/administrador']">
+      <mat-icon>add</mat-icon>
+      <span>Agregar</span>
     </button>
 
   </div>
-</section>
-<mat-divider></mat-divider>
-      <button class="reload-button" (click)="recargarLista()">
-        <mat-icon>refresh</mat-icon>
-      </button>
-    </div>
-  
-    <div *ngIf="adminFiltrados.length === 0 && searchTerm" class="not-found">
-      <p>No se encontró ningún adminstrador con el nombre proporcionado.</p>
-    </div>
-  
-  
-    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
-  
-    <!-- Tabla de empleados -->
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>CI</th>
-          <th>Nombre</th>
-          <th>Dirección</th>
-          <th>Correo Electrónico</th>
-          <th>Teléfono</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let admin of adminFiltrados">
-          <td>{{ admin.codigoadmin }}</td>
-          <td>{{ admin.ci }}</td>
-          <td>{{ admin.nombre }}</td>
-          <td>{{ admin.direccion }}</td>
-          <td>{{ admin.e_mail }}</td>
-          <td>{{ admin.telefono }}</td>
-          
-          <td>
-            <button mat-icon-button color="primary" (click)="editarAdmin(admin)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <!-- Ícono de eliminar -->
-            <button mat-icon-button color="warn" (click)="eliminarAdmin(admin.codigoadmin, admin.ci)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- Formulario de edición -->
-    <div *ngIf="isEditMode" class="edit-form">
+
+</mat-card-header>
+
+    <!-- CONTENIDO ────────────────────────────────────────────── -->
+    <mat-card-content>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Código</th><th>CI</th><th>Nombre</th><th>Dirección</th>
+            <th>Correo Electrónico</th><th>Teléfono</th><th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+         <tr *ngFor="let admin of displayedAdmin">
+        <td>{{ admin.codigoadmin }}</td>
+        <td>{{ admin.ci }}</td>
+        <td>{{ admin.nombre }}</td>
+        <td>{{ admin.direccion }}</td>
+        <td>{{ admin.e_mail }}</td>
+        <td>{{ admin.telefono }}</td>
+
+        <td class="acciones-col">
+          <button mat-icon-button color="primary"
+                  (click)="editarAdmin(admin)"
+                  matTooltip="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn"
+                  (click)="eliminarAdmin(admin.codigoadmin, admin.ci)"
+                  matTooltip="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- paginador: 10 filas por página -->
+  <mat-paginator
+    [length]="adminFiltrados.length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10]"
+    (page)="pageChanged($event)">
+  </mat-paginator>
+
+  <!-- mensaje “sin resultados” -->
+  <p class="no-data" *ngIf="adminFiltrados.length === 0">
+    No hay resultados.
+  </p>
+
+    </mat-card-content>
+  </mat-card>
+
+
+  <div *ngIf="isEditMode" class="edit-form">
       <h3>Editar Administrador</h3>
       <form (ngSubmit)="guardarEdicion()">
         <div class="form-group">
@@ -133,12 +164,12 @@
         </div>
       </form>
     </div>
-  
-    <!-- Botón para agregar empleado -->
-    <div class="add-icon">
-      <button mat-fab color="primary" [routerLink]="['/administrador']">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
-  </div>
-  
+
+  <!-- Botón volver al dashboard -->
+  <button mat-icon-button class="btn-back"
+          matTooltip="Volver"
+          (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+</div>

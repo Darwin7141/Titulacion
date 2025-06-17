@@ -1,175 +1,205 @@
-<div class="clientes-container">
-  <div *ngIf="isLoading" class="loading-overlay">
-    <mat-progress-spinner
-      mode="indeterminate"
-      color="accent"
-      diameter="50">
-    </mat-progress-spinner>
-    <p>Procesando...</p>
-  </div>
-    <h2>Lista de Servicios</h2>
-  
-    <!-- Campo de búsqueda -->
-    <div class="search-bar">
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Nombre de servicio"
-        [(ngModel)]="searchTerm"
-      />
-      <button class="search-button" (click)="buscarServicios()">
-        <mat-icon>search</mat-icon>
-      </button>
-      <button class="reload-button" (click)="recargarLista()">
-        <mat-icon>refresh</mat-icon>
-      </button>
-    </div>
-  
-    <div *ngIf="servFiltrados.length === 0 && searchTerm" class="not-found">
-      <p>No se encontró ningún servicio con el nombre proporcionado.</p>
-    </div>
-  
-  
-    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
-  
-    <!-- Tabla de empleados -->
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Muestra</th>
-          <th>Tipo</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let serv of servFiltrados">
-          <td>{{ serv.idservicio }}</td>
-          <td>{{ serv.nombre }}</td>
-          <td>{{ serv.descripcion }}</td>
-          <td>
-            <img
-              *ngIf="serv.fotografiaUrl"
-              [src]="serv.fotografiaUrl"
-              alt="Imagen de {{ serv.nombre }}"
-              width="100"
-              height="100"
-            />
-            <!-- Opcional: si no hay imagen o falla la carga -->
-           
-          </td>
-          <td>{{ serv.tipo.nombre }}</td>
-          <td>{{ serv.estado.estado }}</td>
-          
-          <td>
-            <button mat-icon-button color="primary" (click)="editarServicios(serv)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <!-- Ícono de eliminar -->
-            <button mat-icon-button color="warn" (click)="eliminarServicios(serv.idservicio)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- Formulario de edición -->
-    <div *ngIf="isEditMode" class="edit-form">
-      <h3>Editar Servicio</h3>
-      <form (ngSubmit)="guardarEdicion()">
-        <div class="form-group">
-          <label>Código</label>
-          <input
-            type="text"
-            [(ngModel)]="servSeleccionado.idservicio"
-            name="idservicio"
-            disabled
-          />
-        </div>
-        
-        <div class="form-group">
-          <label>Nombre</label>
-          <input
-            type="text"
-            [(ngModel)]="servSeleccionado.nombre"
-            name="nombre"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label>Descripción</label>
-          <input
-            type="text"
-            [(ngModel)]="servSeleccionado.descripcion"
-            name="descripcion"
-            required
-          />
-        </div>
-        
-        <div class="form-group">
-          <label>Muestra (imagen actual)</label>
-          <div *ngIf="servSeleccionado.fotografiaUrl">
-            <img
-              [src]="servSeleccionado.fotografiaUrl"
-              alt="Imagen de {{ servSeleccionado.nombre }}"
-              width="120"
-              height="80"
-            />
-          </div>
-          
-          <label for="nuevaImagen">Cambiar imagen:</label>
-          <input
-            id="nuevaImagen"
-            type="file"
-            (change)="onNewImageSelected($event)"
-          />
-        </div>
-    
+<div class="tabla-wrapper">
+  <mat-card class="tabla-card">
 
-        <div class="form-group">
-          <mat-form-field class="col-xs-12">
-            <mat-select #idCargoField="ngModel" name="idtipo" [(ngModel)]="servSeleccionado.idtipo" required placeholder="Seleccione un tipo">
-              <mat-option *ngFor="let serv of tipo" [value]="serv.idtipo">
-                {{ serv.nombre }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un tipo</mat-error>
+    <!-- ──────────────── CABECERA / TOOLBAR ──────────────── -->
+    <mat-card-header>
+      <div class="toolbar">
+
+        <!-- ··· grupo izquierda: buscador + icon-buttons ··· -->
+        <div class="left-group">
+          <mat-form-field appearance="outline" class="buscador slim">
+            <mat-icon matPrefix>search</mat-icon>
+            <input  matInput
+                    placeholder="Nombre de servicio"
+                    [(ngModel)]="searchTerm"
+                    (keyup.enter)="buscarServicios()">
           </mat-form-field>
+
+          <button mat-icon-button color="primary"
+                  matTooltip="Buscar"
+                  (click)="buscarServicios()">
+            <mat-icon>search</mat-icon>
+          </button>
+
+          <button mat-icon-button color="primary"
+                  matTooltip="Recargar"
+                  (click)="recargarLista()">
+            <mat-icon>refresh</mat-icon>
+          </button>
         </div>
 
-        <div class="form-group">
-          <mat-form-field class="col-xs-12">
-            <mat-select 
-              #idEstadoField="ngModel" 
-              name="idestado" 
-              [(ngModel)]="servSeleccionado.idestado" 
-              required 
-              placeholder="Seleccione un estado">
-              
-              <mat-option *ngFor="let est of estados" [value]="est.idestado">
-                {{ est.estado }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="idEstadoField.invalid">Debe seleccionar un estado</mat-error>
-          </mat-form-field>
-        </div> 
-  
-        <div class="form-actions">
-          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
-          <button type="submit">Guardar</button>
+        <!-- ··· botón Agregar (alineado a la derecha) ··· -->
+        <button mat-raised-button color="primary"
+                class="btn-add"
+                [routerLink]="['/servicios']">
+          <mat-icon>add</mat-icon><span>Agregar</span>
+        </button>
+
+      </div>
+    </mat-card-header>
+
+    <!-- ───────────────────── TABLA ───────────────────── -->
+    <mat-card-content>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Muestra</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- arreglo paginado -->
+          <tr *ngFor="let serv of displayedServicios">
+            <td>{{ serv.idservicio }}</td>
+            <td>{{ serv.nombre }}</td>
+            <td>{{ serv.descripcion }}</td>
+
+            <td>
+              <img *ngIf="serv.fotografiaUrl"
+                   [src]="serv.fotografiaUrl"
+                   alt="Imagen de {{ serv.nombre }}"
+                   width="90" height="60">
+            </td>
+
+            <td>{{ serv.tipo.nombre }}</td>
+            <td>{{ serv.estado.estado }}</td>
+
+            <td class="acciones-col">
+              <button mat-icon-button color="primary"
+                      matTooltip="Editar"
+                      (click)="editarServicios(serv)">
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <button mat-icon-button color="warn"
+                      matTooltip="Eliminar"
+                      (click)="eliminarServicios(serv.idservicio)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- paginador: 10 filas por página -->
+      <mat-paginator
+        [length]="servFiltrados.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10]"
+        (page)="pageChanged($event)">
+      </mat-paginator>
+
+      <!-- mensaje “sin resultados” -->
+      <p class="no-data"
+         *ngIf="servFiltrados.length === 0 && searchTerm">
+        No se encontró ningún servicio con el nombre proporcionado.
+      </p>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ─────────── FORMULARIO DE EDICIÓN (sin cambios de estilo) ─────────── -->
+  <div *ngIf="isEditMode" class="edit-form">
+    <h3>Editar Servicio</h3>
+
+    <form (ngSubmit)="guardarEdicion()">
+
+      <div class="form-group">
+        <label>Código</label>
+        <input type="text"
+               [(ngModel)]="servSeleccionado.idservicio"
+               name="idservicio" disabled>
+      </div>
+
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text"
+               [(ngModel)]="servSeleccionado.nombre"
+               name="nombre" required>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción</label>
+        <input type="text"
+               [(ngModel)]="servSeleccionado.descripcion"
+               name="descripcion" required>
+      </div>
+
+      <!-- imagen actual + input file -->
+      <div class="form-group">
+        <label>Muestra (imagen actual)</label>
+        <div *ngIf="servSeleccionado.fotografiaUrl">
+          <img [src]="servSeleccionado.fotografiaUrl"
+               alt="Imagen de {{ servSeleccionado.nombre }}"
+               width="120" height="80">
         </div>
-      </form>
-    </div>
-  
-    <!-- Botón para agregar empleado -->
-    <div class="add-icon">
-      <button mat-fab color="primary" [routerLink]="['/servicios']">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
+        <label for="nuevaImagen">Cambiar imagen:</label>
+        <input id="nuevaImagen" type="file"
+               (change)="onNewImageSelected($event)">
+      </div>
+
+      <!-- selector de tipo -->
+      <div class="form-group">
+        <mat-form-field class="col-xs-12">
+          <mat-select #idTipoField="ngModel"
+                      name="idtipo"
+                      [(ngModel)]="servSeleccionado.idtipo"
+                      required
+                      placeholder="Seleccione un tipo">
+            <mat-option *ngFor="let t of tipo"
+                        [value]="t.idtipo">
+              {{ t.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="idTipoField.invalid">
+            Debe seleccionar un tipo
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- selector de estado -->
+      <div class="form-group">
+        <mat-form-field class="col-xs-12">
+          <mat-select #idEstadoField="ngModel"
+                      name="idestado"
+                      [(ngModel)]="servSeleccionado.idestado"
+                      required
+                      placeholder="Seleccione un estado">
+            <mat-option *ngFor="let est of estados"
+                        [value]="est.idestado">
+              {{ est.estado }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="idEstadoField.invalid">
+            Debe seleccionar un estado
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button type="button"
+                mat-raised-button color="warn"
+                (click)="cancelarEdicion()">Cancelar</button>
+
+        <button type="submit"
+                mat-raised-button color="primary">Guardar</button>
+      </div>
+
+    </form>
   </div>
+
   
+  <button mat-icon-button class="btn-back"
+          matTooltip="Volver"
+          (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  
+</div>

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter} from '@angular/core';
 import { TipocateringService } from '../../services/tipocatering.service';
+import { PageEvent } from '@angular/material/paginator'; 
 
 @Component({
   selector: 'app-listacatering',
@@ -15,6 +16,16 @@ export class ListacateringComponent implements OnInit {
   isEditMode: boolean = false;
   tipoSeleccionado: any = null;
   estados: any[] = [];
+  displayedTipos: any[] = [];
+  pageSize = 5;
+  pageIndex = 0;
+
+  @Output() cerrar = new EventEmitter<void>();
+
+  
+  volver(): void {
+    this.cerrar.emit();
+  }
 
   constructor(private tipoService: TipocateringService) {}
 
@@ -38,6 +49,7 @@ export class ListacateringComponent implements OnInit {
       next: (data) => {
         this.tipo = data;
         this.tipoFiltrados = data;
+        this.updatePagedData();
       },
       error: (err) => {
         console.error('Error al obtener los tipos de catering', err);
@@ -55,6 +67,20 @@ export class ListacateringComponent implements OnInit {
         tipo.nombre.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
+    this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
+  }
+
+   pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;    // (sigue siendo 10)
+    this.updatePagedData();
+  }
+  
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedTipos = this.tipoFiltrados.slice(start, end);
   }
 
   editarTipos(tipo: any): void {
@@ -100,6 +126,8 @@ export class ListacateringComponent implements OnInit {
       next: (data) => {
         this.tipo = data;
         this.tipoFiltrados = data;
+        this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
       },
       error: (err) => {
         console.error('Error al obtener los tipos de catering:', err);

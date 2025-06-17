@@ -1,116 +1,281 @@
-<!DOCTYPE html> 
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Página de Inicio</title>
-  <!-- Fuentes y Material Design -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/icon?family=Material+Icons"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@angular/material/prebuilt-themes/indigo-pink.css"
-  />
-</head>
 
-<body>
-  <!-- Barra superior -->
-  <ul>
-    <!-- Sección izquierda: Ícono de usuario + nombre de usuario -->
-    <li style="float: left;">
-      <!-- Puedes enlazar (click) si quieres mostrar un menú de perfil, etc. -->
-      <a class="profile">
-        <i class="material-icons" style="vertical-align: middle;">person</i>
-        {{ userEmail }}
-      </a>
-    </li>
-  
-    <!-- Sección derecha: Ícono para cerrar sesión -->
+<mat-sidenav-container class="sidenav-container">
 
-    
-    <li style="float: right;">
-      <a class="logout" type="button" (click)="logout()">
-        <i class="material-icons" style="vertical-align: middle;">power_settings_new</i>
-      </a>
-    </li>
+  <!-- ────────────────────  LATERAL  ──────────────────── -->
+  <mat-sidenav #drawer mode="side" opened class="sidenav">
+    <mat-nav-list>
 
-    <li style="float: right; ">
-      <a class="campana-container" (click)="verNotificaciones()">
-    <i class="material-icons" style="vertical-align: middle;">
-      {{ hayNotificaciones ? 'notifications_active' : 'notifications' }}
-    </i>
-    <span *ngIf="hayNotificaciones" class="badge">{{ cantidadNotificaciones }}</span>
+      <!-- ─── GESTIÓN USUARIOS ─── -->
+      <mat-list-item class="menu-principal"
+                     (click)="toggleGestionUsuarios()"
+                     [class.open]="showGestionUsuarios">
+        <mat-icon matListIcon>people</mat-icon>
+        <span>Gestión Usuarios</span>
+        <mat-icon class="expand-icon">
+          {{ showGestionUsuarios ? 'expand_less' : 'expand_more' }}
+        </mat-icon>
+      </mat-list-item>
+
+      <div class="submenu" [@slideToggle]="showGestionUsuarios">
+        <!-- ① Administrador -> cambia la vista -->
+        <a mat-list-item (click)="setView('admin'); drawer.close()">
+          <mat-icon matListIcon>admin_panel_settings</mat-icon>
+          <span>Administrador</span>
+        </a>
+
+        <!-- otros enlaces siguen igual (pueden migrarse después) -->
+        <a mat-list-item routerLink="/listaUsuarios">
+          <mat-icon matListIcon>account_circle</mat-icon>
+          <span>Cuentas Usuarios</span>
+        </a>
+        <a mat-list-item (click)="setView('cliente'); drawer.close()">
+          <mat-icon matListIcon>group</mat-icon>
+          <span>Clientes</span>
+        </a>
+        <a mat-list-item (click)="setView('cargos'); drawer.close()">
+          <mat-icon matListIcon>badge</mat-icon>
+          <span>Cargos Empleados</span>
+        </a>
+        <a mat-list-item (click)="setView('empleados'); drawer.close()">
+          <mat-icon matListIcon>person</mat-icon>
+          <span>Empleados</span>
+        </a>
+        <a mat-list-item (click)="setView('proveedores'); drawer.close()">
+          <mat-icon matListIcon>local_shipping</mat-icon>
+          <span>Proveedores</span>
+        </a>
+      </div>
+
+      <!-- ─── INVENTARIO (sin cambios) ─── -->
+      <mat-list-item class="menu-principal"
+               (click)="toggleProductos()"
+               [class.open]="showProductos">
+  <mat-icon matListIcon>inventory_2</mat-icon>
+  <span>Inventario</span>
+  <mat-icon class="expand-icon">
+    {{ showProductos ? 'expand_less' : 'expand_more' }}
+  </mat-icon>
+</mat-list-item>
+
+<div class="submenu" [@slideToggle]="showProductos">
+  <!-- Lista general -->
+  <a mat-list-item (click)="setView('prod-general'); drawer.close()">
+    <mat-icon matListIcon>store</mat-icon>
+    <span>Lista General</span>
   </a>
-    </li>
-  </ul>
 
-  <!-- Menú lateral (sidenav) -->
-  <div class="sidenav">
-    <!-- 1. Submenú "Gestión Usuarios" -->
-    <a href="javascript:void(0)" (click)="toggleGestionUsuarios()">
-      Gestión Usuarios
-    </a>
-    <div *ngIf="showGestionUsuarios" class="submenu">
-      <a [routerLink]="['/listaAdministrador']">Administrador</a>
-      <a [routerLink]="['/listaUsuarios']">Cuentas Usuarios</a>
-      <a [routerLink]="['/listaClientes']">Clientes</a>
-      <a [routerLink]="['/listaCargos']">Cargos Empleados</a>
-      <a [routerLink]="['/listaEmpleados']">Empleados</a>
-      <a [routerLink]="['/listaProveedor']">Proveedores</a>
-    </div>
+  <!-- categorías -->
+  <a mat-list-item (click)="setView('prod-cat', 7); drawer.close()">
+    <mat-icon matListIcon>local_bar</mat-icon>
+    <span>Bebidas</span>
+  </a>
+  <a mat-list-item (click)="setView('prod-cat', 3); drawer.close()">
+    <mat-icon matListIcon>restaurant_menu</mat-icon>
+    <span>Carnes</span>
+  </a>
+  <a mat-list-item (click)="setView('prod-cat', 8); drawer.close()">
+    <mat-icon matListIcon>layers</mat-icon>
+    <span>Materiales</span>
+  </a>
+  <a mat-list-item (click)="setView('prod-cat', 9); drawer.close()">
+    <mat-icon matListIcon>grain</mat-icon>
+    <span>Granos</span>
+  </a>
+  <a mat-list-item (click)="setView('prod-cat', 5); drawer.close()">
+    <mat-icon matListIcon>cake</mat-icon>
+    <span>Panadería</span>
+  </a>
+</div>
 
-    <!-- 2. Submenú "Productos" -->
-    <a href="javascript:void(0)" (click)="toggleProductos()">
-      Productos
-    </a>
-    <div *ngIf="showProductos" class="submenu">
-      <!-- Ajusta las rutas según tu configuración de routing -->
-      <a [routerLink]="['/listaProductos']">Lista General</a>
-      <a [routerLink]="['/listaCategorias']">Categorias</a>
-      <a [routerLink]="['/listaProductos/categoria',7]">Bebidas</a>
-      <a [routerLink]="['/listaProductos/categoria',3]">Carnes</a>
-      <a [routerLink]="['/listaProductos/categoria',8]">Materiales</a>
-      <a [routerLink]="['/listaProductos/categoria',9]">Granos</a>
-      <a [routerLink]="['/listaProductos/categoria',5]">Panadería y Repostería</a>
-    </div>
+      <!-- ─── CATERING (sin cambios) ─── -->
+      <mat-list-item class="menu-principal"
+                     (click)="toggleCatering()"
+                     [class.open]="showCatering">
+        <mat-icon matListIcon>restaurant</mat-icon>
+        <span>Catering</span>
+        <mat-icon class="expand-icon">
+          {{ showCatering ? 'expand_less' : 'expand_more' }}
+        </mat-icon>
+      </mat-list-item>
 
-    <!-- 3. Submenú "Catering" -->
-    <a href="javascript:void(0)" (click)="toggleCatering()">
-      Catering
-    </a>
-    <div *ngIf="showCatering" class="submenu">
-      <a [routerLink]="['/listaTipos']">Tipos de catering</a>
-      <a [routerLink]="['/listaServicios']">Servicios</a>
-      <a [routerLink]="['/listaMenus']">Menús</a>
-      <a [routerLink]="['/listaReservas']">Reservas</a>
-    </div>
+      <div class="submenu" [@slideToggle]="showCatering">
+       <a mat-list-item (click)="setView('tipos'); drawer.close()">
+          <mat-icon matListIcon>fastfood</mat-icon>
+          <span>Tipos de catering</span>
+        </a>
+        <a mat-list-item (click)="setView('servicios'); drawer.close()">
+          <mat-icon matListIcon>room_service</mat-icon>
+          <span>Servicios</span>
+        </a>
+        <a mat-list-item (click)="setView('menus'); drawer.close()">
+          <mat-icon matListIcon>menu_book</mat-icon>
+          <span>Menús</span>
+        </a>
+        <a mat-list-item (click)="setView('reservas'); drawer.close()">
+          <mat-icon matListIcon>event</mat-icon>
+          <span>Reservas</span>
+        </a>
+      </div>
 
-    <!-- "Reservas" (sin submenú, tal cual) -->
-    <!-- <a [routerLink]="['/reservas']">Reservas</a>-->
-  </div>
+    </mat-nav-list>
+  </mat-sidenav>
 
-  <!-- Contenido o RouterOutlet principal -->
-  <div class="content">
-    <h2></h2>
-    <p></p>
-  </div>
+  <!-- ────────────────────  PRINCIPAL  ──────────────────── -->
+  <mat-sidenav-content>
 
-  <div class="content-admin">
-    <!-- Contorno con imagen de fondo -->
-    <div class="content-main">
-      <div class="background-image"></div>
-      <h1>Bienvenido A DAAYFOOD</h1>
-      <img src="https://scontent.fuio3-1.fna.fbcdn.net/v/t39.30808-6/244667863_115293174241931_2042471049205914810_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHt82VWEgrM4ytjCUsx9-_UDr2Nm1PJqrQOvY2bU8mqtIBQYglZ1F4zT6F5e7yAEcFFKQmNqzPN2TU0SgzjofAl&_nc_ohc=4GdecVpnr0IQ7kNvwGydAVq&_nc_oc=Adn4w83e6EEMeAQe0EfbZGUtqOlal0pNQ3TYPCKkjJv3VHWxRAK0P6koG7NuE_tsGN1b24WzcXsSJAFDj4MAApDG&_nc_zt=23&_nc_ht=scontent.fuio3-1.fna&_nc_gid=Q8dkxy6GsRgROa8Tb3z8qw&oh=00_AfJs718Ihf5inKl2_kuopy9m88GGaqCY-RSVadS3a6xPcQ&oe=683ED962" />
-      <p>Trabajemos juntos</p>
-    </div>
-  </div>
+    <!-- BARRA SUPERIOR -->
+    <mat-toolbar color="primary" class="toolbar">
+      <button mat-icon-button (click)="drawer.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
 
-  
-</body>
-</html>
+      <span class="app-title">DAAYFOOD</span>
+      <span class="spacer"></span>
+
+      <button mat-icon-button (click)="verNotificaciones()">
+        <mat-icon matBadge="{{ cantidadNotificaciones }}"
+                  matBadgeColor="warn"
+                  [matBadgeHidden]="!hayNotificaciones">
+          notifications
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="logout()">
+        <mat-icon>power_settings_new</mat-icon>
+      </button>
+
+      <button mat-button [matMenuTriggerFor]="profileMenu">
+        <mat-icon>person</mat-icon>
+        {{ userEmail }}
+      </button>
+      <mat-menu #profileMenu="matMenu">
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon> Salir
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <!-- ══════════════════  ZONA CENTRAL  ══════════════════ -->
+    <div class="content-wrapper">
+
+      <!-- **********   SWITCH DE VISTAS   ********** -->
+      <ng-container [ngSwitch]="activeView">
+
+        <!-- ① DASHBOARD (vista por defecto) -->
+        <ng-container *ngSwitchCase="'dashboard'">
+
+          <div class="stats-row">
+            <mat-card class="stat-card blue">
+              <div class="label">Stock</div>
+              <div class="value">
+                {{ totalStock }}
+                <mat-icon class="trend">arrow_upward</mat-icon>
+              </div>
+            </mat-card>
+
+            <mat-card class="stat-card green">
+              <div class="label">Clientes</div>
+              <div class="value">
+                {{ totalClientes }}
+                <mat-icon class="trend">arrow_upward</mat-icon>
+              </div>
+            </mat-card>
+
+            <mat-card class="stat-card orange">
+              <div class="label">Proveedores</div>
+              <div class="value">
+                {{ totalProveedores }}
+                <mat-icon class="trend">arrow_upward</mat-icon>
+              </div>
+            </mat-card>
+          </div>
+
+          <div class="dashboard-grid">
+            <!-- gráfico reservas -->
+            <mat-card class="panel">
+              <mat-card-title>Reservas realizadas</mat-card-title>
+              <canvas baseChart *ngIf="chartData"
+                      [data]="chartData"
+                      [options]="chartOptions"
+                      chartType="line">
+              </canvas>
+            </mat-card>
+
+            <!-- top servicios -->
+            <mat-card class="panel">
+              <mat-card-title>Servicios más solicitados</mat-card-title>
+              <ol class="top-list">
+                <li *ngFor="let s of topServicios; let i = index"
+                    [class]="'rank-' + i">
+                  <span class="dot"></span>
+                  <span class="name">{{ s.nombre }}</span>
+                  <span class="badge">{{ s.total }}</span>
+                </li>
+              </ol>
+            </mat-card>
+          </div>
+
+        </ng-container>
+
+        <!-- ② LISTADO DE ADMINISTRADORES -->
+        <ng-container *ngSwitchCase="'admin'">
+          <!-- el propio componente emite (cerrar) si quieres volver -->
+          <app-listaadministrador (cerrar)="setView('dashboard')"></app-listaadministrador>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'cliente'">
+  <app-listarclientes (cerrar)="setView('dashboard')"></app-listarclientes>
+</ng-container>
+
+        <ng-container *ngSwitchCase="'cargos'">
+          <!-- el propio componente emite (cerrar) si quieres volver -->
+          <app-listarcargos (cerrar)="setView('dashboard')"></app-listarcargos>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'empleados'">
+          <!-- el propio componente emite (cerrar) si quieres volver -->
+          <app-listadoempleados (cerrar)="setView('dashboard')"></app-listadoempleados>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'proveedores'">
+          <!-- el propio componente emite (cerrar) si quieres volver -->
+          <app-listarproveedor (cerrar)="setView('dashboard')"></app-listarproveedor>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'prod-general'">
+  <app-listarproductos (cerrar)="setView('dashboard')"> </app-listarproductos>
+</ng-container>
+
+<ng-container *ngSwitchCase="'prod-cat'">
+  <app-listarproductos [idCatParam]="selectedCatId"(cerrar)="setView('dashboard')"> </app-listarproductos>
+</ng-container>
+
+<ng-container *ngSwitchCase="'tipos'">
+          <!-- el propio componente emite (cerrar) si quieres volver -->
+          <app-listacatering (cerrar)="setView('dashboard')"></app-listacatering>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'servicios'">
+          <!-- el propio componente emite (cerrar) si quieres volver -->
+          <app-listarservicio (cerrar)="setView('dashboard')"></app-listarservicio>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'menus'">
+          <!-- el propio componente emite (cerrar) si quieres volver -->
+          <app-listarmenus (cerrar)="setView('dashboard')"></app-listarmenus>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'reservas'">
+          <!-- el propio componente emite (cerrar) si quieres volver -->
+          <app-listar-reservas (cerrar)="setView('dashboard')"></app-listar-reservas>
+        </ng-container>
+
+        
+
+      </ng-container>
+      <!-- **********   FIN DEL SWITCH   ********** -->
+
+    </div> <!-- /content-wrapper -->
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,EventEmitter, Output } from '@angular/core';
 import { ClientesService } from '../../services/clientes.service';
+import { PageEvent } from '@angular/material/paginator'; 
 @Component({
   selector: 'app-listarclientes',
   standalone: false,
@@ -13,6 +14,13 @@ export class ListarclientesComponent implements OnInit {
   searchTerm: string = '';
   isEditMode: boolean = false;
   cliSeleccionado: any = null;
+  displayedClientes: any[] = [];
+  pageSize = 5;
+  pageIndex = 0;
+
+
+  @Output() cerrar = new EventEmitter<void>();
+  volver(){ this.cerrar.emit(); }
 
   constructor(private clienteService: ClientesService) {}
 
@@ -27,6 +35,7 @@ export class ListarclientesComponent implements OnInit {
       next: (data) => {
         this.cliente = data;
         this.cliFiltrados = data;
+        this.updatePagedData();  
       },
       error: (err) => {
         console.error('Error al obtener clientes', err);
@@ -44,7 +53,23 @@ export class ListarclientesComponent implements OnInit {
         cliente.ci.toLowerCase().includes(searchTermLower) // Filtra también por código
       );
     }
+
+    this.pageIndex = 0;                 // resetea a la 1.ª página
+    this.updatePagedData();
   }
+
+   pageChanged(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize  = event.pageSize;    // (sigue siendo 10)
+    this.updatePagedData();
+  }
+  
+  private updatePagedData(): void {
+    const start = this.pageIndex * this.pageSize;
+    const end   = start + this.pageSize;
+    this.displayedClientes = this.cliFiltrados.slice(start, end);
+  }
+
 
   editarClientes(cliente: any): void {
     this.isEditMode = true;
@@ -89,6 +114,8 @@ export class ListarclientesComponent implements OnInit {
       next: (data) => {
         this.cliente = data;
         this.cliFiltrados = data;
+        this.pageIndex = 0;          // ← vuelvo a la primera página
+      this.updatePagedData(); 
       },
       error: (err) => {
         console.error('Error al obtener clientes:', err);

@@ -1,190 +1,308 @@
-body {
-  margin: 0;
-  padding: 0;
-  background-color: white; /* Cambia "white" por cualquier color que desees */
-  font-family: 'Roboto', sans-serif; /* Opcional, para asegurar consistencia con tu fuente */
+/* ────────────────────────────────────────────────────────────────
+   admin.component.css  (versión completa con .menu-principal)
+   ────────────────────────────────────────────────────────────────*/
+
+/* 0) Host ocupa toda la ventana, sin márgenes */
+:host{
+  display:block;
+  height:100vh;
+  margin:0;
+  padding:0;
+  font-family:"Roboto",sans-serif;
 }
 
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #333; /* color de fondo oscuro */
-  position: fixed;        /* la fijamos arriba */
-  top: 0;                 /* empieza en la parte superior */
-  width: 100%;            /* ocupa todo el ancho */
-  z-index: 9999;          /* que quede sobre otros elementos */
-  border: none;           /* quita el borde si no lo quieres */
+/* 1) Toolbar fija arriba */
+:host ::ng-deep .mat-toolbar.toolbar{
+  position:fixed;
+  top:0;left:0;right:0;
+  height:64px;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+  z-index:1000;
+  background:#3f51b5;
+  color:#fff;
+  font-size:16px;
+  font-weight:500;
 }
 
-/* Links dentro de la barra */
-li {
-  float: left;
-}
-li a {
-  display: block;
-  color: white;         /* texto en blanco */
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-li a:hover {
-  background-color: #111;
+/* 2) Empuja iconos/botones a la derecha */
+.spacer{flex:1 1 auto;}
+
+/* 3) Título dentro de la toolbar */
+.app-title{
+  margin-left:8px;
+  font-size:1.25rem;
+  font-weight:500;
 }
 
-ul li a.profile {
-  display: flex;
-  align-items: center;
-  padding: 14px 16px;
-  color: white;
-  text-decoration: none;
+/* 4) Sidebar fija bajo toolbar */
+:host ::ng-deep .mat-sidenav{
+  position:fixed !important;
+  top:64px;bottom:0;left:0;
+  overflow-y:auto;
+  background:#fff;
+  box-shadow:2px 0 5px rgba(0,0,0,.1);
+  transition:transform .25s ease,width .25s ease;          /* animación */
+}
+/* 5) Contenido principal desplazado por toolbar+sidebar */
+:host ::ng-deep .mat-sidenav-content{
+  margin-top:64px;
+  height:calc(100vh - 64px);
+  overflow-y:auto;
+  background:#f5f5f5;
+  transition:margin .25s ease;                               /* animación */
 }
 
-ul li a.profile i {
-  margin-right: 8px; /* Espacio entre icono y texto */
+:host ::ng-deep .mat-sidenav.mat-drawer-opened{
+  width:240px !important;                                    /* ancho normal */
+  transform:translateX(0) !important;
+}
+:host ::ng-deep .mat-drawer-opened + .mat-drawer-content{
+  margin-left:240px !important;
 }
 
-ul li a.logout {
-  display: flex;
-  align-items: center;
-  padding: 14px 16px;
-  color: white;
-  text-decoration: none;
-}
-ul li a.logout:hover {
-  background-color: #111;
+/* ⭐ ESTADO CERRADO (cuando haces drawer.toggle()) */
+:host ::ng-deep .mat-sidenav.mat-drawer-closed{
+  width:64px !important;                                     /* “mini-bar”  */
+  /* default de Angular era translateX(-100%); lo ajustamos:      */
+  transform:translateX(calc(-100% + 64px)) !important;        /* deja 64 px visible */
 }
 
-
-* {
-  box-sizing: border-box;
+/* el contenido se recoloca con el selector hermano + ------------ */
+:host ::ng-deep .mat-drawer-closed + .mat-drawer-content{
+  margin-left:64px !important;
 }
 
-/* Asegúrate de que no haya reglas duplicadas para 'body' */
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  /* Podrías darle un padding-top de ~48px para no tapar el contenido */
-  padding-top: 48px;  /* Ajusta según la altura real de tu barra */
+/* ⭐ OCULTAR texto y flechas cuando está cerrado ----------------- */
+:host ::ng-deep .mat-drawer-closed span,
+:host ::ng-deep .mat-drawer-closed .mdc-list-item__primary-text,
+:host ::ng-deep .mat-drawer-closed .expand-icon{
+  display:none;
 }
 
-/* Style the side navigation */
-.sidenav {
-  position: fixed;
-  top: 48px;       /* Inicia debajo de la barra (que mide ~48px) */
-  left: 0;
-  width: 200px;
-  height: calc(100% - 48px); /* Ajusta la altura */
-  background-color: #111;
-  overflow-x: hidden;
+/* Iconos centrados en la columna de 64 px ------------------------ */
+:host ::ng-deep .mat-drawer-closed mat-icon[matListIcon]{
+  margin-right:0;
+  justify-content:center;
 }
 
-/* Side navigation links */
-.sidenav a {
-  color: white;
-  padding: 16px;
-  text-decoration: none;
-  display: block;
+/* 6) Wrapper interior */
+.content-wrapper{padding:16px;box-sizing:border-box;}
+
+/* 7) Estilo base para TODOS los list-items (menú + submenú) */
+:host ::ng-deep mat-list-item,
+:host ::ng-deep .mat-mdc-list-item{
+  height:48px;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+  font-size:16px;
+  font-weight:500;
+  cursor:pointer;
+  transition:background .2s;
+}
+:host ::ng-deep mat-list-item:hover,
+:host ::ng-deep .mat-mdc-list-item:hover{
+  background:rgba(211,40,40,.04);
 }
 
-/* Change color on hover */
-.sidenav a:hover {
-  background-color: #ddd;
-  color: black;
+/* 7.1) Icono genérico */
+:host ::ng-deep mat-list-item mat-icon[matListIcon],
+:host ::ng-deep .mat-mdc-list-item mat-icon[matListIcon]{
+  font-size:22px;
+  margin-right:12px;
+  color:#000;
+  display:inline-flex;
+  align-items:center;
 }
 
-/* Style the content */
-.content {
-  margin-left: 200px;
-  padding-left: 20px;
+/* 7.2) Flecha expandible (comportamiento base) */
+:host ::ng-deep mat-list-item .expand-icon,
+:host ::ng-deep .mat-mdc-list-item .expand-icon{
+  position:absolute;                 /* anclada al list-item           */
+  right:16px;                        /* misma separación que padding   */
+  top:50%;                           /* centro vertical                */
+  transform:translateY(-50%);        /* corrige la mitad de su alto    */
+  font-size:20px;transition:transform .25s;
+  width:24px;height:24px;            /* garantiza misma “columna”      */
+  display:inline-flex;align-items:center;justify-content:center;
+}
+:host ::ng-deep mat-list-item.open .expand-icon,
+:host ::ng-deep .mat-mdc-list-item.open .expand-icon{
+  transform:translateY(-50%) rotate(180deg); /* rota sin desalinear */
 }
 
-/* Nueva clase para submenús */
-.submenu {
-  margin-left: 15px; 
-}
-.campana-container {
-  position: relative;
-  display: inline-block;
-  color: white;
-  text-decoration: none;
-  padding: 14px 16px;
-}
+/* ────────────────────────────────────────────────────────────────
+   7.3) MENÚ PRINCIPAL (.menu-principal)
+   ────────────────────────────────────────────────────────────────*/
 
-
-
-.campana-container i {
-  font-size: 24px;
-  vertical-align: middle;
+/* Variables fáciles de editar */
+:root{
+  --mp-font-size:17px;       /* tamaño de texto de primer nivel   */
+  --mp-font-color:#0d47a1;   /* color   de texto de primer nivel  */
+  --mp-icon-size:24px;       /* tamaño del icono                  */
 }
 
-/* El circulito rojo */
-.badge {
-  position: absolute;
-  top: 2px;     /* Ajusta hasta que quede pegado a la campana */
-  right: 4px;   /* Muévelo un poco más a la izquierda/derecha */
-  width: 18px;   /* Tamaño del círculo */
-  height: 18px;
-  background: red;
-  color: white;
-  font-size: 12px;
-  border-radius: 50%;
-  display: flex; 
-  
-  align-items: center;     /* Centra verticalmente */
-  justify-content: center;  /* Centra verticalmente */
-  font-weight: bold;
-}
-.content-admin {
-  margin-left: 200px;
-  padding-left: 20px;
-  padding-top: 60px;
+/* Texto del menú principal */
+:host ::ng-deep mat-list-item.menu-principal .mdc-list-item__primary-text{
+  font-size:15px !important;
+  color:#080808 !important;
+  font-weight:600;
+  font-family:"Roboto",sans-serif;
+  font-weight: 150;
 }
 
-/* Estilo del contorno en blanco */
-.content-main {
-  background: #fff;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
-  text-align: center;
-  position: relative;
+/* Icono del menú principal */
+:host ::ng-deep mat-list-item.menu-principal mat-icon[matListIcon]{
+  font-size:20px; 
+  margin-right:12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--mp-font-color);
 }
 
-.content-main img {
-  width: 40%;
-  border-radius: 200px;
-  margin-top: 50px;
+/* Flecha centrada verticalmente */
+:host ::ng-deep mat-list-item.menu-principal .expand-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.content-main h1,
-.content-main p {
-  color: #333;
+/* ────────────────────────────────────────────────────────────────
+   8) SUBMENÚS
+   ────────────────────────────────────────────────────────────────*/
+
+:host ::ng-deep .submenu{background:#fafafa;}
+
+/* contenedor del sub-item */
+:host ::ng-deep .submenu a.mat-list-item,
+:host ::ng-deep .submenu a.mat-mdc-list-item,
+:host ::ng-deep .submenu .mat-mdc-list-item{
+  height:34px;
+  padding-left:48px !important;
+  transition:background .2s;
 }
 
-.content-main h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
+/* texto REAL (clase MDC) */
+:host ::ng-deep .submenu .mdc-list-item__primary-text{
+  font-size:14px !important;
+  font-weight:500;
+  color:#535554 !important;
 }
 
-
-.content-main p {
-  font-size: 1.2rem;
-  margin-top: 20px;
+/* icono sub-menú */
+:host ::ng-deep .submenu mat-icon[matListIcon]{
+  font-size:20px;
+  margin-right:12px;
+  color:#535554 !important;
+  display:inline-flex;
+  align-items:center;
 }
 
-/* Fondo de la imagen de bienvenida */
-.background-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url('https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/244667863_115293174241931_2042471049205914810_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=8_Wqj8usErYQ7kNvgFrFLFE&_nc_oc=AdgLunbNPIccLEhHseo9CkWC1oBt5vA8mRpT1fhAXKthLm2bCpQuxsbWvGlmz6Y6Ozw&_nc_zt=23&_nc_ht=scontent.fuio35-1.fna&_nc_gid=AFacjW9VJpguFPC2WbxE4Pm&oh=00_AYB92mMFtq-mfdUZ9SMPAhBKMVKBdy8-vvz6cB6xHpEKpw&oe=67B2A9E2');
-  background-size: cover;
-  background-position: center;
-  z-index: -1;
-  filter: blur(8px);
+/* hover sub-menú */
+:host ::ng-deep .submenu a.mat-list-item:hover,
+:host ::ng-deep .submenu a.mat-mdc-list-item:hover{
+  background:rgba(37,180,37,.08);
 }
+
+/* ────────────────────────────────────────────────────────────────
+   9) Layout dashboard (sin cambios)
+   ────────────────────────────────────────────────────────────────*/
+.stats-row{
+  display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;
+}
+.stat-card{
+  position:relative;overflow:hidden;
+  flex:1 1 220px;min-width:180px;
+  padding:18px 20px;color:#fff;border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,.12);
+  isolation:isolate;                  /* para stacking context  */
+  transition:transform .25s;
+}
+.stat-card:hover{ transform:translateY(-3px); }
+
+.stat-card .label{
+  font-size:14px;font-weight:500;opacity:.9;
+  letter-spacing:.4px;
+}
+.stat-card .value{
+  display:flex;align-items:center;gap:6px;
+  font-size:32px;font-weight:700;margin-top:6px;
+}
+.stat-card .trend{font-size:22px;opacity:.85;}
+
+/*  ░░  fondos gradiente  ░░ */
+.blue  {background:linear-gradient(135deg,#a3d9db 0%,#39d7e2 100%);}
+.green {background:linear-gradient(135deg,#b1a2b6 0%,#a11ebb 100%);}
+.orange{background:linear-gradient(135deg,#8a8988 0%,#353434 100%);}
+
+/*  ░░  círculos decorativos  ░░ */
+.stat-card::before,
+.stat-card::after{
+  content:"";position:absolute;border-radius:50%;
+  pointer-events:none;mix-blend-mode:soft-light;
+}
+.stat-card::before{
+  width:220%;height:220%;
+  top:-60%;right:-60%;
+  background:rgba(255,255,255,.15);
+}
+.stat-card::after{
+  width:180%;height:180%;
+  bottom:-50%;left:-50%;
+  border:2px solid rgba(255,255,255,.25);
+}
+
+/*  flecha verde ↑ si deseas otra lógica cámbiala con ngClass  */
+.blue  .trend,
+.green .trend,
+.orange.trend{color:#fff;}
+/* ───────── Paneles grid ───────── */
+.dashboard-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;
+}
+.panel{padding:16px;border-radius:8px;}
+.panel canvas{width:100% !important;max-height:280px;}
+
+.top-list{margin:0;padding:0 0 0 16px;}
+.top-list li{display:flex;justify-content:space-between;margin:4px 0;}
+.badge{background:#ececec;border-radius:12px;padding:2px 8px;font-weight:600;}
+@media(max-width:900px){
+  .dashboard-grid{grid-template-columns:1fr;}
+}
+
+.top-list{
+  list-style:none;margin:0;padding:8px 0;
+}
+.top-list li{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 4px; font-size:15px; font-weight:500;
+}
+
+/* puntito de color */
+.top-list .dot{
+  width:10px;height:10px;border-radius:50%;margin-right:8px;
+  flex-shrink:0;
+}
+/* nombre del servicio */
+.top-list .name{
+  flex:1;           /* ocupa todo el espacio intermedio */
+  padding-left:4px;
+}
+
+/* badge numérico */
+.top-list .badge{
+  background:#f1f1f1;color:#555;font-size:13px;
+  padding:2px 10px;border-radius:12px;font-weight:600;
+  min-width:44px;text-align:center;
+}
+
+/* Colores distintos para cada fila (máx. 6) */
+.rank-0 .dot{ background:#00bcd4;}  /* cyan   */
+.rank-1 .dot{ background:#ff9800;}  /* orange */
+.rank-2 .dot{ background:#e91e63;}  /* pink   */
+.rank-3 .dot{ background:#8e24aa;}  /* purple */
+.rank-4 .dot{ background:#2196f3;}  /* blue   */
+.rank-5 .dot{ background:#607d8b;}  /* grey   */
