@@ -1,6 +1,8 @@
 import { Component, OnInit,EventEmitter, Output } from '@angular/core';
 import { ClientesService } from '../../services/clientes.service';
 import { PageEvent } from '@angular/material/paginator'; 
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 @Component({
   selector: 'app-listarclientes',
   standalone: false,
@@ -127,5 +129,62 @@ export class ListarclientesComponent implements OnInit {
     this.searchTerm = '';
     this.cargarLista();
   }
+
+  downloadPdf(): void {
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  /* 1) Encabezado corporativo ------------------------------------------------ */
+  const headerLines = [
+    { txt: 'DAAYFOOD S.A.S', size: 16, bold: true  },
+    { txt: 'Dirección: Dayuma, Vía principal, Calle C N/A y Km 40', size: 11 },
+    { txt: 'Orellana-Ecuador', size: 11 },
+    { txt: 'Teléfonos: 0992268003 – 0989989254', size: 11 }
+  ];
+
+  let y = 36;                               // margen superior
+  headerLines.forEach(line => {
+    doc.setFontSize(line.size);
+    doc.setFont('helvetica', line.bold ? 'bold' : 'normal');
+    doc.text(line.txt, pageWidth / 2, y, { align: 'center' });
+    y += 16;                                // siguiente línea
+  });
+
+  /* Título de la tabla */
+  y += 8;
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.text('LISTADO DE CLIENTES', pageWidth / 2, y, { align: 'center' });
+  y += 18;
+
+  /* 2) Datos ----------------------------------------------------------------- */
+  const headers = [[
+    'Código', 'Cédula', 'Nombre', 'Dirección', 'Correo Electrónico', 'Teléfono'
+  ]];
+
+  const body = this.cliFiltrados.map(cli => [
+    cli.codigocliente, cli.ci, cli.nombre,
+    cli.direccion, cli.e_mail, cli.telefono
+  ]);
+
+  /* 3) autoTable ------------------------------------------------------------- */
+  autoTable(doc, {
+    head: headers,
+    body,
+    startY: y,
+    theme: 'grid',
+    headStyles: {
+      fillColor: [63, 81, 181],
+      textColor: 255,
+      halign: 'center',
+      fontStyle: 'bold'
+    },
+    bodyStyles: { fontSize: 10, textColor: 60 },
+    styles: { cellPadding: 4, overflow: 'linebreak' }
+  });
+
+  /* 4) Descargar ------------------------------------------------------------- */
+  doc.save('clientes.pdf');
+}
 }
 

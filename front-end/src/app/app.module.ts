@@ -24,6 +24,10 @@ import { LayoutModule }     from '@angular/cdk/layout';
 import { MatToolbarModule }   from '@angular/material/toolbar';
 import { MatBadgeModule }     from '@angular/material/badge';
 import { MatMenuModule }      from '@angular/material/menu';
+import { MatDatepickerModule }  from '@angular/material/datepicker';
+import { MatNativeDateModule }  from '@angular/material/core';
+
+
 
 
 
@@ -77,6 +81,7 @@ import { ContactoComponent } from './componentsCliente/contacto/contacto.compone
 import { AsistenteVirtualComponent } from './componentsCliente/asistente-virtual/asistente-virtual.component';
 import { GestionProductosComponent } from './components/gestion-productos/gestion-productos.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { PagosDialogComponent } from './components/pagos-dialog/pagos-dialog.component';
 
 
 
@@ -125,6 +130,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     ContactoComponent,
     AsistenteVirtualComponent,
     GestionProductosComponent,
+    PagosDialogComponent,
     
     
   
@@ -157,7 +163,9 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatToolbarModule,
     MatBadgeModule,
     NgChartsModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatDatepickerModule,
+    MatNativeDateModule
     
     
     

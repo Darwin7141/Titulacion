@@ -1,116 +1,192 @@
-<!-- ═══════════ LISTA DE RESERVAS (unificada al estilo dashboard) ═══════════ -->
+<!-- ═══════════ LISTA DE RESERVAS (dashboard) ═══════════ -->
 <div class="tabla-wrapper">
   <mat-card class="tabla-card">
 
-    <!-- ─────────────── CABECERA / TOOLBAR ─────────────── -->
+    <!-- ──────────────── CABECERA / TOOLBAR ──────────────── -->
     <mat-card-header>
       <div class="toolbar">
 
-        <!-- ··· buscador + icon-buttons ··· -->
-        <div class="left-group">
-          <mat-form-field appearance="outline" class="buscador slim">
-            <mat-icon matPrefix>search</mat-icon>
-            <input  matInput
-                    placeholder="Nombre o código"
-                    [(ngModel)]="searchTerm"
-                    (keyup.enter)="buscarReserva()">
-          </mat-form-field>
+        <!-- ▸ CONTENEDOR COLUMNA IZQUIERDA  (vertical) -->
+        <div class="left-col">
 
-          <button mat-icon-button color="primary"
-                  matTooltip="Buscar"
-                  (click)="buscarReserva()">
-            <mat-icon>search</mat-icon>
-          </button>
+          <!-- ── Fila 1: buscador + icon-buttons ── -->
+          <div class="search-row">
+            <mat-form-field appearance="outline" class="buscador slim">
+              <mat-icon matPrefix>search</mat-icon>
+              <input  matInput
+                      placeholder="Nombre o código"
+                      [(ngModel)]="searchTerm"
+                      (keyup.enter)="buscarReserva()" />
+            </mat-form-field>
 
-          <button mat-icon-button color="primary"
-                  matTooltip="Recargar"
-                  (click)="recargarLista()">
-            <mat-icon>refresh</mat-icon>
-          </button>
+            <button mat-icon-button color="primary"
+                    matTooltip="Buscar"
+                    (click)="buscarReserva()">
+              <mat-icon>search</mat-icon>
+            </button>
 
-        
-        </div>
+            <button mat-icon-button color="primary"
+                    matTooltip="Recargar"
+                    (click)="recargarLista()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          </div>
 
-        
+          <!-- ── Fila 2: Ver pagos + filtros ── -->
+          <div class="pagos-row">
+
+            <!-- botón principal -->
+            <button mat-raised-button color="primary"
+                    class="btn-pagos-main"
+                    (click)="togglePagosPanel()">
+              <mat-icon>attach_money</mat-icon>
+              <span>Ver pagos</span>
+            </button>
+
+            <!-- filtros – sólo visibles cuando showPagosPanel === true -->
+            <ng-container *ngIf="showPagosPanel">
+
+              <!-- DESDE -->
+              <mat-form-field appearance="outline" class="date-field">
+  <input  matInput
+          placeholder="Desde"
+          [matDatepicker]="dpDesde"
+          [(ngModel)]="dateRange.desde" />
+  <mat-datepicker-toggle matSuffix [for]="dpDesde"></mat-datepicker-toggle>
+  <mat-datepicker #dpDesde></mat-datepicker>
+</mat-form-field>
+
+<!-- HASTA -->
+<mat-form-field appearance="outline" class="date-field">
+  <input  matInput
+          placeholder="Hasta"
+          [matDatepicker]="dpHasta"
+          [(ngModel)]="dateRange.hasta" />
+  <mat-datepicker-toggle matSuffix [for]="dpHasta"></mat-datepicker-toggle>
+  <mat-datepicker #dpHasta></mat-datepicker>
+</mat-form-field>
+
+              <button mat-raised-button color="primary"
+                      class="btn-filtrar"
+                      (click)="filtrarPagos()">
+                Filtrar
+              </button>
+
+              
+
+            </ng-container>
+
+          </div> <!-- /pagos-row -->
+
+        </div> <!-- /left-col -->
+
       </div>
     </mat-card-header>
 
-    <!-- ───────────────────── TABLA ───────────────────── -->
-    <mat-card-content>
+    <!-- ─────────────── CONTENIDO (tabla) ─────────────── -->
+    <mat-card-content class="table-container">
 
-      <table class="admin-table" *ngIf="displayedReservas.length > 0">
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Cédula</th>
-            <th>Cliente</th>
-            <th>Dirección</th>
-            <th>Fecha Evento</th>
-            <th>Cant. Personas</th>
-            <th>Total</th>
-            <th>1.º Pago</th>
-            <th>2.º Pago</th>
-            <th>Saldo</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
+      <div class="table-scroll">
 
-        <tbody>
-          <tr *ngFor="let res of displayedReservas">
-            <td>{{ res.idreserva }}</td>
-            <td>{{ res.cliente.ci }}</td>
-            <td>{{ res.cliente.nombre }}</td>
-            <td>{{ res.direccionevento }}</td>
-            <td>{{ res.fechaevento | date:'shortDate' }}</td>
-            <td>{{ res.cantpersonas }}</td>
-            <td>{{ res.total | currency:'USD':'symbol' }}</td>
-            <td>{{ res.primer_pago | currency:'USD':'symbol' }}</td>
-            <td>{{ res.segundo_pago | currency:'USD':'symbol' }}</td>
-            <td>{{ res.saldo_pendiente | currency:'USD':'symbol' }}</td>
+        <!-- ───────────────────── TABLA RESERVAS ───────────────────── -->
+        <table class="admin-table" *ngIf="displayedReservas.length > 0">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Cédula</th>
+              <th>Cliente</th>
+              <th>Dirección</th>
+              <th>Fecha Evento</th>
+              <th>Cant. Personas</th>
+              <th>Total</th>
+              <th>1.º&nbsp;Pago</th>
+              <th>2.º&nbsp;Pago</th>
+              <th>Saldo</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
 
-            <!-- selector de estado inline -->
-            <td>
-              <mat-form-field appearance="outline" class="estado-select">
-                <mat-select [(ngModel)]="res.idestado">
-                  <mat-option *ngFor="let est of estadosReserva"
-                              [value]="est.idestado">
-                    {{ est.estado_reserva }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </td>
+          <tbody>
+            <tr *ngFor="let res of displayedReservas">
+              <td>{{ res.idreserva }}</td>
+              <td>{{ res.cliente.ci }}</td>
+              <td>{{ res.cliente.nombre }}</td>
+              <td>{{ res.direccionevento }}</td>
+              <td>{{ res.fechaevento | date:'shortDate' }}</td>
+              <td>{{ res.cantpersonas }}</td>
+              <td>{{ res.total | currency:'USD':'symbol' }}</td>
+              <td>{{ res.primer_pago | currency:'USD':'symbol' }}</td>
+              <td>{{ res.segundo_pago | currency:'USD':'symbol' }}</td>
+              <td>{{ res.saldo_pendiente | currency:'USD':'symbol' }}</td>
 
-            <td class="acciones-col">
-              <button mat-icon-button color="primary"
-                      matTooltip="Guardar cambio de estado"
-                      (click)="guardarEstadoReserva(res)">
-                <mat-icon>save</mat-icon>
-              </button>
+              <!-- selector de estado -->
+              <td>
+                <mat-form-field appearance="outline" class="estado-select">
+                  <mat-select [(ngModel)]="res.idestado">
+                    <mat-option *ngFor="let est of estadosReserva"
+                                [value]="est.idestado">
+                      {{ est.estado_reserva }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </td>
 
-              <button mat-icon-button color="warn"
-                      matTooltip="Eliminar reserva"
-                      (click)="eliminarReserva(res.idreserva)">
-                <mat-icon>delete</mat-icon>
-              </button>
+              <!-- acciones -->
+              <td class="acciones-col">
+                <button mat-icon-button color="primary"
+                        matTooltip="Guardar cambio de estado"
+                        (click)="guardarEstadoReserva(res)">
+                  <mat-icon>save</mat-icon>
+                </button>
 
-              <button mat-icon-button color="accent"
-                      matTooltip="Ver detalles"
-                      (click)="verDetalles(res.idreserva)">
-                <mat-icon>visibility</mat-icon>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <button mat-icon-button color="warn"
+                        matTooltip="Eliminar reserva"
+                        (click)="eliminarReserva(res.idreserva)">
+                  <mat-icon>delete</mat-icon>
+                </button>
 
-      <!-- mensaje “sin resultados” -->
-      <p class="no-data"
-         *ngIf="displayedReservas.length === 0 && searchTerm">
-        No se encontró ninguna reserva con la información proporcionada.
-      </p>
+                <button mat-icon-button color="accent"
+                        matTooltip="Ver detalles"
+                        (click)="verDetalles(res.idreserva)">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-      <!-- paginador Material -->
+        <!-- mensaje sin resultados -->
+        <p class="no-data"
+           *ngIf="displayedReservas.length === 0 && searchTerm">
+          No se encontró ninguna reserva con la información proporcionada.
+        </p>
+      </div> <!-- /table-scroll -->
+
+      <!-- botón Descargar (listado) -->
+      <button mat-raised-button color="accent"
+              class="btn-download"
+              [matMenuTriggerFor]="menuDescargar">
+        <mat-icon>file_download</mat-icon>
+        <span>Descargar</span>
+      </button>
+
+      <!-- menú de descarga -->
+      <mat-menu #menuDescargar="matMenu">
+        <button mat-menu-item (click)="downloadPdf()">
+          <mat-icon>list_alt</mat-icon>
+          <span>Listado completo</span>
+        </button>
+        <mat-divider></mat-divider>
+        <ng-container *ngFor="let est of estadosReserva">
+          <button mat-menu-item (click)="downloadPdf(est.idestado)">
+            <mat-icon>filter_alt</mat-icon>
+            <span>{{ est.estado_reserva }}</span>
+          </button>
+        </ng-container>
+      </mat-menu>
+
+      <!-- paginador -->
       <mat-paginator
         [length]="resFiltrados.length"
         [pageSize]="pageSize"
@@ -118,12 +194,12 @@
         (page)="pageChanged($event)">
       </mat-paginator>
 
-      <button mat-icon-button
-          class="btn-back"
-          matTooltip="Volver"
-          (click)="volver()">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
+      <!-- botón volver -->
+      <button mat-icon-button class="btn-back"
+              matTooltip="Volver"
+              (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
 
     </mat-card-content>
   </mat-card>

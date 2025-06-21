@@ -1,0 +1,55 @@
+/* ===== contenedor: alto máx. y scroll vertical ===== */
+
+
+.tabla-wrapper.mini{
+  max-height: 440px;          /* ajusta a tu gusto          */
+  overflow-y: auto;           /* scroll si es necesario     */
+}
+
+/* ===== tabla ===== */
+.admin-table{
+  min-width: 620px;           /* ← evita que colapse        */
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+}
+
+.admin-table th,
+.admin-table td{
+  padding: 6px 14px;
+  border-bottom: 1px solid #e8e8e8;
+  white-space: nowrap;
+}
+
+.admin-table thead th{
+  text-align: left;
+  background: #fafafa;
+  font-weight: 600;
+  color: #666;
+}
+
+.admin-table tbody tr:hover{
+  background: #f9fbff;
+}
+
+.right{ text-align: right; }
+
+/* total */
+.total-row{
+  font-weight: 600;
+  background: #f3f3f3;
+}
+
+/* ===== botones ===== */
+.btns{
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  padding-top: 16px;
+  
+}
+.admin-table thead th:last-child{
+  text-align: right;
+}
+

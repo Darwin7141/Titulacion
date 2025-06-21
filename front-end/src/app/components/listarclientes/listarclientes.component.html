@@ -81,13 +81,21 @@
   </table>
 
   <!-- paginador: 10 filas por página -->
-  <mat-paginator
+  <button mat-raised-button
+        color="accent"
+        class="btn-download"
+        (click)="downloadPdf()">
+  <mat-icon>file_download</mat-icon>
+  <span>Descargar</span>
+</button>
+
+<!-- Paginador permanece idéntico y centrado -->
+<mat-paginator
     [length]="cliFiltrados.length"
     [pageSize]="pageSize"
     [pageSizeOptions]="[10]"
     (page)="pageChanged($event)">
-  </mat-paginator>
-
+</mat-paginator>
   <!-- mensaje “sin resultados” -->
   <p class="no-data" *ngIf="cliFiltrados.length === 0">
     No hay resultados.

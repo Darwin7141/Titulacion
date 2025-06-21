@@ -1,0 +1,35 @@
+<h3 mat-dialog-title>Pagos Recibidos</h3>
+
+<!-- contenedor con scroll -->
+<div class="tabla-wrapper mini">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>Fecha</th>
+        <th>Reserva</th>
+        <th>Monto</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let p of data.pagos">
+        <td>{{ p.cliente }}</td>
+        <td>{{ p.fecha   | date:'shortDate' }}</td>
+        <td>{{ p.reserva }}</td>
+        <td class="right">{{ p.monto | currency:'USD':'symbol' }}</td>
+      </tr>
+
+      <!-- 4 columnas ⇒ colspan = 3 -->
+      <tr class="total-row">
+        <td colspan="3">TOTAL</td>
+        <td class="right">{{ data.total | currency:'USD':'symbol' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="btns">
+  <button mat-stroked-button (click)="cerrar()">Cerrar</button>
+  <button mat-raised-button color="primary" (click)="downloadPdf()">PDF</button>
+</div>

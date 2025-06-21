@@ -213,3 +213,95 @@
 
 :host ::ng-deep .mat-paginator-range-label,
 :host ::ng-deep .mat-mdc-paginator-range-label{ display:none!important; }
+
+.btn-download{
+  position: absolute;      /* lo sacamos del flujo */
+  left: 14px;                 /* pegado a la izquierda */
+  bottom: 115px;            /* misma línea que el paginador */
+  height: 36px;
+  line-height: 36px;
+  min-width: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #788378; 
+  
+}
+.btn-download mat-icon{margin-right:4px;}
+
+----------------------------------------
+/* botón Ver pagos */
+/* contenedor horizontal desplazable */
+/* —————————————————————————————————————————————
+   BLOQUE «VER PAGOS» (fila bajo la toolbar)
+   ————————————————————————————————————————————— */
+.pagos-row{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:40px;   /* ← súbelo a 32 – 40 px según tu gusto */
+  
+}
+
+/* separación adicional SOLO entre los dos date-pickers, si la quieres: */
+.date-field + .date-field{
+  margin-left:16px;   /* empuja el segundo date-picker respecto al primero */
+}
+
+/* y, si los botones también necesitan más “aire” de los date-pickers: */
+.date-field:first-of-type{
+  margin-right:8px;   /* distancia entre “Desde” y “Filtrar”              */
+}
+
+/* botón */
+.btn-pagos-main{
+  height:36px;line-height:36px;
+  display:flex;align-items:center;gap:6px;
+   margin-bottom: 14px;
+}
+
+.btn-filtrar{
+  margin-left:24px;   /* ajusta el valor a tu gusto (px) */
+}
+
+/* —————————————————————
+   DATE-PICKERS con estilo pill
+   ————————————————————— */
+        /* ancho parecido al buscador */
+
+/* caja “pill” */
+:host ::ng-deep .date-field .mdc-text-field{
+  height:36px!important;
+  padding:0 10px;
+  border:1px solid #b0c6e8;
+  border-radius:18px;
+  background:#fff;
+  display:flex;align-items:center;
+  box-sizing:border-box;
+}
+/* quito todo el notch/outline Material */
+:host ::ng-deep .date-field
+  .mdc-notched-outline__leading,
+:host ::ng-deep .date-field
+  .mdc-notched-outline__trailing,
+:host ::ng-deep .date-field
+  .mdc-notched-outline__notch{
+  display:none!important;
+}
+/* suprimo la ‘line-ripple’ que da el realce azul */
+:host ::ng-deep .date-field .mdc-line-ripple{
+  display:none!important;
+}
+
+/* ajusto la zona de texto interna */
+:host ::ng-deep .date-field .mat-mdc-form-field-flex,
+:host ::ng-deep .date-field .mat-mdc-form-field-infix{
+  height:36px;
+  padding:0!important;
+  display:flex;align-items:center;
+}
+
+/* icono calendario del mismo tono que el buscador */
+:host ::ng-deep .date-field .mat-mdc-form-field-suffix .mat-icon{
+  font-size:20px;color:#607d8b;
+}

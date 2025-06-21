@@ -2,6 +2,8 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { ServiciocateringService } from '../../services/serviciocatering.service';
 import { TipocateringService } from '../../services/tipocatering.service';
 import { PageEvent } from '@angular/material/paginator';
+import { jsPDF } from 'jspdf';
+import autoTable, { CellHookData }  from 'jspdf-autotable';
 
 @Component({
   selector: 'app-listarservicio',
@@ -163,6 +165,7 @@ volver(): void {
         console.error('Error al actualizar el servicio:', err);
       },
     });
+
   }
 
   
@@ -216,5 +219,101 @@ onNewImageSelected(event: any): void {
     // Aquí podrías generar una vista previa, etc.
   }
 }
+
+private async urlToBase64(url: string): Promise<string> {
+  try {
+    const blob = await fetch(url).then(r => r.blob());
+    return await new Promise<string>(res => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result as string);
+      fr.readAsDataURL(blob);
+    });
+  } catch (e) {
+    console.error('No se pudo convertir la imagen', url, e);
+    return '';
+  }
+}
+
+/* ─────────────────────── UTIL: url → base64 ─────────────────────── */
+async downloadPdf(): Promise<void> {
+
+  /* 0) filas: ‘muestra’ vacío y ‘img’ con la base64  */
+  const filas = await Promise.all(
+    this.servFiltrados.map(async s => ({
+      codigo : s.idservicio,
+      nombre : s.nombre,
+      muestra: '',                                   // ← vacío
+      img    : await this.urlToBase64(s.fotografiaUrl),
+      tipo   : s.tipo.nombre,
+      estado : s.estado.estado
+    }))
+  );
+
+  /* 1) documento + encabezado (sin cambios) */
+  const doc       = new jsPDF({ orientation:'landscape', unit:'pt', format:'a4' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  const header = [
+    { txt:'DAAYFOOD S.A.S', size:16, bold:true },
+    { txt:'Dirección: Dayuma, Vía principal, Calle C N/A y Km 40', size:11 },
+    { txt:'Orellana-Ecuador', size:11 },
+    { txt:'Teléfonos: 0992268003 – 0989989254', size:11 }
+  ];
+  let y = 36;
+  header.forEach(l => {
+    doc.setFontSize(l.size).setFont('helvetica', l.bold?'bold':'normal');
+    doc.text(l.txt, pageWidth/2, y, { align:'center' });
+    y += 16;
+  });
+  y += 8;
+  doc.setFontSize(13).setFont('helvetica','bold')
+     .text('LISTADO DE SERVICIOS', pageWidth/2, y, { align:'center' });
+  y += 18;
+
+  /* 2) definición de columnas */
+  const columnas = [
+    { header:'Código' , dataKey:'codigo'  },
+    { header:'Nombre' , dataKey:'nombre'  },
+    { header:'Muestra', dataKey:'muestra' },
+    { header:'Tipo'   , dataKey:'tipo'    },
+    { header:'Estado' , dataKey:'estado'  }
+  ];
+
+  /* 3) tabla + miniaturas */
+  autoTable(doc, {
+    columns      : columnas,
+    body         : filas,
+    startY       : y,
+    theme        : 'grid',
+    columnStyles : { muestra:{ cellWidth:48 } },
+    headStyles   : { fillColor:[63,81,181], textColor:255,
+                     halign:'center', fontStyle:'bold' },
+    bodyStyles   : { fontSize:10, textColor:60 },
+    styles       : { cellPadding:4 },
+
+    didParseCell: data => {                           // ⬅⬅
+    if (data.column.dataKey === 'muestra' &&
+        data.section === 'body') {
+      data.cell.styles.minCellHeight = 44;          // 40 img + 2 px arriba/abajo
+      data.cell.styles.valign        = 'middle';    // centra texto de otras celdas
+    }
+  },
+
+    didDrawCell: (data: CellHookData) => {
+      if (data.column.dataKey === 'muestra' && data.section === 'body') {
+        const img64 = (data.row.raw as any).img;   // nuestra base64
+        if (!img64) return;
+        const size = 40;
+        const x = data.cell.x + (data.cell.width  - size)/2;
+        const y = data.cell.y + (data.cell.height - size)/2;
+        doc.addImage(img64, 'JPEG', x, y, size, size); // usa 'PNG' si aplica
+      }
+    }
+  });
+
+  /* 4) guardar */
+  doc.save('Servicios.pdf');
+}
+
 }
 

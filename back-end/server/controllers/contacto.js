@@ -5,7 +5,6 @@ const twilio = require('twilio');
 
 
 
-
 function enviarContacto(req, res) {
   try {
     const { nombre, email, celular, serviciosSeleccionados } = req.body;
@@ -31,7 +30,7 @@ function enviarContacto(req, res) {
           - Servicios elegidos: ${serviciosStr}
         `;
 
-        // Enviar correo y WhatsApp EN PARALELO
+        
         const envioCorreo = enviarCorreoEmpresa({ nombre, email, celular, serviciosSeleccionados });
         const envioWhatsApp = client.messages.create({
           from: TWILIO_WHATSAPP_FROM,
@@ -43,12 +42,12 @@ function enviarContacto(req, res) {
         console.log('¡Proceso de correo+WhatsApp completado en background!');
       } catch (errBg) {
         console.error('Error en el proceso en segundo plano:', errBg);
-        // O podrías registrar un log, pero ya no puedes responder al front (ya enviamos 202).
+
       }
     });
   } catch (error) {
     console.error('Error al intentar procesar la solicitud:', error);
-    // Si algo falla antes de la respuesta, devuelves 500
+    
     return res.status(500).json({ message: 'Error al recibir la solicitud.' });
   }
 }

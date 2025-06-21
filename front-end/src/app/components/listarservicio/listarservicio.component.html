@@ -88,6 +88,14 @@
         </tbody>
       </table>
 
+      <button mat-raised-button
+        color="accent"
+        class="btn-download"
+        (click)="downloadPdf()">
+  <mat-icon>file_download</mat-icon>
+  <span>Descargar</span>
+</button>
+
       <!-- paginador: 10 filas por página -->
       <mat-paginator
         [length]="servFiltrados.length"
