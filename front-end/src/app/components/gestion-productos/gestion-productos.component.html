@@ -11,11 +11,22 @@
   </mat-form-field>
 
   <!-- Lista filtrada -->
-  <mat-selection-list [multiple]="false" style="max-height:200px; overflow:auto">
-    <mat-list-option *ngFor="let p of filtrados" (click)="select(p)">
-      {{p.idproducto}} — {{p.nombre}} (stock: {{p.stock}})
-    </mat-list-option>
-  </mat-selection-list>
+ <mat-selection-list [multiple]="false" style="max-height:200px; overflow:auto">
+  <mat-list-option
+    *ngFor="let p of filtrados"
+    [disabled]="p.stock === 0"
+    (click)="select(p)"
+  >
+    {{ p.idproducto }} — {{ p.nombre }}
+    <span *ngIf="p.stock > 0" class="stock-info">
+      (stock: {{ p.stock }})
+    </span>
+    <span *ngIf="p.stock === 0" class="no-stock">
+      No disponible
+    </span>
+  </mat-list-option>
+</mat-selection-list>
+
 
   <!-- Cantidad + agregar -->
   <div *ngIf="seleccionado" style="margin-top:1em">

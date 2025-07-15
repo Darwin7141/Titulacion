@@ -1,6 +1,8 @@
 import { Component, OnInit} from '@angular/core';
 import { TipocateringService } from '../../services/tipocatering.service';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-tipocatering',
@@ -21,7 +23,7 @@ export class TipocateringComponent implements OnInit {
     constructor(
       
       private serviceTipo: TipocateringService,
-      
+      private dialogRef: MatDialogRef<TipocateringComponent> ,
       private _router:Router) {}
   
         ngOnInit():void {
@@ -38,17 +40,17 @@ export class TipocateringComponent implements OnInit {
 
     agregar() {
       this.serviceTipo.agregar(this.tipo).subscribe({
-        next: (response) => {
-         
-            localStorage.setItem('identity_user', JSON.stringify(response.usuario));
-            this._router.navigate(['/listaTipos']);
-          
-          // Aquí puedes manejar la respuesta, como guardar un token o redirigir al usuario
-        },
+             next: () => {
+               Swal.fire({ icon: 'success', title: 'Éxito', text: 'El tipo de catering se agregó correctamente.' })
+                   .then(() => this.dialogRef.close('added'));   // ⬅️  cerramos pasando flag
+             },
         error: (err) => {
           console.error('Error en enviar datos del tipo de catering:', err);
           // Aquí puedes manejar el error, como mostrar un mensaje al usuario
         },
       });
     }
+     cancelar(): void {
+    this.dialogRef.close();     // simplemente cierra sin flag
+  }
   }

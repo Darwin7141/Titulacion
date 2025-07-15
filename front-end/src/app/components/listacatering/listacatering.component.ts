@@ -1,6 +1,8 @@
 import { Component, OnInit, Output, EventEmitter} from '@angular/core';
 import { TipocateringService } from '../../services/tipocatering.service';
 import { PageEvent } from '@angular/material/paginator'; 
+import { MatDialog } from '@angular/material/dialog';
+import { TipocateringComponent } from '../tipocatering/tipocatering.component';
 
 @Component({
   selector: 'app-listacatering',
@@ -27,7 +29,9 @@ export class ListacateringComponent implements OnInit {
     this.cerrar.emit();
   }
 
-  constructor(private tipoService: TipocateringService) {}
+  constructor(private tipoService: TipocateringService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
 
@@ -139,4 +143,18 @@ export class ListacateringComponent implements OnInit {
     this.searchTerm = '';
     this.cargarLista();
   }
+
+  abrirDialogoAgregar(): void {
+      const dialogRef = this.dialog.open(TipocateringComponent, {
+        width: '600px',          // o el ancho que prefieras
+         disableClose: true,
+      autoFocus: false  
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === 'added') {   // se envía desde el diálogo
+          this.obtenerTipos();      // refresca la tabla
+        }
+      });
+    }
 }

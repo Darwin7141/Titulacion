@@ -1,6 +1,8 @@
 import { Component, OnInit} from '@angular/core';
 import { CargosService } from '../../services/cargos.service';
 import { Router } from '@angular/router';
+import { MatDialogRef } from '@angular/material/dialog';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cargos',
@@ -19,24 +21,25 @@ export class CargosComponent implements OnInit {
     constructor(
       
       private cargoService: CargosService,
-        private _router:Router) {}
+        private _router:Router,
+      private dialogRef: MatDialogRef<CargosComponent> ) {}
   
     ngOnInit():void {
       
     }
     agregar() {
       this.cargoService.agregar(this.cargos).subscribe({
-        next: (response) => {
-         
-            localStorage.setItem('identity_user', JSON.stringify(response.usuario));
-            this._router.navigate(['/listaCargos']);
-          
-          // Aquí puedes manejar la respuesta, como guardar un token o redirigir al usuario
-        },
+              next: () => {
+                Swal.fire({ icon: 'success', title: 'Éxito', text: 'Cargo agregado correctamente.' })
+                    .then(() => this.dialogRef.close('added'));   // ⬅️  cerramos pasando flag
+              },
         error: (err) => {
           console.error('Error en enviar datos del cargo:', err);
           // Aquí puedes manejar el error, como mostrar un mensaje al usuario
         },
       });
     }
+    cancelar(): void {
+    this.dialogRef.close();     // simplemente cierra sin flag
+  }
   }

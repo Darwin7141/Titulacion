@@ -36,11 +36,11 @@
 
     <!-- BOTÓN AGREGAR (derecha) -->
     <button mat-raised-button color="primary"
-            class="btn-add"
-            [routerLink]="['/administrador']">
-      <mat-icon>add</mat-icon>
-      <span>Agregar</span>
-    </button>
+        class="btn-add"
+        (click)="abrirDialogoAgregar()">
+  <mat-icon>add</mat-icon>
+  <span>Agregar</span>
+</button>
 
   </div>
 

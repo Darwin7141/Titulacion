@@ -58,4 +58,30 @@ export class EmpleadosService {
       this.httpOptions
     );
   }
+
+  verificarCedula(ci: string): Observable<any> {
+      return this.http.get(`${this.url}empleado/verificarCedula/${ci}`);
+    }
+    
+    verificarEmail(email: string): Observable<any> {
+      return this.http.get(`${this.url}empleado/verificarEmail/${email}`);
+    }
+    
+    verificarTelefono(telefono: string): Observable<any> {
+      return this.http.get(`${this.url}empleado/verificarTelefono/${telefono}`);
+    }
+
+    buscarPorCedula(ci: string): Observable<any> {
+      return this.http.get<any>(`${this.url}empleado/porcedula/${ci}`);
+
+    }
+
+    buscarPorEmail(email: string): Observable<any> {
+      return this.http.get<any>(`${this.url}empleado/poremail/${email}`);
+
+    }
+
+    buscarPorTelefono(telefono: string): Observable<any> {
+      return this.http.get<any>(`${this.url}empleado/portelefono/${telefono}`);
+    }
 }

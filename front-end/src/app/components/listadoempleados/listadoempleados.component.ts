@@ -1,6 +1,8 @@
 import { Component, OnInit ,Output, EventEmitter} from '@angular/core';
 import { EmpleadosService } from '../../services/empleados.service';
 import { PageEvent } from '@angular/material/paginator'; 
+import { MatDialog } from '@angular/material/dialog';
+import { EmpleadosComponent } from '../empleados/empleados.component';
 
 @Component({
   selector: 'app-listadoempleados',
@@ -26,7 +28,9 @@ export class ListadoempleadosComponent implements OnInit {
     this.cerrar.emit();
   }
 
-  constructor(private empleadosService: EmpleadosService) {}
+  constructor(private empleadosService: EmpleadosService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.empleadosService.getCargosEmpleados().subscribe({
@@ -135,6 +139,19 @@ export class ListadoempleadosComponent implements OnInit {
     this.searchTerm = '';
     this.cargarLista();
   }
+  abrirDialogoAgregar(): void {
+      const dialogRef = this.dialog.open(EmpleadosComponent, {
+        width: '600px',          // o el ancho que prefieras
+         disableClose: true,
+      autoFocus: false  
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === 'added') {   // se envía desde el diálogo
+          this.obtenerEmpleados();      // refresca la tabla
+        }
+      });
+    }
 }
 
 

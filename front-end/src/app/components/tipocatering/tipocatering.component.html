@@ -1,26 +1,42 @@
-<div class="content">
-    <h2>AGREGAR TIPO CATERING</h2>
-    <form #tipoForm="ngForm" (ngSubmit)="agregar()">
-  
-      
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="tipo.nombre" required placeholder="Nombre" autofocus>
-        <mat-error *ngIf="nombreField.invalid">El nombre del tipo es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #desField="ngModel" name="descripcion" [(ngModel)]="tipo.descripcion" required placeholder="Descripción" autofocus>
-        <mat-error *ngIf="desField.invalid">La descripción es requerida</mat-error>
-      </mat-form-field>
-  
-      
-      
-      
+<div class="registro-panel">
+  <div class="registro-panel-content">
+    <h3>Agregar Tipo de Catering</h3>
 
+    <form #tipoForm="ngForm"
+          (ngSubmit)="agregar()"
+          autocomplete="on">
 
-      <button [routerLink]="['/listaTipos']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
-      <button  [disabled]="!tipoForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit" >Agregar</button>
+      <div class="form-grid">
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" type="text"
+                 [(ngModel)]="tipo.nombre"
+                 placeholder="Ingrese el nombre"
+                 required cdkFocusInitial>
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <input id="descripcion" name="descripcion" type="text"
+                 [(ngModel)]="tipo.descripcion"
+                 placeholder="Ingrese la descripción"
+                 required>
+        </div>
+      </div><!-- /form-grid -->
+
+      <!-- Botones -->
+      <div class="registro-buttons">
+        <button type="button"
+                class="btn-cancel"
+                (click)="cancelar()">Cancelar</button>
+
+        <button type="submit"
+                class="btn-register"
+                [disabled]="!tipoForm.valid">Registrar</button>
+      </div>
+
     </form>
   </div>
-  
+</div>

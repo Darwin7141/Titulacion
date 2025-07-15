@@ -1,44 +1,85 @@
-<div class="content">
-  <h2>AGREGAR EMPLEADO</h2>
-  <form #empleadoForm="ngForm" (ngSubmit)="agregar()">
+<div class="registro-panel">
+  <div class="registro-panel-content">
+    <h3>Agregar Empleado</h3>
 
-    <mat-form-field class="col-xs-12">
-      <input matInput type="text" #ciField="ngModel" name="ci" [(ngModel)]="empleado.ci" required placeholder="Cédula" autofocus>
-      <mat-error *ngIf="ciField.invalid">Su cédula es requerido</mat-error>
-    </mat-form-field>
+    <form #empleadoForm="ngForm"
+          (ngSubmit)="agregar()"
+          autocomplete="on">
 
-    <mat-form-field class="col-xs-12">
-      <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="empleado.nombre" required placeholder="Nombre" autofocus>
-      <mat-error *ngIf="nombreField.invalid">Su nombre es requerido</mat-error>
-    </mat-form-field>
+      <!-- 3 filas × 2 columnas = 6 campos -->
+      <div class="form-grid">
 
-    <mat-form-field class="col-xs-12">
-      <input matInput type="text" #direccionField="ngModel" name="direccion" [(ngModel)]="empleado.direccion" required placeholder="Dirección" autofocus>
-      <mat-error *ngIf="direccionField.invalid">Su dirección es requerida</mat-error>
-    </mat-form-field>
+        <!-- Cédula -->
+        <div class="form-group">
+          <label for="ci">Cédula</label>
+          <input id="ci" name="ci" type="text"
+                 [(ngModel)]="empleado.ci"
+                 placeholder="Ingrese la cédula"
+                 required cdkFocusInitial>
+        </div>
 
-    <mat-form-field class="col-xs-12">
-      <input matInput type="text" #emailField="ngModel" name="e_mail" [(ngModel)]="empleado.e_mail" required placeholder="E_mail" autofocus>
-      <mat-error *ngIf="emailField.invalid">Su e_mail es requerido</mat-error>
-    </mat-form-field>
+        <!-- Dirección -->
+        <div class="form-group">
+          <label for="direccion">Dirección</label>
+          <input id="direccion" name="direccion" type="text"
+                 [(ngModel)]="empleado.direccion"
+                 placeholder="Ingrese la dirección"
+                 required>
+        </div>
 
-    <mat-form-field class="col-xs-12">
-      <input matInput type="text" #telefonoField="ngModel" name="telefono" [(ngModel)]="empleado.telefono" required placeholder="Teléfono" autofocus>
-      <mat-error *ngIf="telefonoField.invalid">Su teléfono es requerido</mat-error>
-    </mat-form-field>
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" type="text"
+                 [(ngModel)]="empleado.nombre"
+                 placeholder="Ingrese el nombre"
+                 required>
+        </div>
 
-    <mat-form-field class="col-xs-12">
-      <mat-select #idCargoField="ngModel" name="idcargo" [(ngModel)]="empleado.idcargo" required placeholder="Seleccione un cargo">
-        <mat-option *ngFor="let cargo of cargo" [value]="cargo.idcargo">
-          {{ cargo.nombrecargo }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="idCargoField.invalid">Debe seleccionar un cargo</mat-error>
-    </mat-form-field>
+        <!-- Correo -->
+        <div class="form-group">
+          <label for="correo">Correo Electrónico</label>
+          <input id="correo" name="e_mail" type="email"
+                 [(ngModel)]="empleado.e_mail"
+                 placeholder="Ingrese el correo"
+                 required>
+        </div>
 
-   
+        <!-- Teléfono -->
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" name="telefono" type="tel"
+                 [(ngModel)]="empleado.telefono"
+                 placeholder="Ingrese el teléfono"
+                 required>
+        </div>
 
-    <button [routerLink]="['/listaEmpleados']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
-    <button  [disabled]="!empleadoForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit" >Agregar</button>
-  </form>
+        <!-- Cargo (select) -->
+        <div class="form-group">
+          <label for="idcargo">Cargo</label>
+          <select id="idcargo" name="idcargo"
+                  [(ngModel)]="empleado.idcargo"
+                  required>
+            <option value="" disabled selected>Seleccione un cargo</option>
+            <option *ngFor="let c of cargo" [value]="c.idcargo">
+              {{ c.nombrecargo }}
+            </option>
+          </select>
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <!-- Botones -->
+      <div class="registro-buttons">
+        <button type="button"
+                class="btn-cancel"
+                (click)="cancelar()">Cancelar</button>
+
+        <button type="submit"
+                class="btn-register"
+                [disabled]="!empleadoForm.valid">Registrar</button>
+      </div>
+
+    </form>
+  </div>
 </div>

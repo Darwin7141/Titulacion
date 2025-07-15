@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ServiciocateringService } from '../../services/serviciocatering.service';
 import { TipocateringService } from '../../services/tipocatering.service';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
+import { MatDialogRef } from '@angular/material/dialog';
+import { Optional } from '@angular/core';
+import { of } from 'rxjs'; 
 
 
 @Component({
@@ -30,7 +34,7 @@ export class ServiciocateringComponent implements OnInit {
       private tipoService: TipocateringService,
       private serviceTipo: TipocateringService,
       private servCatering: ServiciocateringService,
-
+      @Optional() private dialogRef: MatDialogRef<ServiciocateringComponent> ,
       
       private _router:Router) {}
   
@@ -61,42 +65,54 @@ export class ServiciocateringComponent implements OnInit {
             console.log('Imagen seleccionada:', this.nuevaImagen);
           }
         }
+
+        private get esDialogo(): boolean { return !!this.dialogRef; }
+
+        private irALista(): void { this._router.navigate(['/listaServicios']); }
         
 
-        agregar(): void {
-          // 1) Activar spinner
-          this.isLoading = true;
-      
-          // 2) Crear servicio
-          this.servCatering.agregar(this.servicio).subscribe({
-            next: (response) => {
-              const idservicio = response.idservicio;
-              console.log('Servicio creado con ID:', idservicio);
-      
-              // 3) Subir imagen (si existe)
-              if (this.nuevaImagen) {
-                this.servCatering.subirImagenServicio(this.nuevaImagen, idservicio)
-                  .subscribe({
-                    next: (resUpload) => {
-                      console.log('Imagen subida correctamente:', resUpload);
-                      this.isLoading = false; // Desactivar spinner
-                      this._router.navigate(['/listaServicios']);
-                    },
-                    error: (err) => {
-                      this.isLoading = false; // desactivar spinner
-                      console.error('Error al subir la imagen:', err);
-                    },
-                  });
-              } else {
-                this.isLoading = false; // desactivar spinner
-                this._router.navigate(['/listaServicios']);
-              }
-            },
-            error: (err) => {
-              this.isLoading = false; // desactivar spinner
-              console.error('Error al crear el servicio', err);
-            },
-          });
+  agregar(): void {
+  this.isLoading = true;              // spinner ON
+
+  this.servCatering.agregar(this.servicio).subscribe({
+    next: ({ idservicio }) => {
+      // (A) si hay imagen, súbela primero
+      const subir = this.nuevaImagen
+        ? this.servCatering.subirImagenServicio(this.nuevaImagen, idservicio)
+        : of(null);                   // from 'rxjs'
+
+      subir.subscribe({
+        next: () => finalizaExito(),
+        error: err => finalizaError('al subir la imagen', err)
+      });
+    },
+    error: err => finalizaError('al crear el servicio', err)
+  });
+
+  /* ---------- helpers internas ---------- */
+  const finalizaExito = () => {
+    this.isLoading = false;
+    Swal.fire({ icon:'success', title:'Éxito', text:'Servicio agregado correctamente.' })
+      .then(() => {
+        if (this.esDialogo) {
+          this.dialogRef!.close('added');   // notifica a la lista
+        } else {
+          this.irALista();                  // navegación normal
         }
+      });
+  };
+
+  const finalizaError = (msg: string, err: any) => {
+    this.isLoading = false;
+    console.error(`Error ${msg}:`, err);
+    Swal.fire({ icon:'error', title:'Error', text:`Ocurrió un error ${msg}.` });
+  };
+}
+
+cancelar(): void {
+  this.esDialogo ? this.dialogRef!.close()
+                 : this.irALista();
+}
+
       }
 

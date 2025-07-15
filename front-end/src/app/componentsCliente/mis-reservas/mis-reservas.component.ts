@@ -561,54 +561,32 @@ abrirPayPal(tipo: 'inicial' | 'final', reserva: any) {
   });
 }
 
-cancelarReserva(reserva: any) {
-  const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
-  const nombre = user.nombre;
-  const codigocliente = user.codigocliente;
-  const fechaEvento = new Date(reserva.fechaevento);
-  const ahora = new Date();
-  const diffHrs = (fechaEvento.getTime() - ahora.getTime()) / (1000 * 60 * 60);
 
-  if (diffHrs < 48) {
-    // CASO < 48h: dejamos tu flujo original
-    Swal.fire({
-      icon: 'warning',
-      title: '¿Continuar cancelación?',
-      text: `Estimado/a ${nombre}, para solicitar cancelar su reserva 
-             debe hacerlo 48 hrs antes de la fecha programada, caso contrario 
-             perderá el abono inicial realizado. ¿Desea continuar con la 
-             cancelación de su reserva?`,
-      showCancelButton: true,
-      confirmButtonText: 'Sí',
-      cancelButtonText: 'No'
-    }).then(result => {
-      if (!result.isConfirmed) {
-        // “No”: volvemos a la lista
-        this.router.navigate(['/misReservas']);
-        return;
-      }
-      // “Sí”: enviamos y mostramos modal éxito
+cancelarReserva(reserva: any) {
+  // 1) Recuperas el nombre y código del cliente
+  const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
+  const nombre = user.nombre || 'Cliente';
+  const codigocliente = user.codigocliente;
+
+  // 2) Muestras tu alerta genérica
+  Swal.fire({
+    icon: 'warning',
+    title: `Estimado/a ${nombre}`,
+    text: `Por políticas internas de la empresa, le informamos que al solicitar la cancelación de su reserva, perderá cualquier abono económico realizado anteriormente. ¿Deseas continuar con la cancelación de tu reserva?`,
+    showCancelButton: true,
+    confirmButtonText: 'Sí',
+    cancelButtonText: 'No'
+  }).then(result => {
+    if (result.isConfirmed) {
+      // 3a) Si el usuario acepta: envías la solicitud y dejas que enviarSolicitudCancelacion muestre el modal de éxito y notifique al admin
       this.enviarSolicitudCancelacion(reserva.idreserva, codigocliente);
-    });
-  } else {
-    // CASO ≥ 48h: primer modal de confirmación genérico
-    Swal.fire({
-      icon: 'question',
-      title: '¿Está seguro que desea cancelar su reserva?',
-      showCancelButton: true,
-      confirmButtonText: 'Sí',
-      cancelButtonText: 'No'
-    }).then(result => {
-      if (!result.isConfirmed) {
-        // “No”: volvemos a la lista
-        this.router.navigate(['/misReservas']);
-        return;
-      }
-      // “Sí”: enviamos y mostramos modal éxito
-      this.enviarSolicitudCancelacion(reserva.idreserva, codigocliente);
-    });
-  }
+    } else {
+      // 3b) Si cancela: lo devuelves al listado
+      this.router.navigate(['/misReservas']);
+    }
+  });
 }
+
 
 // Extraigo el envío + modal de éxito en un método para no repetir
 private enviarSolicitudCancelacion(idreserva: string, codigocliente: string) {

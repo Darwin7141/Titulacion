@@ -1,6 +1,8 @@
 import { Component, OnInit,  Output, EventEmitter } from '@angular/core';
 import { AdministradorService } from '../../services/administrador.service';
 import { PageEvent } from '@angular/material/paginator'; 
+import { MatDialog } from '@angular/material/dialog';
+import { AdministradorComponent } from '../administrador/administrador.component';
 
 @Component({
   selector: 'app-listaadministrador',
@@ -26,7 +28,9 @@ export class ListaadministradorComponent implements OnInit {
     this.cerrar.emit();
   }
 
-  constructor(private adminService: AdministradorService) {}
+  constructor(private adminService: AdministradorService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
    
@@ -133,5 +137,19 @@ export class ListaadministradorComponent implements OnInit {
   recargarLista(): void {
     this.searchTerm = '';
     this.cargarLista();
+  }
+
+  abrirDialogoAgregar(): void {
+    const dialogRef = this.dialog.open(AdministradorComponent, {
+      width: '600px',          // o el ancho que prefieras
+       disableClose: true,
+    autoFocus: false  
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'added') {   // se envía desde el diálogo
+        this.obtenerAdmin();      // refresca la tabla
+      }
+    });
   }
 }

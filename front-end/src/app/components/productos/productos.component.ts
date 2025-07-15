@@ -3,6 +3,9 @@ import { ProveedoresService } from '../../services/proveedores.service';
 import { ProductosService } from '../../services/productos.service';
 import { CategoriaProductosService } from '../../services/categoria-productos.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Optional, Inject } from '@angular/core';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-productos',
@@ -30,11 +33,15 @@ export class ProductosComponent implements OnInit {
       private serviceProducto: ProductosService,
       private serviceProveedor: ProveedoresService,
       private categoriaService: CategoriaProductosService,
-      private _router:Router) {}
+      private _router:Router,
+    @Optional() private dialogRef: MatDialogRef<ProductosComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) private data: any) {}
   
       ngOnInit(): void {
         // Leer parámetro de la ruta (idCategoria)
-        this.categoriaFijaId = this.route.snapshot.paramMap.get('idCategoria');
+        this.categoriaFijaId =
+      this.data?.idCategoria ??
+      this.route.snapshot.paramMap.get('idCategoria');
     
         // Cargar proveedores
         this.serviceProveedor.getProveedor().subscribe({
@@ -61,37 +68,43 @@ export class ProductosComponent implements OnInit {
           this.productos.idcategoria = this.categoriaFijaId;
         }
       }
+
+      private get esDialogo(): boolean { return !!this.dialogRef; }
     
 
-      agregar() {
-        // Si no hay categoría fija, se asume que el usuario la selecciona en el formulario
-        // Si sí hay categoría fija, ya la tenemos en this.productos.categoria
-        this.serviceProducto.agregar(this.productos).subscribe({
-          next: (response) => {
-            // Luego de crear, navegar a la lista correspondiente
-            if (this.categoriaFijaId) {
-              // Redirigimos a la lista de esa categoría
-              this._router.navigate(['/listaProductos/categoria', this.categoriaFijaId]);
-            } else {
-              // Redirigimos a la lista general
-              this._router.navigate(['/listaProductos']);
-            }
-          },
-          error: (err) => {
-            console.error('Error al enviar datos del producto:', err);
-            // Manejo de error
-          },
+      agregar(): void {
+  this.serviceProducto.agregar(this.productos).subscribe({
+    next: () => {
+      Swal.fire({ icon:'success', title:'Éxito', text:'Producto agregado correctamente.' })
+        .then(() => {
+          if (this.esDialogo) {
+            this.dialogRef!.close('added');        // notifica a la lista
+          } else {
+            this.irALista();                       // navegación normal
+          }
         });
-      }
+    },
+    error: err => {
+      console.error('Error al enviar producto:', err);
+      Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al agregar el producto.' });
+    }
+  });
+}
 
-      cancelar() {
-        // Si hay una categoría fija, regresa a esa categoría
-        if (this.categoriaFijaId) {
-          this._router.navigate(['/listaProductos/categoria', this.categoriaFijaId]);
-        } else {
-          // De lo contrario, lista general
-          this._router.navigate(['/listaProductos']);
-        }
-      }
+  private irALista(): void {
+  if (this.categoriaFijaId) {
+    this._router.navigate(['/listaProductos/categoria', this.categoriaFijaId]);
+  } else {
+    this._router.navigate(['/listaProductos']);
+  }
+}
+
+     cancelar(): void {
+  if (this.esDialogo) {
+    this.dialogRef!.close();
+  } else {
+    this.irALista();
+  }
+}
     
   }

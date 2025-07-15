@@ -122,12 +122,12 @@ io.on('connection', (socket) => {
 
 const { checkExpiracionesYNotificar } = require('./server/controllers/notificaciones');
 
-// Al arrancar el servidor, lanzamos la primera comprobación:
+
 setImmediate(() => checkExpiracionesYNotificar(io));
 
-// Luego, repetimos cada 24 horas:
+
 setInterval(() => checkExpiracionesYNotificar(io), 24 * 60 * 60 * 1000);
 
-// **Importante**: exportamos `app` y `server`.
+
 // www.js se encargará de llamar a `server.listen(...)`.
 module.exports = { app, server };

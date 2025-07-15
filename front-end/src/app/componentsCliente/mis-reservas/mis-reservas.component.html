@@ -15,15 +15,12 @@
   <div *ngFor="let reserva of reservas; let i = index" class="reserva-card">
     
 
-    <!-- 1) Etiquetas en negrita -->
+    
      <p><strong>Reserva:</strong> {{ reserva.idreserva }}</p>
     <p><strong>Fecha:</strong> {{ reserva.fechaevento }}</p>
     <p><strong>Dirección:</strong> {{ reserva.direccionevento }}</p>
 
-    <!-- Quitamos el <p>Total: ...> que tenías antes, 
-         para moverlo a la tabla de detalles. -->
-
-    <!-- 3) Resaltar estado con un “badge” -->
+    
     <p *ngIf="reserva.nombre">
       <strong>Estado:</strong>
       <span class="estado-badge">{{ reserva.nombre.estado_reserva }}</span>
@@ -63,9 +60,7 @@
       <button (click)="editarReserva(reserva.idreserva)" class="edit-button">
         <i class="fa fa-edit"></i> Editar
       </button>
-      <button (click)="eliminarReserva(reserva.idreserva)" class="delete-button">
-        <i class="fa fa-trash"></i> Eliminar
-      </button>
+      
 
       <button
   class="cancel-button"

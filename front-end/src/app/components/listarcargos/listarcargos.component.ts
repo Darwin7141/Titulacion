@@ -1,6 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CargosService } from '../../services/cargos.service';
 import { PageEvent } from '@angular/material/paginator'; 
+import { MatDialog } from '@angular/material/dialog';
+import { CargosComponent } from '../cargos/cargos.component';
 
 @Component({
   selector: 'app-listarcargos',
@@ -27,7 +29,9 @@ export class ListarcargosComponent implements OnInit {
   }
 
 
-  constructor(private cargoService: CargosService) {}
+  constructor(private cargoService: CargosService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
    
@@ -127,4 +131,18 @@ export class ListarcargosComponent implements OnInit {
     this.searchTerm = '';
     this.cargarLista();
   }
+
+  abrirDialogoAgregar(): void {
+      const dialogRef = this.dialog.open(CargosComponent, {
+        width: '600px',          // o el ancho que prefieras
+         disableClose: true,
+      autoFocus: false  
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === 'added') {   // se envía desde el diálogo
+          this.obtenerCargos();      // refresca la tabla
+        }
+      });
+    }
 }

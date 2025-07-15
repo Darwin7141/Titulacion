@@ -4,6 +4,8 @@ import { TipocateringService } from '../../services/tipocatering.service';
 import { PageEvent } from '@angular/material/paginator';
 import { jsPDF } from 'jspdf';
 import autoTable, { CellHookData }  from 'jspdf-autotable';
+import { MatDialog } from '@angular/material/dialog';
+import { ServiciocateringComponent } from '../serviciocatering/serviciocatering.component';
 
 @Component({
   selector: 'app-listarservicio',
@@ -43,7 +45,8 @@ volver(): void {
   constructor(
     private cateringService: ServiciocateringService,
     private serviceTipo: TipocateringService,
-    private tipoCatering: TipocateringService
+    private tipoCatering: TipocateringService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -314,6 +317,20 @@ async downloadPdf(): Promise<void> {
   /* 4) guardar */
   doc.save('Servicios.pdf');
 }
+
+abrirDialogoAgregar(): void {
+    const dialogRef = this.dialog.open(ServiciocateringComponent, {
+      width: '600px',          // o el ancho que prefieras
+       disableClose: true,
+    autoFocus: false  
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'added') {   // se envía desde el diálogo
+        this.obtenerServicios();      // refresca la tabla
+      }
+    });
+  }
 
 }
 

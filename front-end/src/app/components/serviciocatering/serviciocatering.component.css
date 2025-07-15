@@ -1,57 +1,103 @@
-.agregar-servicio-container {
-  max-width: 600px;            /* Limita el ancho máximo */
-  margin: 2rem auto;           /* Centra el contenedor vertical y horizontal */
-  padding: 2rem;               /* Espacio interno */
-  background-color: #ffffff;   /* Fondo blanco */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-  border-radius: 8px;          /* Bordes redondeados */
-}
 
-.agregar-servicio-container h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-weight: 600;
-}
-
-.form-row {
+/* Contenedor centrado dentro del diálogo */
+.registro-panel {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem; /* Espacio horizontal/vertical entre items */
-  margin-bottom: 1rem;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Ajusta el mat-form-field para que crezcan uniformemente */
-.form-row mat-form-field {
-  flex: 1;
-}
-
-/* Estilos para el grupo que contiene la carga de archivo */
-.file-group {
+/* Tarjeta */
+.registro-panel-content {
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 640px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  color: #333;
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
 }
 
-.file-group label {
-  font-weight: 500;
-  margin-bottom: 0.4rem;
+/* Título */
+.registro-panel-content h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  color: var(--verde);
 }
 
-/* Fila de botones */
-.button-row {
+/* Grid 2 columnas */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 30px;
+}
+
+/* Inputs */
+.form-group { display: flex; flex-direction: column; }
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #555;
+}
+.form-group input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color .3s;
+}
+.form-group input:focus {
+  outline: none;
+  border-color: var(--verde);
+}
+
+/* Botonera */
+.registro-buttons {
+  margin-top: 25px;
   display: flex;
-  justify-content: flex-end; /* Alinea los botones a la derecha */
-  gap: 1rem;
-  margin-top: 1.5rem;
+  justify-content: flex-end;
+  gap: 15px;
+}
+.btn-cancel,
+.btn-register {
+  padding: 10px 24px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background .3s, transform .2s;
+}
+.btn-cancel {
+  background: #eee;
+  color: #333;
+}
+.btn-cancel:hover {
+  background: #ddd;
+  transform: translateY(-2px);
+}
+.btn-register {
+  background:  #0ccf36;
+  color: white;
+}
+.btn-register:hover {
+  background: #098123;
+  transform: translateY(-2px);
+}
+.loading-overlay{
+  position:absolute;inset:0;background:rgba(255,255,255,.7);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;z-index:10
 }
 
-/* Opcional: estilizar botones */
-.cancel-button {
-  background-color: #f5f5f5;
+.form-group select{
+  padding:10px 12px;
+  border:1px solid #ccc;
+  border-radius:4px;
+  font-size:14px;
+  transition:border-color .3s;
+  background:#fff;
+  color: #555;
 }
-
-.cancel-button:hover {
-  background-color: #e0e0e0;
-}
-
-

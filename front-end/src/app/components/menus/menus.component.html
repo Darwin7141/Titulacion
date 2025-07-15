@@ -1,110 +1,83 @@
-<div class="agregar-menu-container">
-  <h2>AGREGAR MENÚ</h2>
+<!-- menus.component.html -->
+<div class="registro-panel">
+  <!-- overlay opcional de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <mat-progress-spinner
+      mode="indeterminate"
+      color="accent"
+      diameter="50">
+    </mat-progress-spinner>
+    <p>Procesando…</p>
+  </div>
 
-  <!-- Formulario para crear el menú -->
-  <form #tipoForm="ngForm" (ngSubmit)="agregar()">
-    <!-- Primera fila: Nombre y Descripción -->
-    <div class="form-row">
-      <mat-form-field class="col-xs-12">
-        <input
-          matInput
-          type="text"
-          #nombreField="ngModel"
-          name="nombre"
-          [(ngModel)]="menu.nombre"
-          required
-          placeholder="Nombre"
-          autofocus
-        />
-        <mat-error *ngIf="nombreField.invalid"
-          >El nombre del menú es requerido</mat-error
-        >
-      </mat-form-field>
+  <!-- tarjeta -->
+  <div class="registro-panel-content">
+    <h3>Agregar Menú</h3>
 
-      <mat-form-field class="col-xs-12">
-        <input
-          matInput
-          type="text"
-          #desField="ngModel"
-          name="descripcion"
-          [(ngModel)]="menu.descripcion"
-          required
-          placeholder="Descripción"
-        />
-        <mat-error *ngIf="desField.invalid"
-          >La descripción del menú es requerida</mat-error
-        >
-      </mat-form-field>
-    </div>
+    <form #menuForm="ngForm"
+          (ngSubmit)="agregar()"
+          autocomplete="on">
 
-    <!-- Segunda fila: Precio y Servicio -->
-    <div class="form-row">
-      <mat-form-field class="col-xs-12">
-        <input
-          matInput
-          type="text"
-          #precioField="ngModel"
-          name="precio"
-          [(ngModel)]="menu.precio"
-          required
-          placeholder="Costo"
-        />
-        <mat-error *ngIf="precioField.invalid"
-          >El precio del menú es requerido</mat-error
-        >
-      </mat-form-field>
+      <!-- grid 2 columnas -->
+      <div class="form-grid">
+        <!-- nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" type="text"
+                 [(ngModel)]="menu.nombre"
+                 placeholder="Nombre del menú"
+                 required cdkFocusInitial>
+        </div>
 
-      <mat-form-field class="col-xs-12">
-        <mat-select
-          #idServicioField="ngModel"
-          name="idservicio"
-          [(ngModel)]="menu.idservicio"
-          required
-          placeholder="Seleccione un servicio"
-        >
-          <mat-option *ngFor="let t of tipo" [value]="t.idservicio">
-            {{ t.nombre }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="idServicioField.invalid"
-          >Debe seleccionar un servicio</mat-error
-        >
-      </mat-form-field>
-    </div>
+        <!-- precio -->
+        <div class="form-group">
+          <label for="precio">Precio</label>
+          <input id="precio" name="precio" type="number" min="0" step="0.01"
+                 [(ngModel)]="menu.precio"
+                 placeholder="Costo"
+                 required>
+        </div>
 
-    <!-- Tercera fila: Campo para subir la imagen -->
-    <div class="form-row">
-      <div class="form-group file-group">
-        <label for="imagen">Seleccione la imagen:</label>
-        <input
-          id="imagen"
-          type="file"
-          (change)="onNewImageSelected($event)"
-        />
+        <!-- descripción (ocupa dos columnas) -->
+        <div class="form-group" style="grid-column:1 / span 2;">
+          <label for="descripcion">Descripción</label>
+          <input id="descripcion" name="descripcion" type="text"
+                 [(ngModel)]="menu.descripcion"
+                 placeholder="Descripción"
+                 required>
+        </div>
+
+        <!-- servicio -->
+        <div class="form-group">
+          <label for="idservicio">Servicio</label>
+          <select id="idservicio" name="idservicio"
+                  [(ngModel)]="menu.idservicio"
+                  required>
+            <option value="" disabled selected>Seleccione un servicio</option>
+            <option *ngFor="let s of tipo" [value]="s.idservicio">
+              {{ s.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <!-- imagen (toda la fila) -->
+        <div class="form-group file-group" style="grid-column:1 / span 2;">
+          <label for="imagen">Imagen:</label>
+          <input id="imagen" type="file"
+                 (change)="onNewImageSelected($event)">
+        </div>
+      </div><!-- /form-grid -->
+
+      <!-- botones -->
+      <div class="registro-buttons">
+        <button type="button"
+                class="btn-cancel"
+                (click)="cancelar()">Cancelar</button>
+
+        <button type="submit"
+                class="btn-register"
+                [disabled]="!menuForm.valid">Registrar</button>
       </div>
-    </div>
-
-    <!-- Fila de botones -->
-    <div class="button-row">
-      <button
-        [routerLink]="['/listaMenus']"
-        mat-raised-button
-        color="default"
-        type="button"
-        class="cancel-button"
-      >
-        Cancelar
-      </button>
-
-      <button
-        [disabled]="!tipoForm.form.valid"
-        mat-raised-button
-        color="primary"
-        type="submit"
-        class="submit-button"
-      >
-        Agregar
-      </button>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>

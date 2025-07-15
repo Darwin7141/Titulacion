@@ -1,40 +1,77 @@
-<div class="content">
-    <h2>AGREGAR ADMINISTRADOR</h2>
-    <form #adminForm="ngForm" (ngSubmit)="agregar()">
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #ciField="ngModel" name="ci" [(ngModel)]="administrador.ci" required placeholder="Cédula" autofocus>
-        <mat-error *ngIf="ciField.invalid">Su cédula es requerida</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="administrador.nombre" required placeholder="Nombre" autofocus>
-        <mat-error *ngIf="nombreField.invalid">Su nombre es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #direccionField="ngModel" name="direccion" [(ngModel)]="administrador.direccion" required placeholder="Dirección" autofocus>
-        <mat-error *ngIf="direccionField.invalid">Su dirección es requerida</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #emailField="ngModel" name="e_mail" [(ngModel)]="administrador.e_mail" required placeholder="E_mail" autofocus>
-        <mat-error *ngIf="emailField.invalid">Su e_mail es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #telefonoField="ngModel" name="telefono" [(ngModel)]="administrador.telefono" required placeholder="Teléfono" autofocus>
-        <mat-error *ngIf="telefonoField.invalid">Su teléfono es requerido</mat-error>
-      </mat-form-field>
+<!-- administrador.component.html -->
+<div class="registro-panel">
+  <div class="registro-panel-content">
+    <h3>Agregar Administrador</h3>
 
-      <mat-form-field class="col-xs-12">
-        <input matInput type="password" #contraseniaField="ngModel" name="contrasenia" [(ngModel)]="administrador.contrasenia" required placeholder="Contraseña" autofocus>
-        <mat-error *ngIf="contraseniaField.invalid">Su contrasenia</mat-error>
-      </mat-form-field>
-  
-  
-      <button [routerLink]="['//listaAdministrador']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
-      <button [disabled]="!adminForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit">Agregar</button>
+    <form #adminForm="ngForm"
+          (ngSubmit)="agregar()"
+          autocomplete="on">
+
+      <div class="form-grid">
+
+        <!-- Columna 1 -->
+        <div class="form-group">
+          <label for="ci">Cédula</label>
+          <input  id="ci" name="ci" type="text"
+                  [(ngModel)]="administrador.ci"
+                  placeholder="Ingrese su cédula"
+                  required cdkFocusInitial>
+        </div>
+
+        <div class="form-group">
+          <label for="direccion">Dirección</label>
+          <input  id="direccion" name="direccion" type="text"
+                  [(ngModel)]="administrador.direccion"
+                  placeholder="Ingrese su dirección"
+                  required>
+        </div>
+
+        <!-- Columna 2 -->
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input  id="nombre" name="nombre" type="text"
+                  [(ngModel)]="administrador.nombre"
+                  placeholder="Ingrese su nombre"
+                  required>
+        </div>
+
+        <div class="form-group">
+          <label for="correo">Correo Electrónico</label>
+          <input  id="correo" name="correo" type="email"
+                  [(ngModel)]="administrador.e_mail"
+                  placeholder="Ingrese su correo electrónico"
+                  required>
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input  id="telefono" name="telefono" type="tel"
+                  [(ngModel)]="administrador.telefono"
+                  placeholder="Ingrese su teléfono"
+                  required>
+        </div>
+
+        <div class="form-group">
+          <label for="contrasenia">Contraseña</label>
+          <input  id="contrasenia" name="contrasenia" type="password"
+                  [(ngModel)]="administrador.contrasenia"
+                  placeholder="Ingrese su contraseña"
+                  required>
+        </div>
+
+      </div>
+
+      <!-- Botonera -->
+      <div class="registro-buttons">
+        <button type="button"
+                class="btn-cancel"
+                (click)="cancelar()">Cancelar</button>
+
+        <button type="submit"
+                class="btn-register"
+                [disabled]="!adminForm.valid">Registrar</button>
+      </div>
+
     </form>
   </div>
-  
+</div>

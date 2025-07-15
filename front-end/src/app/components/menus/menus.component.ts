@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,Optional, Inject  } from '@angular/core';
 import { MenusService } from '../../services/menus.service';
 import { ServiciocateringService } from '../../services/serviciocatering.service';
 import { Router } from '@angular/router';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { of } from 'rxjs';              
+import Swal  from 'sweetalert2';
 
 @Component({
   selector: 'app-menus',
@@ -26,9 +29,12 @@ export class MenusComponent implements OnInit {
       
       private servCatering: ServiciocateringService,
       private menuCatering: MenusService,
-
-      
+      @Optional() private dialogRef: MatDialogRef<MenusComponent>,
+      @Optional() @Inject(MAT_DIALOG_DATA) private data: any,
       private _router:Router) {}
+
+      private get esDialogo(): boolean { return !!this.dialogRef; }
+    private irALista(): void { this._router.navigate(['/listaMenus']); }
   
         ngOnInit():void {
           this.servCatering.getServicio().subscribe({
@@ -50,42 +56,47 @@ export class MenusComponent implements OnInit {
         }
         
 
-        agregar(): void {
-          // 1) Activar spinner
-          this.isLoading = true;
+         agregar(): void {
+    this.isLoading = true;
+
+    this.menuCatering.agregar(this.menu).subscribe({
+      next : ({ idmenu }) => {
+
+        /* subimos la imagen solo si existe */
+        const subir$ = this.nuevaImagen
+          ? this.menuCatering.subirImagenServicio(this.nuevaImagen, idmenu)
+          : of(null);
+
+        subir$.subscribe({
+          next : ()  => this.finalizaExito(),
+          error: err => this.finalizaError('al subir la imagen', err)
+        });
+      },
+      error: err => this.finalizaError('al crear el menú', err)
+    });
+  }
+
+  /* ---------------- cancelar ---------------- */
+  cancelar(): void {
+    this.esDialogo ? this.dialogRef!.close()
+                   : this.irALista();
+  }
+
+  /* ---------------- helpers privados ---------------- */
+  private finalizaExito(): void {
+    this.isLoading = false;
+    Swal.fire({ icon:'success', title:'Éxito', text:'Menú agregado correctamente.' })
+      .then(() => this.esDialogo ? this.dialogRef!.close('added')
+                                 : this.irALista());
+  }
+
+  private finalizaError(msg: string, err: any): void {
+    this.isLoading = false;
+    console.error(`Error ${msg}:`, err);
+    Swal.fire({ icon:'error', title:'Error', text:`Ocurrió un error ${msg}.` });
+  }
+}
       
-          // 2) Crear servicio
-          this.menuCatering.agregar(this.menu).subscribe({
-            next: (response) => {
-              const idmenu = response.idmenu;
-              console.log('Menú creado con ID:', idmenu);
-      
-              // 3) Subir imagen (si existe)
-              if (this.nuevaImagen) {
-                this.menuCatering.subirImagenServicio(this.nuevaImagen, idmenu)
-                  .subscribe({
-                    next: (resUpload) => {
-                      console.log('Imagen subida correctamente:', resUpload);
-                      this.isLoading = false; // Desactivar spinner
-                      this._router.navigate(['/listaMenus']);
-                    },
-                    error: (err) => {
-                      this.isLoading = false; // desactivar spinner
-                      console.error('Error al subir la imagen:', err);
-                    },
-                  });
-              } else {
-                this.isLoading = false; // desactivar spinner
-                this._router.navigate(['/listaMenus']);
-              }
-            },
-            error: (err) => {
-              this.isLoading = false; // desactivar spinner
-              console.error('Error al crear el servicio', err);
-            },
-          });
-        }
-      }
 
 
 

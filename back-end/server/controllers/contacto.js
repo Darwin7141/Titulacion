@@ -4,6 +4,15 @@ const { enviarCorreoEmpresa, enviarCorreoNotificacionReserva } = require('../uti
 const twilio = require('twilio');
 
 
+const accountSid = 'AC564a1b6f9290142bc6b92745d09553ab';  
+const authToken = '53e43b653b9a1395a570ec60106cd080';  
+const client = twilio(accountSid, authToken);
+
+
+const TWILIO_WHATSAPP_FROM = 'whatsapp:+14155238886';  
+
+const EMPRESA_WHATSAPP = 'whatsapp:+593992268003'; 
+
 
 function enviarContacto(req, res) {
   try {

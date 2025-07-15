@@ -523,34 +523,31 @@ function eliminar(req, res) {
 function getAll(req, res) {
   modelos.reservas.findAll({
     include: [
-
-         {
-          model: modelos.clientes,
-          as: 'cliente',
-          attributes: ['codigocliente', 'nombre', 'ci']
-        },
-        
-          {
-            model: modelos.estado_reserva,
-            as: 'nombre', // Este alias debe coincidir con el definido en el modelo
-            attributes: ['estado_reserva'], // Seleccionar solo el campo necesario
-          },
-      ],
-
-    order: [['idreserva', 'ASC']] // Ordenar por codigocliente en orden ascendente
+      {
+        model: modelos.clientes,
+        as: 'cliente',
+        attributes: ['codigocliente', 'nombre', 'ci']
+      },
+      {
+        model: modelos.estado_reserva,
+        as: 'nombre',
+        attributes: ['estado_reserva']
+      },
+    ],
+    order: [['idreserva', 'ASC']]
   })
-    .then(reservas => {
-      if (reservas.length === 0) {
-        return res.status(404).send({ message: 'No se encontraron reservas.' });
-      }
-      res.status(200).send(reservas); // Enviar el listado de clientes ordenado
-    })
-    .catch(err => {
-      console.error("Error al obtener las reservas:", err);
-      res.status(500).send({ message: "Ocurrió un error al obtener las reservas.", error: err.message });
+  .then(reservas => {
+    // Ya no devolvemos 404 cuando reservas.length === 0
+    return res.status(200).json(reservas);
+  })
+  .catch(err => {
+    console.error("Error al obtener las reservas:", err);
+    return res.status(500).json({
+      message: "Ocurrió un error al obtener las reservas.",
+      error: err.message
     });
+  });
 }
-
 async function getByCliente(req, res) {
   const { codigocliente } = req.params;
   try {

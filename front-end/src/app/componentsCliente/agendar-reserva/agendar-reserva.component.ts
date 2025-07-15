@@ -173,14 +173,11 @@ export class AgendarReservaComponent implements OnInit{
   // 1) Consulto todas las reservas
   this.reservasService.getAllReservas().subscribe({
     next: (all: any[]) => {
-      // ① El datepicker ahora te da "YYYY-MM-DD" directamente
+      
       const selectedDate = this.formReserva.fechaevento;
-
-      // ② Cuenta cuántas ya existen en esa misma fecha
       const mismas = all.filter(r => {
         if (!r.fechaevento) return false;
-        // r.fechaevento suele venir "2025-06-12" o "2025-06-12T00:00:00.000Z"
-        // en ambos casos los primeros 10 chars son la fecha:
+        
         const fechaDbYmd = String(r.fechaevento).slice(0, 10);
         return fechaDbYmd === selectedDate;
       }).length;

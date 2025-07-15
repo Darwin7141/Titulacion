@@ -1,36 +1,67 @@
-<div class="content">
-    <h2>AGREGAR PROVEEDOR</h2>
-    <form #provForm="ngForm" (ngSubmit)="agregar()">
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #ciField="ngModel" name="ci" [(ngModel)]="proveedor.ci" required placeholder="Cédula" autofocus>
-        <mat-error *ngIf="ciField.invalid">Su cédula es requerida</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="proveedor.nombre" required placeholder="Nombre" autofocus>
-        <mat-error *ngIf="nombreField.invalid">Su nombre es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #direccionField="ngModel" name="direccion" [(ngModel)]="proveedor.direccion" required placeholder="Dirección" autofocus>
-        <mat-error *ngIf="direccionField.invalid">Su dirección es requerida</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #emailField="ngModel" name="e_mail" [(ngModel)]="proveedor.e_mail" required placeholder="E_mail" autofocus>
-        <mat-error *ngIf="emailField.invalid">Su e_mail es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #telefonoField="ngModel" name="telefono" [(ngModel)]="proveedor.telefono" required placeholder="Teléfono" autofocus>
-        <mat-error *ngIf="telefonoField.invalid">Su teléfono es requerido</mat-error>
-      </mat-form-field>
-  
-  
-      <button [routerLink]="['/listaProveedor']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
-      <button [disabled]="!provForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit">Agregar</button>
+<div class="registro-panel">
+  <div class="registro-panel-content">
+    <h3>Agregar Proveedor</h3>
+
+    <form #provForm="ngForm"
+          (ngSubmit)="agregar()"
+          autocomplete="on">
+
+      <div class="form-grid">
+        <!-- Cédula -->
+        <div class="form-group">
+          <label for="ci">Cédula</label>
+          <input id="ci" name="ci" type="text"
+                 [(ngModel)]="proveedor.ci"
+                 placeholder="Ingrese la cédula"
+                 required cdkFocusInitial>
+        </div>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label for="direccion">Dirección</label>
+          <input id="direccion" name="direccion" type="text"
+                 [(ngModel)]="proveedor.direccion"
+                 placeholder="Ingrese la dirección"
+                 required>
+        </div>
+
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" type="text"
+                 [(ngModel)]="proveedor.nombre"
+                 placeholder="Ingrese el nombre"
+                 required>
+        </div>
+
+        <!-- Correo -->
+        <div class="form-group">
+          <label for="correo">Correo Electrónico</label>
+          <input id="correo" name="e_mail" type="email"
+                 [(ngModel)]="proveedor.e_mail"
+                 placeholder="Ingrese el correo"
+                 required>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" name="telefono" type="tel"
+                 [(ngModel)]="proveedor.telefono"
+                 placeholder="Ingrese el teléfono"
+                 required>
+        </div>
+      </div><!-- /form-grid -->
+
+      <div class="registro-buttons">
+        <button type="button"
+                class="btn-cancel"
+                (click)="cancelar()">Cancelar</button>
+        <button type="submit"
+                class="btn-register"
+                [disabled]="!provForm.valid">Registrar</button>
+      </div>
+
     </form>
   </div>
-  
-
+</div>

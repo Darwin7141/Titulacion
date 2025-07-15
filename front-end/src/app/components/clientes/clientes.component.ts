@@ -3,6 +3,7 @@ import { ClientesService } from '../../services/clientes.service';
 import { ValidacionesService } from '../../services/validaciones.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-clientes',
@@ -25,7 +26,8 @@ export class ClientesComponent implements OnInit {
       
       private clienteService: ClientesService,
       private validaciones: ValidacionesService,
-        private _router:Router) {}
+        private _router:Router,
+      private dialogRef: MatDialogRef<ClientesComponent> ) {}
   
     ngOnInit():void {
       
@@ -107,21 +109,16 @@ export class ClientesComponent implements OnInit {
      
              // Si todo es válido, agregar el administrador
              this.clienteService.agregar(this.clientes).subscribe({
-               next: (response) => {
-                 Swal.fire({
-                   icon: 'success',
-                   title: 'Éxito',
-                   text: 'Cliente agregado correctamente.',
-                 }).then(() => {
-                   this._router.navigate(['/listaClientes']);
-                 });
-               },
+                     next: () => {
+                       Swal.fire({ icon: 'success', title: 'Éxito', text: 'Cliente agregado correctamente.' })
+                           .then(() => this.dialogRef.close('added'));   // ⬅️  cerramos pasando flag
+                     },
                error: (err) => {
-                 console.error('Error en enviar datos del administrador:', err);
+                 console.error('Error en enviar datos del cliente:', err);
                  Swal.fire({
                    icon: 'error',
                    title: 'Error',
-                   text: 'Ocurrió un error al agregar el administrador.',
+                   text: 'Ocurrió un error al agregar el cliente.',
                  });
                },
              });
@@ -129,4 +126,7 @@ export class ClientesComponent implements OnInit {
          });
        });
      }
+     cancelar(): void {
+    this.dialogRef.close();     // simplemente cierra sin flag
+  }
    }

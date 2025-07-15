@@ -13,6 +13,8 @@ export class ProveedoresService {
     withCredentials: true    // ← aquí está la clave
   };
 
+  constructor(private http: HttpClient) {}
+
   getProveedor(): Observable<any[]> {
     // También debes incluir withCredentials en los GET
     return this.http.get<any[]>(`${this.url}proveedor`, this.httpOptions);
@@ -41,5 +43,31 @@ export class ProveedoresService {
     );
   }
 
-  constructor(private http: HttpClient) {}
+  verificarCedula(ci: string): Observable<any> {
+      return this.http.get(`${this.url}proveedor/verificarCedula/${ci}`,this.httpOptions);
+    }
+    
+    verificarEmail(email: string): Observable<any> {
+      return this.http.get(`${this.url}proveedor/verificarEmail/${email}`,this.httpOptions);
+    }
+    
+    verificarTelefono(telefono: string): Observable<any> {
+      return this.http.get(`${this.url}proveedor/verificarTelefono/${telefono}`,this.httpOptions);
+    }
+
+    buscarPorCedula(ci: string): Observable<any> {
+      return this.http.get<any>(`${this.url}proveedor/porcedula/${ci}`);
+
+    }
+
+    buscarPorEmail(email: string): Observable<any> {
+      return this.http.get<any>(`${this.url}proveedor/poremail/${email}`);
+
+    }
+
+    buscarPorTelefono(telefono: string): Observable<any> {
+      return this.http.get<any>(`${this.url}proveedor/portelefono/${telefono}`);
+    }
+
+  
 }

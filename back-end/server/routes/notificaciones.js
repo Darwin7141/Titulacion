@@ -14,7 +14,7 @@ module.exports = (app) => {
        where: {
          codigocliente,
          leida: false,
-         tipo: { [Op.notIn]: ['CANCELACION', 'EXPIRACION'] }   // excluimos cancelaciones y expiraciones
+         tipo: { [Op.notIn]: ['CANCELACION', 'EXPIRACION',  'PAGO' ] }   // excluimos cancelaciones y expiraciones
        },
       order: [['creado_en', 'ASC']]
     });

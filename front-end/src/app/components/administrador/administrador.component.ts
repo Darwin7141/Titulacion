@@ -3,6 +3,7 @@ import { AdministradorService } from '../../services/administrador.service';
 import { Router } from '@angular/router';
 import { ValidacionesService } from '../../services/validaciones.service'; // Importar el servicio de validaciones
 import Swal from 'sweetalert2';
+import { MatDialogRef } from '@angular/material/dialog';
 @Component({
   selector: 'app-administrador',
   templateUrl: './administrador.component.html',
@@ -24,7 +25,8 @@ export class AdministradorComponent implements OnInit {
   constructor(
     private serviceAdmin: AdministradorService,
     private validaciones: ValidacionesService, // Inyectar el servicio de validaciones
-    private _router: Router
+    private _router: Router,
+    private dialogRef: MatDialogRef<AdministradorComponent> 
   ) {}
 
   ngOnInit(): void {
@@ -125,15 +127,10 @@ export class AdministradorComponent implements OnInit {
   
           // Si todo es válido, agregar el administrador
           this.serviceAdmin.agregar(this.administrador).subscribe({
-            next: (response) => {
-              Swal.fire({
-                icon: 'success',
-                title: 'Éxito',
-                text: 'Administrador agregado correctamente.',
-              }).then(() => {
-                this._router.navigate(['/listaAdministrador']);
-              });
-            },
+        next: () => {
+          Swal.fire({ icon: 'success', title: 'Éxito', text: 'Administrador agregado correctamente.' })
+              .then(() => this.dialogRef.close('added'));   // ⬅️  cerramos pasando flag
+        },
             error: (err) => {
               console.error('Error en enviar datos del administrador:', err);
               Swal.fire({
@@ -146,5 +143,9 @@ export class AdministradorComponent implements OnInit {
         });
       });
     });
+  }
+
+  cancelar(): void {
+    this.dialogRef.close();     // simplemente cierra sin flag
   }
 }

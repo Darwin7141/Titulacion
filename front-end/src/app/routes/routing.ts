@@ -102,4 +102,4 @@ const app_routes:Routes=[
     {path:'**', pathMatch:'full',redirectTo:''}
 ]
 
-export const AppRouting=RouterModule.forRoot(app_routes);
+export const AppRouting = RouterModule.forRoot(app_routes);

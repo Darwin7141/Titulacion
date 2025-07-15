@@ -29,11 +29,12 @@
         </div>
 
         <!-- ··· botón Agregar (alineado a la derecha) ··· -->
-        <button mat-raised-button color="primary"
-                class="btn-add"
-                [routerLink]="['/menus']">
-          <mat-icon>add</mat-icon><span>Agregar</span>
-        </button>
+         <button mat-raised-button color="primary"
+        class="btn-add"
+        (click)="abrirDialogoAgregar()">
+  <mat-icon>add</mat-icon>
+  <span>Agregar</span>
+</button>
 
       </div>
     </mat-card-header>

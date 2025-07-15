@@ -1,0 +1,7 @@
+.no-stock {
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.38); /* gris apagado, similar a controles deshabilitados */
+}
+.stock-info {
+  color: rgba(0, 0, 0, 0.87);
+}

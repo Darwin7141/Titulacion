@@ -1,6 +1,8 @@
 import { Component , OnInit, Output, EventEmitter } from '@angular/core';
 import { ProveedoresService } from '../../services/proveedores.service';
 import { PageEvent } from '@angular/material/paginator'; 
+import { MatDialog } from '@angular/material/dialog';
+import { ProveedoresComponent } from '../proveedores/proveedores.component';
 
 @Component({
   selector: 'app-listarproveedor',
@@ -26,7 +28,9 @@ export class ListarproveedorComponent implements OnInit {
     this.cerrar.emit();
   }
 
-  constructor(private adminService: ProveedoresService) {}
+  constructor(private adminService: ProveedoresService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
    
@@ -126,4 +130,18 @@ export class ListarproveedorComponent implements OnInit {
     this.searchTerm = '';
     this.cargarLista();
   }
+
+  abrirDialogoAgregar(): void {
+      const dialogRef = this.dialog.open(ProveedoresComponent, {
+        width: '600px',          // o el ancho que prefieras
+         disableClose: true,
+      autoFocus: false  
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === 'added') {   // se envía desde el diálogo
+          this.obtenerProv();      // refresca la tabla
+        }
+      });
+    }
 }

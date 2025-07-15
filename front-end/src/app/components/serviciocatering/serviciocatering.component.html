@@ -1,115 +1,86 @@
-<div class="agregar-servicio-container">
+<div class="registro-panel">
+  <!-- Capa de carga -------------------------------------------------------- -->
   <div *ngIf="isLoading" class="loading-overlay">
-    <mat-progress-spinner
-      mode="indeterminate"
-      color="accent"
-      diameter="50">
-    </mat-progress-spinner>
-    <p>Procesando...</p>
+    <mat-progress-spinner mode="indeterminate"
+                          diameter="50"
+                          color="accent"></mat-progress-spinner>
+    <p>Procesando…</p>
   </div>
-  
-  <h2>AGREGAR SERVICIO</h2>
-  <form #tipoForm="ngForm" (ngSubmit)="agregar()">
-    <div class="form-row">
-      <mat-form-field class="col-xs-12">
-        <input
-          matInput
-          type="text"
-          #nombreField="ngModel"
-          name="nombre"
-          [(ngModel)]="servicio.nombre"
-          required
-          placeholder="Nombre"
-          autofocus
-        />
-        <mat-error *ngIf="nombreField.invalid"
-          >El nombre del servicio es requerido</mat-error
-        >
-      </mat-form-field>
 
-      <mat-form-field class="col-xs-12">
-        <input
-          matInput
-          type="text"
-          #desField="ngModel"
-          name="descripcion"
-          [(ngModel)]="servicio.descripcion"
-          required
-          placeholder="Descripción"
-        />
-        <mat-error *ngIf="desField.invalid"
-          >La descripción es requerida</mat-error
-        >
-      </mat-form-field>
-    </div>
+  <!-- Tarjeta -------------------------------------------------------------- -->
+  <div class="registro-panel-content">
+    <h3>Agregar Servicio</h3>
 
-    <div class="form-row">
-      <mat-form-field class="col-xs-12">
-        <mat-select
-          #idTipoField="ngModel"
-          name="idtipo"
-          [(ngModel)]="servicio.idtipo"
-          required
-          placeholder="Seleccione un tipo"
-        >
-          <mat-option *ngFor="let t of tipo" [value]="t.idtipo">
-            {{ t.nombre }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="idTipoField.invalid"
-          >Debe seleccionar un tipo de servicio</mat-error
-        >
-      </mat-form-field>
+    <form #tipoForm="ngForm"
+          (ngSubmit)="agregar()"
+          autocomplete="on">
 
-      <mat-form-field class="col-xs-12">
-        <mat-select
-          #idEstadoField="ngModel"
-          name="idestado"
-          [(ngModel)]="servicio.idestado"
-          required
-          placeholder="Seleccione un estado"
-        >
-          <mat-option *ngFor="let est of estados" [value]="est.idestado">
-            {{ est.estado }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="idEstadoField.invalid"
-          >Debe seleccionar un estado</mat-error
-        >
-      </mat-form-field>
-    </div>
+      <!-- GRID: 2 columnas -------------------------------------------------- -->
+      <div class="form-grid">
 
-    <div class="form-row">
-      <div class="form-group file-group">
-        <label for="imagen">Seleccione la imagen:</label>
-        <input
-          id="imagen"
-          type="file"
-          (change)="onNewImageSelected($event)"
-        />
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" type="text"
+                 [(ngModel)]="servicio.nombre"
+                 placeholder="Nombre del servicio"
+                 required cdkFocusInitial>
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <input id="descripcion" name="descripcion" type="text"
+                 [(ngModel)]="servicio.descripcion"
+                 placeholder="Descripción"
+                 required>
+        </div>
+
+        <!-- Tipo -->
+        <div class="form-group">
+          <label for="idtipo">Tipo</label>
+          <select id="idtipo" name="idtipo"
+                  [(ngModel)]="servicio.idtipo"
+                  required>
+            <option value="" disabled selected>Seleccione un tipo</option>
+            <option *ngFor="let t of tipo" [value]="t.idtipo">
+              {{ t.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Estado -->
+        <div class="form-group">
+          <label for="idestado">Estado</label>
+          <select id="idestado" name="idestado"
+                  [(ngModel)]="servicio.idestado"
+                  required>
+            <option value="" disabled selected>Seleccione un estado</option>
+            <option *ngFor="let e of estados" [value]="e.idestado">
+              {{ e.estado }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Imagen (ocupa las 2 columnas) -->
+        <div class="form-group file-group"
+             style="grid-column: 1 / span 2;">
+          <label for="imagen">Imagen:</label>
+          <input id="imagen" type="file"
+                 (change)="onNewImageSelected($event)">
+        </div>
+      </div><!-- /form-grid -->
+
+      <!-- Botones ----------------------------------------------------------- -->
+      <div class="registro-buttons">
+        <button type="button"
+                class="btn-cancel"
+                (click)="cancelar()">Cancelar</button>
+
+        <button type="submit"
+                class="btn-register"
+                [disabled]="!tipoForm.valid">Registrar</button>
       </div>
-    </div>
-
-    <div class="button-row">
-      <button
-        [routerLink]="['/listaServicios']"
-        mat-raised-button
-        color="default"
-        type="button"
-        class="cancel-button"
-      >
-        Cancelar
-      </button>
-
-      <button
-        [disabled]="!tipoForm.form.valid"
-        mat-raised-button
-        color="primary"
-        type="submit"
-        class="submit-button"
-      >
-        Agregar
-      </button>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>

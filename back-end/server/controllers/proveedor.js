@@ -138,9 +138,119 @@ function getAll(req, res) {
     });
 }
 
+async function verificarCedula(req, res) {
+    const { ci } = req.params;
+    try {
+        const cliente = await modelos.proveedor.findOne({ where: { ci } });
+        if (cliente) {
+            return res.status(200).send({ existe: true });
+        }
+        res.status(200).send({ existe: false });
+    } catch (err) {
+        console.error("Error al verificar cédula:", err);
+        res.status(500).send({ message: "Error al verificar la cédula.", error: err.message });
+    }
+}
+
+async function verificarEmail(req, res) {
+    const { email } = req.params;
+    try {
+        const cliente = await modelos.proveedor.findOne({ where: { e_mail: email } });
+        if (cliente) {
+            return res.status(200).send({ existe: true });
+        }
+        res.status(200).send({ existe: false });
+    } catch (err) {
+        console.error("Error al verificar email:", err);
+        res.status(500).send({ message: "Error al verificar el email.", error: err.message });
+    }
+}
+
+async function verificarTelefono(req, res) {
+    const { telefono } = req.params;
+    try {
+        const cliente = await modelos.proveedor.findOne({ where: { telefono } });
+        if (cliente) {
+            return res.status(200).send({ existe: true });
+        }
+        res.status(200).send({ existe: false });
+    } catch (err) {
+        console.error("Error al verificar teléfono:", err);
+        res.status(500).send({ message: "Error al verificar el teléfono.", error: err.message });
+    }
+}
+
+async function getProveedorPorCedula(req, res) {
+    const { ci } = req.params;
+    try {
+      const cliente = await modelos.proveedor.findOne({ where: { ci } });
+      if (!cliente) {
+        return res.status(404).send({ message: 'No se encontró un proveedor con esa cédula.' });
+      }
+      // Enviamos todo el objeto cliente (o filtra lo que quieras)
+      return res.status(200).send(cliente);
+    } catch (err) {
+      console.error("Error al obtener proveedor por cédula:", err);
+      return res.status(500).send({ message: "Error al obtener proveedor por cédula.", error: err.message });
+    }
+  }
+
+  async function getProveedorPorEmail(req, res) {
+    const { email } = req.params;
+    try {
+      const cliente = await modelos.proveedor.findOne({ where: { e_mail: email } });
+      if (!cliente) {
+        return res.status(404).send({ message: 'No se encontró un proveedor con ese e-mail.' });
+      }
+      return res.status(200).send(cliente);
+    } catch (err) {
+      // ...
+    }
+  }
+
+  async function getProveedorPorTelefono(req, res) {
+    const { telefono } = req.params;
+    try {
+      const cliente = await modelos.proveedor.findOne({ where: { telefono } });
+      if (!cliente) {
+        return res.status(404).send({ message: 'No se encontró un proveedor con ese e-mail.' });
+      }
+      return res.status(200).send(cliente);
+    } catch (err) {
+      // ...
+    }
+  }
+
+  async function getOneByCodigo(req, res) {
+  const codigoproveedor = req.params.codigoproveedor;
+  try {
+    // Busca cliente por su clave primaria (codigocliente)
+    const cliente = await modelos.empleado.findByPk(codigoproveedor);
+    if (!cliente) {
+      return res.status(404).json({ message: 'Proveedor no encontrado.' });
+    }
+    // En este punto `cliente` es un objeto con todos sus campos (nombre, ci, direccion, telefono, etc.)
+    return res.status(200).json(cliente);
+  } catch (err) {
+    console.error('Error al obtener proveedor por código:', err);
+    return res.status(500).json({
+      message: 'Ocurrió un error al buscar el proveedor.',
+      error: err.message
+    });
+  }
+}
+
+
 module.exports = {
     create,
     update,
     eliminar,
-    getAll
+    getAll,
+    verificarCedula,
+    verificarEmail,
+    verificarTelefono,
+    getProveedorPorCedula,
+    getProveedorPorEmail,
+    getProveedorPorTelefono,
+    getOneByCodigo
   };

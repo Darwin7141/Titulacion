@@ -3,6 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { MatDialog } from '@angular/material/dialog';
+import { ProductosComponent } from '../productos/productos.component'; 
 
 import { ProductosService }        from '../../services/productos.service';
 import { ProveedoresService }      from '../../services/proveedores.service';
@@ -42,7 +44,8 @@ export class ListarproductosComponent implements OnInit {
     private proveedorService:  ProveedoresService,
     private productoService:   ProductosService,
     private categoriaService:  CategoriaProductosService,
-    private route:             ActivatedRoute
+    private route:             ActivatedRoute,
+    private dialog: MatDialog  
   ) {}
 
   /* --------- ciclo de vida --------- */
@@ -212,4 +215,17 @@ export class ListarproductosComponent implements OnInit {
     /* 4) Descargar ------------------------------------------------------------- */
     doc.save('Productos.pdf');
   }
+
+  abrirDialogoAgregar(): void {
+  const ref = this.dialog.open(ProductosComponent, {
+    width: '640px',
+    disableClose: true,
+    autoFocus: false,
+    data: { idCategoria: this.idCatParam }   // pasamos la categoría actual (puede ser null)
+  });
+
+  ref.afterClosed().subscribe(r => {
+    if (r === 'added') { this.loadProducts(); }   // refresca la tabla
+  });
+}
 }

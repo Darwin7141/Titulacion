@@ -1,10 +1,7 @@
-<!-- ──────────────────────────────────────────────────────────────
-     LISTAR PRODUCTOS – usa los mismos estilos (tabla-wrapper, etc.)
-     ────────────────────────────────────────────────────────────── -->
+
 <div class="tabla-wrapper">
   <mat-card class="tabla-card">
 
-    <!-- CABECERA / TOOLBAR ───────────────────────────────────── -->
     <mat-card-header>
       <div class="toolbar">
 
@@ -33,10 +30,10 @@
 
         <!-- ··· botón Agregar (alineado a la derecha) ··· -->
         <button mat-raised-button color="primary"
-                class="btn-add"
-                [routerLink]="['/productos/categoria', idCatParam]">
-          <mat-icon>add</mat-icon><span>Agregar</span>
-        </button>
+        class="btn-add"
+        (click)="abrirDialogoAgregar()">
+  <mat-icon>add</mat-icon><span>Agregar</span>
+</button>
 
       </div>
     </mat-card-header>

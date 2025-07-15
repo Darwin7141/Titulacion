@@ -1,40 +1,82 @@
-<div class="content">
-    <h2>AGREGAR CLIENTE</h2>
-    <form #cliForm="ngForm" (ngSubmit)="agregar()">
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #ciField="ngModel" name="ci" [(ngModel)]="clientes.ci" required placeholder="Cédula" autofocus>
-        <mat-error *ngIf="ciField.invalid">Su cédula es requerida</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="clientes.nombre" required placeholder="Nombre" autofocus>
-        <mat-error *ngIf="nombreField.invalid">Su nombre es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #direccionField="ngModel" name="direccion" [(ngModel)]="clientes.direccion" required placeholder="Dirección" autofocus>
-        <mat-error *ngIf="direccionField.invalid">Su dirección es requerida</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #emailField="ngModel" name="e_mail" [(ngModel)]="clientes.e_mail" required placeholder="E_mail" autofocus>
-        <mat-error *ngIf="emailField.invalid">Su e_mail es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #telefonoField="ngModel" name="telefono" [(ngModel)]="clientes.telefono" required placeholder="Teléfono" autofocus>
-        <mat-error *ngIf="telefonoField.invalid">Su teléfono es requerido</mat-error>
-      </mat-form-field>
+<!-- clientes.component.html -->
+<div class="registro-panel">
+  <div class="registro-panel-content">
+    <h3>Agregar Cliente</h3>
 
-       <mat-form-field class="col-xs-12">
-        <input matInput type="password" #contraseniaField="ngModel" name="contrasenia" [(ngModel)]="clientes.contrasenia" required placeholder="Contraseña" autofocus>
-        <mat-error *ngIf="contraseniaField.invalid">Su contrasenia</mat-error>
-      </mat-form-field>
-  
-  
-      <button [routerLink]="['/listaClientes']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
-      <button [disabled]="!cliForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit">Agregar</button>
+    <form #cliForm="ngForm"
+          (ngSubmit)="agregar()"
+          autocomplete="on">
+
+      <!-- GRID 2️⃣x2️⃣ -->
+      <div class="form-grid">
+
+        <!-- Cédula -->
+        <div class="form-group">
+          <label for="ci">Cédula</label>
+          <input id="ci" name="ci" type="text"
+                 [(ngModel)]="clientes.ci"
+                 placeholder="Ingrese su cédula"
+                 required cdkFocusInitial>
+        </div>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label for="direccion">Dirección</label>
+          <input id="direccion" name="direccion" type="text"
+                 [(ngModel)]="clientes.direccion"
+                 placeholder="Ingrese su dirección"
+                 required>
+        </div>
+
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" type="text"
+                 [(ngModel)]="clientes.nombre"
+                 placeholder="Ingrese su nombre"
+                 required>
+        </div>
+
+        <!-- Correo -->
+        <div class="form-group">
+          <label for="correo">Correo Electrónico</label>
+          <input id="correo" name="e_mail" type="email"
+                 [(ngModel)]="clientes.e_mail"
+                 placeholder="Ingrese su correo electrónico"
+                 required>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" name="telefono" type="tel"
+                 [(ngModel)]="clientes.telefono"
+                 placeholder="Ingrese su teléfono"
+                 required>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="form-group">
+          <label for="contrasenia">Contraseña</label>
+          <input id="contrasenia" name="contrasenia" type="password"
+                 [(ngModel)]="clientes.contrasenia"
+                 placeholder="Ingrese su contraseña"
+                 required>
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <!-- Botonera -->
+      <div class="registro-buttons">
+        <button type="button"
+                class="btn-cancel"
+                (click)="cancelar()">Cancelar</button>
+
+        <button type="submit"
+                class="btn-register"
+                [disabled]="!cliForm.valid">Registrar</button>
+      </div>
+
     </form>
   </div>
-  
+</div>

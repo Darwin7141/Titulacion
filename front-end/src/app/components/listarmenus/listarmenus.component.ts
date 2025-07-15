@@ -3,6 +3,8 @@ import { MenusService } from '../../services/menus.service';
 import { ServiciocateringService } from '../../services/serviciocatering.service';
 import { ActivatedRoute } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator'; 
+import { MatDialog } from '@angular/material/dialog';
+import { MenusComponent } from '../menus/menus.component';
 
 
 @Component({
@@ -33,7 +35,8 @@ export class ListarmenusComponent implements OnInit {
   constructor(
     private menuService: MenusService,
     private servCatering: ServiciocateringService,
-    private route: ActivatedRoute  
+    private route: ActivatedRoute,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -233,4 +236,18 @@ obtenerMenus(): void {
       // Aquí podrías generar una vista previa, etc.
     }
   }
+
+  abrirDialogoAgregar(): void {
+      const dialogRef = this.dialog.open(MenusComponent, {
+        width: '600px',          // o el ancho que prefieras
+         disableClose: true,
+      autoFocus: false  
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === 'added') {   // se envía desde el diálogo
+          this.obtenerMenus();      // refresca la tabla
+        }
+      });
+    }
 }

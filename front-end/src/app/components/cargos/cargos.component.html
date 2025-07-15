@@ -1,24 +1,44 @@
-<div class="content">
-    <h2>AGREGAR CARGO</h2>
-    <form #cargoForm="ngForm" (ngSubmit)="agregar()">
-  
-      
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="cargos.nombrecargo" required placeholder="Nombre" autofocus>
-        <mat-error *ngIf="nombreField.invalid">El nombre del acrgo es requerido</mat-error>
-      </mat-form-field>
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #descripcionField="ngModel" name="descripcion" [(ngModel)]="cargos.descripcion" required placeholder="Descripción" autofocus>
-        <mat-error *ngIf="descripcionField.invalid">La descripción del cargo es requerida</mat-error>
-      </mat-form-field>
-  
-      
-  
-  
-      <button [routerLink]="['/listaCargos']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
-      <button [disabled]="!cargoForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit">Agregar</button>
+<div class="registro-panel">
+  <div class="registro-panel-content">
+    <h3>Agregar Cargo</h3>
+
+    <form #cargoForm="ngForm"
+          (ngSubmit)="agregar()"
+          autocomplete="on">
+
+      <div class="form-grid">
+
+        <!-- Nombre del cargo -->
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" type="text"
+                 [(ngModel)]="cargos.nombrecargo"
+                 placeholder="Ingrese el nombre del cargo"
+                 required cdkFocusInitial>
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <input id="descripcion" name="descripcion" type="text"
+                 [(ngModel)]="cargos.descripcion"
+                 placeholder="Ingrese una descripción"
+                 required>
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <!-- Botonera -->
+      <div class="registro-buttons">
+        <button type="button"
+                class="btn-cancel"
+                (click)="cancelar()">Cancelar</button>
+
+        <button type="submit"
+                class="btn-register"
+                [disabled]="!cargoForm.valid">Registrar</button>
+      </div>
+
     </form>
   </div>
-  
+</div>

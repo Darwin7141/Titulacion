@@ -3,6 +3,8 @@ import { ClientesService } from '../../services/clientes.service';
 import { PageEvent } from '@angular/material/paginator'; 
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { MatDialog } from '@angular/material/dialog';
+import { ClientesComponent } from '../clientes/clientes.component';
 @Component({
   selector: 'app-listarclientes',
   standalone: false,
@@ -24,7 +26,9 @@ export class ListarclientesComponent implements OnInit {
   @Output() cerrar = new EventEmitter<void>();
   volver(){ this.cerrar.emit(); }
 
-  constructor(private clienteService: ClientesService) {}
+  constructor(private clienteService: ClientesService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
    
@@ -186,5 +190,18 @@ export class ListarclientesComponent implements OnInit {
   /* 4) Descargar ------------------------------------------------------------- */
   doc.save('clientes.pdf');
 }
+ abrirDialogoAgregar(): void {
+    const dialogRef = this.dialog.open(ClientesComponent, {
+      width: '600px',          // o el ancho que prefieras
+       disableClose: true,
+    autoFocus: false  
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'added') {   // se envía desde el diálogo
+        this.obtenerClientes();      // refresca la tabla
+      }
+    });
+  }
 }
 
