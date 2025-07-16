@@ -12,21 +12,33 @@
 
   <!-- tarjeta -->
   <div class="registro-panel-content">
-    <h3>Agregar Menú</h3>
+    <!-- Título dinámico -->
+    <h3>{{ esEdicion ? 'Editar Menú' : 'Agregar Menú' }}</h3>
 
+    <!-- Un único submit → guardar() decide si crea o actualiza -->
     <form #menuForm="ngForm"
-          (ngSubmit)="agregar()"
+          (ngSubmit)="guardar()"
           autocomplete="on">
 
       <!-- grid 2 columnas -->
       <div class="form-grid">
+
+        <!-- Código (solo visible en edición) -->
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="idmenu" type="text"
+                 [(ngModel)]="menu.idmenu"
+                 disabled>
+        </div>
+
         <!-- nombre -->
         <div class="form-group">
           <label for="nombre">Nombre</label>
           <input id="nombre" name="nombre" type="text"
                  [(ngModel)]="menu.nombre"
                  placeholder="Nombre del menú"
-                 required cdkFocusInitial>
+                 required
+                 cdkFocusInitial>
         </div>
 
         <!-- precio -->
@@ -76,7 +88,9 @@
 
         <button type="submit"
                 class="btn-register"
-                [disabled]="!menuForm.valid">Registrar</button>
+                [disabled]="!menuForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
       </div>
     </form>
   </div>

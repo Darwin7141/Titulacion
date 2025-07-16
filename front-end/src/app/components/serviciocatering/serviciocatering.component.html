@@ -9,14 +9,24 @@
 
   <!-- Tarjeta -------------------------------------------------------------- -->
   <div class="registro-panel-content">
-    <h3>Agregar Servicio</h3>
+    <!-- Título dinámico -->
+    <h3>{{ esEdicion ? 'Editar Servicio' : 'Agregar Servicio' }}</h3>
 
+    <!-- Un único submit → guardar() decide si crea o actualiza -->
     <form #tipoForm="ngForm"
-          (ngSubmit)="agregar()"
+          (ngSubmit)="guardar()"
           autocomplete="on">
 
       <!-- GRID: 2 columnas -------------------------------------------------- -->
       <div class="form-grid">
+
+        <!-- Código (solo visible en edición) -->
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="idservicio" type="text"
+                 [(ngModel)]="servicio.idservicio"
+                 disabled>
+        </div>
 
         <!-- Nombre -->
         <div class="form-group">
@@ -24,7 +34,8 @@
           <input id="nombre" name="nombre" type="text"
                  [(ngModel)]="servicio.nombre"
                  placeholder="Nombre del servicio"
-                 required cdkFocusInitial>
+                 required
+                 cdkFocusInitial>
         </div>
 
         <!-- Descripción -->
@@ -79,7 +90,9 @@
 
         <button type="submit"
                 class="btn-register"
-                [disabled]="!tipoForm.valid">Registrar</button>
+                [disabled]="!tipoForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
       </div>
     </form>
   </div>

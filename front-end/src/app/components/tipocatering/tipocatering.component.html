@@ -1,30 +1,44 @@
 <div class="registro-panel">
   <div class="registro-panel-content">
-    <h3>Agregar Tipo de Catering</h3>
+   
+    <h3>{{ esEdicion ? 'Editar Tipo de Catering' : 'Agregar Tipo de Catering' }}</h3>
 
-    <form #tipoForm="ngForm"
-          (ngSubmit)="agregar()"
+    
+    <form #caterForm="ngForm"
+          (ngSubmit)="guardar()"
           autocomplete="on">
 
       <div class="form-grid">
-        <!-- Nombre -->
+
+       
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="idtipo" type="text"
+                 [(ngModel)]="tipo.idtipo"
+                 disabled>
+        </div>
+
+       
         <div class="form-group">
           <label for="nombre">Nombre</label>
           <input id="nombre" name="nombre" type="text"
                  [(ngModel)]="tipo.nombre"
-                 placeholder="Ingrese el nombre"
-                 required cdkFocusInitial>
+                 placeholder="Ej. Ejecutivo, Light, Buffet..."
+                 required
+                 cdkFocusInitial>
         </div>
 
-        <!-- Descripción -->
+        
         <div class="form-group">
           <label for="descripcion">Descripción</label>
-          <input id="descripcion" name="descripcion" type="text"
-                 [(ngModel)]="tipo.descripcion"
-                 placeholder="Ingrese la descripción"
-                 required>
+          <textarea id="descripcion" name="descripcion"
+                    [(ngModel)]="tipo.descripcion"
+                    placeholder="Detalle de lo que incluye"
+                    rows="3"
+                    required></textarea>
         </div>
-      </div><!-- /form-grid -->
+
+      </div>
 
       <!-- Botones -->
       <div class="registro-buttons">
@@ -34,7 +48,9 @@
 
         <button type="submit"
                 class="btn-register"
-                [disabled]="!tipoForm.valid">Registrar</button>
+                [disabled]="!caterForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
       </div>
 
     </form>

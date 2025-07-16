@@ -1,67 +1,85 @@
 <!-- administrador.component.html -->
 <div class="registro-panel">
   <div class="registro-panel-content">
-    <h3>Agregar Administrador</h3>
+    <!-- Título dinámico -->
+    <h3>{{ esEdicion ? 'Editar Administrador' : 'Agregar Administrador' }}</h3>
 
+    <!-- Usamos guardar() para ambos casos -->
     <form #adminForm="ngForm"
-          (ngSubmit)="agregar()"
+          (ngSubmit)="guardar()"
           autocomplete="on">
 
       <div class="form-grid">
 
-        <!-- Columna 1 -->
+        <!-- Código (solo cuando se edita) -->
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="codigoadmin" type="text"
+                 [(ngModel)]="administrador.codigoadmin"
+                 disabled>
+        </div>
+
+        
+
+        
+
+        <!-- Cédula -->
         <div class="form-group">
           <label for="ci">Cédula</label>
-          <input  id="ci" name="ci" type="text"
-                  [(ngModel)]="administrador.ci"
-                  placeholder="Ingrese su cédula"
-                  required cdkFocusInitial>
+          <input id="ci" name="ci" type="text"
+                 [(ngModel)]="administrador.ci"
+                 placeholder="Ingrese su cédula"
+                 required cdkFocusInitial>
         </div>
 
+        <!-- Dirección -->
         <div class="form-group">
           <label for="direccion">Dirección</label>
-          <input  id="direccion" name="direccion" type="text"
-                  [(ngModel)]="administrador.direccion"
-                  placeholder="Ingrese su dirección"
-                  required>
+          <input id="direccion" name="direccion" type="text"
+                 [(ngModel)]="administrador.direccion"
+                 placeholder="Ingrese su dirección"
+                 required>
         </div>
 
-        <!-- Columna 2 -->
+        <!-- Nombre -->
         <div class="form-group">
           <label for="nombre">Nombre</label>
-          <input  id="nombre" name="nombre" type="text"
-                  [(ngModel)]="administrador.nombre"
-                  placeholder="Ingrese su nombre"
-                  required>
+          <input id="nombre" name="nombre" type="text"
+                 [(ngModel)]="administrador.nombre"
+                 placeholder="Ingrese su nombre"
+                 required>
         </div>
 
+        <!-- Correo -->
         <div class="form-group">
           <label for="correo">Correo Electrónico</label>
-          <input  id="correo" name="correo" type="email"
-                  [(ngModel)]="administrador.e_mail"
-                  placeholder="Ingrese su correo electrónico"
-                  required>
+          <input id="correo" name="e_mail" type="email"
+                 [(ngModel)]="administrador.e_mail"
+                 placeholder="Ingrese su correo electrónico"
+                 [disabled]="esEdicion" required>
         </div>
 
+        <!-- Teléfono -->
         <div class="form-group">
           <label for="telefono">Teléfono</label>
-          <input  id="telefono" name="telefono" type="tel"
-                  [(ngModel)]="administrador.telefono"
-                  placeholder="Ingrese su teléfono"
-                  required>
+          <input id="telefono" name="telefono" type="tel"
+                 [(ngModel)]="administrador.telefono"
+                 placeholder="Ingrese su teléfono"
+                 required>
         </div>
 
+        <!-- Contraseña -->
         <div class="form-group">
           <label for="contrasenia">Contraseña</label>
-          <input  id="contrasenia" name="contrasenia" type="password"
-                  [(ngModel)]="administrador.contrasenia"
-                  placeholder="Ingrese su contraseña"
-                  required>
+          <input id="contrasenia" name="contrasenia" type="password"
+                 [(ngModel)]="administrador.contrasenia"
+                 placeholder="Ingrese su contraseña"
+                 [disabled]="esEdicion" required>
         </div>
 
-      </div>
+      </div><!-- /form-grid -->
 
-      <!-- Botonera -->
+      <!-- Botones -->
       <div class="registro-buttons">
         <button type="button"
                 class="btn-cancel"
@@ -69,7 +87,9 @@
 
         <button type="submit"
                 class="btn-register"
-                [disabled]="!adminForm.valid">Registrar</button>
+                [disabled]="!adminForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
       </div>
 
     </form>

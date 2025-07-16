@@ -1,14 +1,21 @@
 <!-- clientes.component.html -->
 <div class="registro-panel">
   <div class="registro-panel-content">
-    <h3>Agregar Cliente</h3>
+    <h3>{{ esEdicion ? 'Editar Cliente' : 'Agregar Cliente' }}</h3>
 
     <form #cliForm="ngForm"
-          (ngSubmit)="agregar()"
+          (ngSubmit)="guardar()"
           autocomplete="on">
 
-      <!-- GRID 2️⃣x2️⃣ -->
       <div class="form-grid">
+
+        <!-- Código de cliente (solo visible en edición) -->
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="codigocliente" type="text"
+                 [(ngModel)]="clientes.codigocliente"
+                 disabled>
+        </div>
 
         <!-- Cédula -->
         <div class="form-group">
@@ -37,12 +44,13 @@
                  required>
         </div>
 
-        <!-- Correo -->
+        <!-- Correo (deshabilitado en edición) -->
         <div class="form-group">
           <label for="correo">Correo Electrónico</label>
           <input id="correo" name="e_mail" type="email"
                  [(ngModel)]="clientes.e_mail"
                  placeholder="Ingrese su correo electrónico"
+                 [disabled]="esEdicion"
                  required>
         </div>
 
@@ -55,18 +63,19 @@
                  required>
         </div>
 
-        <!-- Contraseña -->
-        <div class="form-group">
-          <label for="contrasenia">Contraseña</label>
-          <input id="contrasenia" name="contrasenia" type="password"
-                 [(ngModel)]="clientes.contrasenia"
-                 placeholder="Ingrese su contraseña"
-                 required>
-        </div>
+        <!-- Contraseña (deshabilitada en edición) -->
+        <div class="form-group" *ngIf="!esEdicion">
+  <label for="contrasenia">Contraseña</label>
+  <input  id="contrasenia"
+          name="contrasenia"
+          type="password"
+          [(ngModel)]="clientes.contrasenia"
+          placeholder="Ingrese su contraseña"
+          required>
+</div>
 
       </div><!-- /form-grid -->
 
-      <!-- Botonera -->
       <div class="registro-buttons">
         <button type="button"
                 class="btn-cancel"
@@ -74,7 +83,9 @@
 
         <button type="submit"
                 class="btn-register"
-                [disabled]="!cliForm.valid">Registrar</button>
+                [disabled]="!cliForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
       </div>
 
     </form>

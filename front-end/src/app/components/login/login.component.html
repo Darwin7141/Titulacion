@@ -353,6 +353,12 @@ Responsabilidad, Ética profesional, Resiliencia.
 
 
   <ng-template #recuperarDialog>
+    <div *ngIf="isLoadingRecuperar" class="loading-overlay">
+    <mat-progress-spinner mode="indeterminate"
+                          diameter="50"
+                          color="accent"></mat-progress-spinner>
+    <p>Procesando…</p>
+  </div>
   <div class="recuperar-card">
     <div class="recuperar-card__inner">
       <h2 class="recuperar-card__title">Recuperar Contraseña</h2>

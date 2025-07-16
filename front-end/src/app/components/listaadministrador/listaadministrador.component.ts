@@ -78,10 +78,7 @@ export class ListaadministradorComponent implements OnInit {
   }
 
 
-  editarAdmin(admin: any): void {
-    this.isEditMode = true;
-    this.adminSeleccionado = { ...admin }; // Copia para evitar modificar el original
-  }
+  
 
   guardarEdicion(): void {
     if (this.adminSeleccionado) {
@@ -144,12 +141,19 @@ export class ListaadministradorComponent implements OnInit {
       width: '600px',          // o el ancho que prefieras
        disableClose: true,
     autoFocus: false  
-    });
+    }).afterClosed().subscribe(flag => {
+    if (flag) this.obtenerAdmin();   // ← refresca con 'saved' o el que envíes
+  });
+}
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === 'added') {   // se envía desde el diálogo
-        this.obtenerAdmin();      // refresca la tabla
-      }
-    });
-  }
+  editarAdmin(admin: any): void {
+  this.dialog.open(AdministradorComponent, {
+    width: '600px',
+    disableClose: true,
+    autoFocus: false,
+    data: { admin }                 // enviamos el registro
+  }).afterClosed().subscribe(flag => {
+    if (flag) this.obtenerAdmin();   // ← refresca con 'saved' o el que envíes
+  });
+}
 }

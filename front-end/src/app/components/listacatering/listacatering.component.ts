@@ -87,11 +87,6 @@ export class ListacateringComponent implements OnInit {
     this.displayedTipos = this.tipoFiltrados.slice(start, end);
   }
 
-  editarTipos(tipo: any): void {
-    this.isEditMode = true;
-    this.tipoSeleccionado = { ...tipo }; // Copia para evitar modificar el original
-  }
-
   guardarEdicion(): void {
     if (this.tipoSeleccionado) {
       this.tipoService.editarTipo(this.tipoSeleccionado).subscribe({
@@ -149,12 +144,19 @@ export class ListacateringComponent implements OnInit {
         width: '600px',          // o el ancho que prefieras
          disableClose: true,
       autoFocus: false  
-      });
-  
-      dialogRef.afterClosed().subscribe(result => {
-        if (result === 'added') {   // se envía desde el diálogo
-          this.obtenerTipos();      // refresca la tabla
-        }
-      });
-    }
+      }).afterClosed().subscribe(flag => {
+                if (flag) this.obtenerTipos();   
+              });
+            }
+            
+              editarTipos(tipo: any): void {
+              this.dialog.open(TipocateringComponent, {
+                width: '600px',
+                disableClose: true,
+                autoFocus: false,
+                data: { tipo }                 
+              }).afterClosed().subscribe(flag => {
+                if (flag) this.obtenerTipos();   
+              });
+            }
 }

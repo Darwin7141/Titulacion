@@ -1,19 +1,32 @@
+<!-- proveedores.component.html -->
 <div class="registro-panel">
   <div class="registro-panel-content">
-    <h3>Agregar Proveedor</h3>
+    <!-- Título dinámico -->
+    <h3>{{ esEdicion ? 'Editar Proveedor' : 'Agregar Proveedor' }}</h3>
 
+    <!-- Un único submit → guardar() decide si crea o actualiza -->
     <form #provForm="ngForm"
-          (ngSubmit)="agregar()"
+          (ngSubmit)="guardar()"
           autocomplete="on">
 
       <div class="form-grid">
-        <!-- Cédula -->
+
+        <!-- Código del proveedor (solo visible en edición) -->
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="codigoproveedor" type="text"
+                 [(ngModel)]="proveedor.codigoproveedor"
+                 disabled>
+        </div>
+
+        <!-- Cédula / RUC -->
         <div class="form-group">
-          <label for="ci">Cédula</label>
+          <label for="ci">Cédula / RUC</label>
           <input id="ci" name="ci" type="text"
                  [(ngModel)]="proveedor.ci"
-                 placeholder="Ingrese la cédula"
-                 required cdkFocusInitial>
+                 placeholder="Ingrese la cédula o RUC"
+                 required
+                 cdkFocusInitial>
         </div>
 
         <!-- Dirección -->
@@ -25,21 +38,22 @@
                  required>
         </div>
 
-        <!-- Nombre -->
+        <!-- Nombre / Razón Social -->
         <div class="form-group">
-          <label for="nombre">Nombre</label>
+          <label for="nombre">Nombre / Razón Social</label>
           <input id="nombre" name="nombre" type="text"
                  [(ngModel)]="proveedor.nombre"
-                 placeholder="Ingrese el nombre"
+                 placeholder="Ingrese el nombre o razón social"
                  required>
         </div>
 
-        <!-- Correo -->
+        <!-- Correo (bloqueado al editar) -->
         <div class="form-group">
           <label for="correo">Correo Electrónico</label>
           <input id="correo" name="e_mail" type="email"
                  [(ngModel)]="proveedor.e_mail"
                  placeholder="Ingrese el correo"
+                 [disabled]="esEdicion"
                  required>
         </div>
 
@@ -51,15 +65,20 @@
                  placeholder="Ingrese el teléfono"
                  required>
         </div>
+
       </div><!-- /form-grid -->
 
+      <!-- Botones -->
       <div class="registro-buttons">
         <button type="button"
                 class="btn-cancel"
                 (click)="cancelar()">Cancelar</button>
+
         <button type="submit"
                 class="btn-register"
-                [disabled]="!provForm.valid">Registrar</button>
+                [disabled]="!provForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
       </div>
 
     </form>

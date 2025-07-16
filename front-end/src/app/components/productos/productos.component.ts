@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
 })
 export class ProductosComponent implements OnInit {
   productos = {
-    
+    idproducto: '',
     nombre: '', // Para almacenar el valor de la contraseña
     stock: '',
     codigoproveedor: '',
@@ -28,6 +28,8 @@ export class ProductosComponent implements OnInit {
   categoriaFijaId: string | null = null;
   prov: any[] = [];
   cat: any[] = [];
+  esEdicion = false;
+
     constructor(
       private route: ActivatedRoute,
       private serviceProducto: ProductosService,
@@ -38,8 +40,13 @@ export class ProductosComponent implements OnInit {
     @Optional() @Inject(MAT_DIALOG_DATA) private data: any) {}
   
       ngOnInit(): void {
-        // Leer parámetro de la ruta (idCategoria)
-        this.categoriaFijaId =
+      if (this.data?.prod) {
+    this.productos = { ...this.data.prod };   // precargar
+    this.esEdicion     = true;
+  }
+
+
+      this.categoriaFijaId =
       this.data?.idCategoria ??
       this.route.snapshot.paramMap.get('idCategoria');
     
@@ -106,5 +113,29 @@ export class ProductosComponent implements OnInit {
     this.irALista();
   }
 }
+
+guardar(): void {
+  
+  const peticion$ = this.esEdicion
+      ? this.serviceProducto.editarProducto(this.productos)
+      : this.serviceProducto.agregar(this.productos);
+
+  peticion$.subscribe({
+    next : () => {
+      Swal.fire({
+        icon : 'success',
+        title: 'Éxito',
+        text : this.esEdicion
+               ? 'Producto actualizado correctamente.'
+               : 'Producto agregado correctamente.'
+      }).then(() => this.dialogRef.close('saved'));
+    },
+    error: err => {
+      console.error('Error al guardar producto:', err);
+      Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al guardar.' });
+    }
+  });
+
+      }
     
   }

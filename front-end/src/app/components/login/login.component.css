@@ -887,3 +887,9 @@ body > header + * {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.loading-overlay{
+  position:absolute;inset:0;background:#ffffff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;z-index:10
+}

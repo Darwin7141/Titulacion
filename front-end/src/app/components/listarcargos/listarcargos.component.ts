@@ -75,11 +75,7 @@ export class ListarcargosComponent implements OnInit {
   }
 
 
-  editarCargos(cargo: any): void {
-    this.isEditMode = true;
-    this.cargoSeleccionado = { ...cargo }; // Copia para evitar modificar el original
-  }
-
+ 
   guardarEdicion(): void {
     if (this.cargoSeleccionado) {
       this.cargoService.editarCargo(this.cargoSeleccionado).subscribe({
@@ -137,12 +133,19 @@ export class ListarcargosComponent implements OnInit {
         width: '600px',          // o el ancho que prefieras
          disableClose: true,
       autoFocus: false  
-      });
-  
-      dialogRef.afterClosed().subscribe(result => {
-        if (result === 'added') {   // se envía desde el diálogo
-          this.obtenerCargos();      // refresca la tabla
-        }
-      });
-    }
+      }).afterClosed().subscribe(flag => {
+          if (flag) this.obtenerCargos();   // ← refresca con 'saved' o el que envíes
+        });
+      }
+      
+        editarCargos(cargo: any): void {
+        this.dialog.open(CargosComponent, {
+          width: '600px',
+          disableClose: true,
+          autoFocus: false,
+          data: { cargo }                 // enviamos el registro
+        }).afterClosed().subscribe(flag => {
+          if (flag) this.obtenerCargos();   // ← refresca con 'saved' o el que envíes
+        });
+      }
 }

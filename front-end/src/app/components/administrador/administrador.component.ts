@@ -4,6 +4,11 @@ import { Router } from '@angular/router';
 import { ValidacionesService } from '../../services/validaciones.service'; // Importar el servicio de validaciones
 import Swal from 'sweetalert2';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Optional, Inject } from '@angular/core';
+
+
+
 @Component({
   selector: 'app-administrador',
   templateUrl: './administrador.component.html',
@@ -12,6 +17,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class AdministradorComponent implements OnInit {
   administrador = {
+    codigoadmin: '',
     ci: '',
     nombre: '',
     direccion: '',
@@ -21,15 +27,22 @@ export class AdministradorComponent implements OnInit {
   };
 
   admin: any[] = [];
+  esEdicion = false;
 
   constructor(
     private serviceAdmin: AdministradorService,
     private validaciones: ValidacionesService, // Inyectar el servicio de validaciones
     private _router: Router,
-    private dialogRef: MatDialogRef<AdministradorComponent> 
+    private dialogRef: MatDialogRef<AdministradorComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 
   ngOnInit(): void {
+
+    if (this.data?.admin) {
+    this.administrador = { ...this.data.admin };   // precargar
+    this.esEdicion     = true;
+  }
     this.serviceAdmin.getAdministrador().subscribe({
       next: (data) => {
         this.admin = data; // Asigna los datos de administradores
@@ -148,4 +161,89 @@ export class AdministradorComponent implements OnInit {
   cancelar(): void {
     this.dialogRef.close();     // simplemente cierra sin flag
   }
-}
+
+
+
+guardar(): void {
+  if (!this.validaciones.validarCedulaEcuador(this.administrador.ci)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Cédula no válida',
+        text: 'La cédula ingresada no es válida.',
+      });
+      return;
+    }
+  
+    if (!this.administrador.nombre.trim()) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Nombre obligatorio',
+        text: 'El nombre es obligatorio.',
+      });
+      return;
+    }
+  
+    if (!this.administrador.direccion.trim()) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Dirección obligatoria',
+        text: 'La dirección es obligatoria.',
+      });
+      return;
+    }
+
+    if (!this.administrador.contrasenia.trim()) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Contraseña obligatoria',
+        text: 'La contraseña es obligatoria.',
+      });
+      return;
+    }
+  
+
+    if (!this.validaciones.validarEmail(this.administrador.e_mail)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Correo no válido',
+        text: 'El correo electrónico no es válido.',
+      });
+      return;
+    }
+  
+    if (!this.validaciones.validarTelefono(this.administrador.telefono)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Teléfono no válido',
+        text: 'El número de teléfono debe tener 10 dígitos y comenzar con 0.',
+      });
+      return;
+    }
+  
+    // Lógica de verificación y envío
+    
+  
+
+  const peticion$ = this.esEdicion
+      ? this.serviceAdmin.editarAdmin(this.administrador)
+      : this.serviceAdmin.agregar(this.administrador);
+
+  peticion$.subscribe({
+    next : () => {
+      Swal.fire({
+        icon : 'success',
+        title: 'Éxito',
+        text : this.esEdicion
+               ? 'Administrador actualizado correctamente.'
+               : 'Administrador agregado correctamente.'
+      }).then(() => this.dialogRef.close('saved'));
+    },
+    error: err => {
+      console.error('Error al guardar administrador:', err);
+      Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al guardar.' });
+    }
+  });
+
+      }
+    
+    }

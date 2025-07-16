@@ -75,10 +75,7 @@ export class ListarproveedorComponent implements OnInit {
     const end   = start + this.pageSize;
     this.displayedProveedores = this.provFiltrados.slice(start, end);
   }
-  editarProv(prov: any): void {
-    this.isEditMode = true;
-    this.provSeleccionado = { ...prov }; // Copia para evitar modificar el original
-  }
+ 
 
   guardarEdicion(): void {
     if (this.provSeleccionado) {
@@ -136,12 +133,19 @@ export class ListarproveedorComponent implements OnInit {
         width: '600px',          // o el ancho que prefieras
          disableClose: true,
       autoFocus: false  
-      });
-  
-      dialogRef.afterClosed().subscribe(result => {
-        if (result === 'added') {   // se envía desde el diálogo
-          this.obtenerProv();      // refresca la tabla
-        }
-      });
-    }
+      }).afterClosed().subscribe(flag => {
+          if (flag) this.obtenerProv();   // ← refresca con 'saved' o el que envíes
+        });
+      }
+      
+        editarProv(prov: any): void {
+        this.dialog.open(ProveedoresComponent, {
+          width: '600px',
+          disableClose: true,
+          autoFocus: false,
+          data: { prov }                 
+        }).afterClosed().subscribe(flag => {
+          if (flag) this.obtenerProv();   
+        });
+      }
 }

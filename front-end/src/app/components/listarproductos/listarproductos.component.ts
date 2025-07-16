@@ -122,12 +122,7 @@ export class ListarproductosComponent implements OnInit {
     this.displayedProductos = this.prodFiltrados.slice(start, end);
   }
 
-  /* --------- CRUD --------- */
-  editarProducto(p: any): void {
-    this.isEditMode = true;
-    this.prodSeleccionado = { ...p };
-  }
-
+ 
   guardarEdicion(): void {
     if (!this.prodSeleccionado) return;
     this.productoService.editarProducto(this.prodSeleccionado).subscribe({
@@ -222,10 +217,19 @@ export class ListarproductosComponent implements OnInit {
     disableClose: true,
     autoFocus: false,
     data: { idCategoria: this.idCatParam }   // pasamos la categoría actual (puede ser null)
-  });
-
-  ref.afterClosed().subscribe(r => {
-    if (r === 'added') { this.loadProducts(); }   // refresca la tabla
-  });
-}
+  }).afterClosed().subscribe(flag => {
+            if (flag) this.loadProducts();   // ← refresca con 'saved' o el que envíes
+          });
+        }
+        
+          editarProducto(prod: any): void {
+          this.dialog.open(ProductosComponent, {
+            width: '600px',
+            disableClose: true,
+            autoFocus: false,
+            data: { prod }                 // enviamos el registro
+          }).afterClosed().subscribe(flag => {
+            if (flag) this.loadProducts();   // ← refresca con 'saved' o el que envíes
+          });
+        }
 }

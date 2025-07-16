@@ -1,20 +1,32 @@
+<!-- cargos.component.html -->
 <div class="registro-panel">
   <div class="registro-panel-content">
-    <h3>Agregar Cargo</h3>
+    <!-- Título dinámico -->
+    <h3>{{ esEdicion ? 'Editar Cargo' : 'Agregar Cargo' }}</h3>
 
+    <!-- Usamos guardar() para ambos casos -->
     <form #cargoForm="ngForm"
-          (ngSubmit)="agregar()"
+          (ngSubmit)="guardar()"
           autocomplete="on">
 
       <div class="form-grid">
 
+        <!-- Código (solo visible en edición) -->
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="codigocargo" type="text"
+                 [(ngModel)]="cargos.idcargo"
+                 disabled>
+        </div>
+
         <!-- Nombre del cargo -->
         <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" name="nombre" type="text"
+          <label for="nombrecargo">Nombre</label>
+          <input id="nombrecargo" name="nombrecargo" type="text"
                  [(ngModel)]="cargos.nombrecargo"
                  placeholder="Ingrese el nombre del cargo"
-                 required cdkFocusInitial>
+                 required
+                 cdkFocusInitial>
         </div>
 
         <!-- Descripción -->
@@ -28,7 +40,7 @@
 
       </div><!-- /form-grid -->
 
-      <!-- Botonera -->
+      <!-- Botones -->
       <div class="registro-buttons">
         <button type="button"
                 class="btn-cancel"
@@ -36,7 +48,9 @@
 
         <button type="submit"
                 class="btn-register"
-                [disabled]="!cargoForm.valid">Registrar</button>
+                [disabled]="!cargoForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
       </div>
 
     </form>

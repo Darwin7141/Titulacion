@@ -11,6 +11,7 @@ import { MatDialog, MatDialogRef  } from '@angular/material/dialog';
 import { ValidacionesService } from '../../services/validaciones.service';
 import { PreclientesService } from '../../services/preclientes.service';
 import { RecuperarContrasenaService } from '../../services/recuperar-contrasena.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -62,6 +63,7 @@ export class LoginComponent implements OnInit {
   mostrarServicios = true;
   servicios: any[] = []; // aquí guardaremos los servicios
   menus: any[] = [];
+  isLoadingRecuperar = false;
 
   constructor(
     
@@ -641,19 +643,16 @@ scrollTo(id: string, event: Event) {
   }
 
   solicitarRecuperacion() {
-    if (!this.correoRecuperar) return;
-    this.recuperarService.solicitarRecuperacion({ correo: this.correoRecuperar })
-      .subscribe({
-        next: () => Swal.fire({
-                      icon: 'success',
-                      title: 'Éxito',
-                      text: 'Revisa tu correo para reestablecer tu contraseña.',
-                    })
-                         .then(() => this.closeRecuperar()),
-        error: () => Swal.fire('Error enviando correo','error')
-      });
-  }
-  }
+  if (!this.correoRecuperar) return;
+  this.isLoadingRecuperar = true;
+  this.recuperarService.solicitarRecuperacion({ correo: this.correoRecuperar })
+    .pipe(finalize(() => this.isLoadingRecuperar = false))
+    .subscribe({
+      next: () => Swal.fire('Éxito', 'Revisa tu correo para restablecer tu contraseña.', 'success')
+                      .then(() => this.closeRecuperar()),
+      error: () => Swal.fire('Error', 'No se pudo enviar el enlace. Intenta de nuevo.', 'error')
+    });
+}}
 
   
 

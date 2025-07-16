@@ -1,3 +1,11 @@
+<div *ngIf="isLoading" class="loading-overlay">
+    <mat-progress-spinner mode="indeterminate"
+                          diameter="50"
+                          color="accent"></mat-progress-spinner>
+    <p>Procesando…</p>
+  </div>
+
+  
 <div class="container-fluid">
     <div class="content-login col-lg-3 col-md-4 col-sm-6 col-xs-12">
       <h2>Recuperar Contraseña</h2>

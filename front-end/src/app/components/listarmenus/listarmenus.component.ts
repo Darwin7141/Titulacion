@@ -116,12 +116,6 @@ obtenerMenus(): void {
   }
 
 
-
-  editarMenus(menu: any): void {
-    this.isEditMode = true;
-    this.menuSeleccionado = { ...menu }; // Copia para evitar modificar el original
-  }
-
   guardarEdicion(): void {
     if (this.menuSeleccionado) {
       const idmenu = this.menuSeleccionado.idmenu;
@@ -242,12 +236,19 @@ obtenerMenus(): void {
         width: '600px',          // o el ancho que prefieras
          disableClose: true,
       autoFocus: false  
-      });
-  
-      dialogRef.afterClosed().subscribe(result => {
-        if (result === 'added') {   // se envía desde el diálogo
-          this.obtenerMenus();      // refresca la tabla
-        }
-      });
-    }
+      }).afterClosed().subscribe(flag => {
+        if (flag) this.obtenerMenus();   });
+                }
+                
+          editarMenus(menu: any): void {
+            this.dialog.open(MenusComponent, {
+            width: '600px',
+            disableClose: true,
+            autoFocus: false,
+            data: { menu }                
+            }).afterClosed().subscribe(flag => {
+            if (flag) this.obtenerMenus();   
+            });
+          }
+      
 }

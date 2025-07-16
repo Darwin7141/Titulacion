@@ -6,6 +6,8 @@ import Swal from 'sweetalert2';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Optional } from '@angular/core';
 import { of } from 'rxjs'; 
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Inject } from '@angular/core';
 
 
 @Component({
@@ -17,8 +19,8 @@ import { of } from 'rxjs';
 })
 export class ServiciocateringComponent implements OnInit {
   servicio = {
-    
-    nombre: '', // Para almacenar el valor de la contraseña
+    idservicio: '', 
+    nombre: '',
     descripcion: '',
     idtipo: '',
     idestado: '',
@@ -29,16 +31,25 @@ export class ServiciocateringComponent implements OnInit {
 
   nuevaImagen: File | null = null;
   isLoading: boolean = false;
+  esEdicion = false;
+
     constructor(
       
       private tipoService: TipocateringService,
       private serviceTipo: TipocateringService,
       private servCatering: ServiciocateringService,
       @Optional() private dialogRef: MatDialogRef<ServiciocateringComponent> ,
+      @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
       
       private _router:Router) {}
   
         ngOnInit():void {
+          if (this.data?.servicio) {
+          this.servicio= { ...this.data.servicio};   // precargar
+          this.esEdicion     = true;
+  }
+
+
           this.tipoService.getTipo().subscribe({
             next: (data) => {
               this.tipo = data; // Asigna los cargos a la lista
@@ -114,5 +125,61 @@ cancelar(): void {
                  : this.irALista();
 }
 
+guardar(): void {
+    this.isLoading = true;
+
+    // 1) Decide si crea o actualiza
+    const accion$ = this.esEdicion
+      ? this.servCatering.editarServicio(this.servicio)    // PUT /servicios/:id
+      : this.servCatering.agregar(this.servicio);          // POST /servicios
+
+    accion$.subscribe({
+      next: (res: any) => {
+        // 2) Obtén el idservicio
+        const idservicio = this.esEdicion
+          ? this.servicio.idservicio
+          : res.idservicio;
+
+        // 3) Si seleccionaste imagen, súbela ahora
+        const upload$ = this.nuevaImagen
+          ? this.servCatering.subirImagenServicio(this.nuevaImagen, idservicio)
+          : of(null);
+
+        upload$.subscribe({
+          next: () => this.finalizaExito(),
+          error: err => this.finalizaError('al subir la imagen', err)
+        });
+      },
+      error: err => this.finalizaError('al guardar el servicio', err)
+    });
+  }
+
+  private finalizaExito(): void {
+    this.isLoading = false;
+    Swal.fire({
+      icon: 'success',
+      title: 'Éxito',
+      text: this.esEdicion
+        ? 'Servicio actualizado correctamente.'
+        : 'Servicio agregado correctamente.'
+    }).then(() => {
+      if (this.esDialogo) {
+        this.dialogRef!.close(this.esEdicion ? 'saved' : 'added');
+      } else {
+        this.irALista();
       }
+    });
+  }
+
+  private finalizaError(msg: string, err: any): void {
+    this.isLoading = false;
+    console.error(`Error ${msg}:`, err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: `Ocurrió un error ${msg}.`
+    });
+  }
+
+}
 

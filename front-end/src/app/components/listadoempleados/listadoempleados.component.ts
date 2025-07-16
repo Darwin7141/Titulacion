@@ -84,10 +84,7 @@ export class ListadoempleadosComponent implements OnInit {
     this.displayedEmpleados = this.empleadosFiltrados.slice(start, end);
   }
 
-  editarEmpleado(empleado: any): void {
-    this.isEditMode = true;
-    this.empleadoSeleccionado = { ...empleado }; // Copia para evitar modificar el original
-  }
+ 
 
   guardarEdicion(): void {
     if (this.empleadoSeleccionado) {
@@ -144,14 +141,21 @@ export class ListadoempleadosComponent implements OnInit {
         width: '600px',          // o el ancho que prefieras
          disableClose: true,
       autoFocus: false  
-      });
-  
-      dialogRef.afterClosed().subscribe(result => {
-        if (result === 'added') {   // se envía desde el diálogo
-          this.obtenerEmpleados();      // refresca la tabla
-        }
-      });
-    }
+      }).afterClosed().subscribe(flag => {
+          if (flag) this.obtenerEmpleados();   // ← refresca con 'saved' o el que envíes
+        });
+      }
+      
+        editarEmpleado(emp: any): void {
+        this.dialog.open(EmpleadosComponent, {
+          width: '600px',
+          disableClose: true,
+          autoFocus: false,
+          data: { emp }                 // enviamos el registro
+        }).afterClosed().subscribe(flag => {
+          if (flag) this.obtenerEmpleados();   // ← refresca con 'saved' o el que envíes
+        });
+      }
 }
 
 

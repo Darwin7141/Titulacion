@@ -6,6 +6,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { of } from 'rxjs';              
 import Swal  from 'sweetalert2';
 
+
+
 @Component({
   selector: 'app-menus',
   standalone: false,
@@ -15,7 +17,7 @@ import Swal  from 'sweetalert2';
 })
 export class MenusComponent implements OnInit {
   menu = {
-    
+    idmenu: '',
     nombre: '', // Para almacenar el valor de la contraseña
     descripcion: '',
     precio: '',
@@ -25,6 +27,7 @@ export class MenusComponent implements OnInit {
   tipo: any[] = [];
   nuevaImagen: File | null = null;
   isLoading: boolean = false;
+  esEdicion = false;
     constructor(
       
       private servCatering: ServiciocateringService,
@@ -37,6 +40,11 @@ export class MenusComponent implements OnInit {
     private irALista(): void { this._router.navigate(['/listaMenus']); }
   
         ngOnInit():void {
+
+          if (this.data?.menu) {
+          this.menu= { ...this.data.menu};   // precargar
+          this.esEdicion     = true;
+      }
           this.servCatering.getServicio().subscribe({
             next: (data) => {
               this.tipo = data; // Asigna los cargos a la lista
@@ -83,18 +91,58 @@ export class MenusComponent implements OnInit {
   }
 
   /* ---------------- helpers privados ---------------- */
-  private finalizaExito(): void {
-    this.isLoading = false;
-    Swal.fire({ icon:'success', title:'Éxito', text:'Menú agregado correctamente.' })
-      .then(() => this.esDialogo ? this.dialogRef!.close('added')
-                                 : this.irALista());
-  }
+  
 
   private finalizaError(msg: string, err: any): void {
     this.isLoading = false;
     console.error(`Error ${msg}:`, err);
     Swal.fire({ icon:'error', title:'Error', text:`Ocurrió un error ${msg}.` });
   }
+
+  guardar(): void {
+  this.isLoading = true;
+
+  // 1) Decide si creas o actualizas
+  const accion$ = this.esEdicion
+    ? this.menuCatering.editarMenu(this.menu)         // PUT /menus/:id
+    : this.menuCatering.agregar(this.menu);           // POST /menus
+
+  accion$.subscribe({
+    next: (res: any) => {
+      // 2) Saca el idmenu de la respuesta o del modelo
+      const idmenu = this.esEdicion
+        ? this.menu.idmenu
+        : res.idmenu;
+
+      // 3) Si seleccionaste imagen, súbela ahora
+      const upload$ = this.nuevaImagen
+        ? this.menuCatering.subirImagenServicio(this.nuevaImagen, idmenu)
+        : of(null);
+
+      upload$.subscribe({
+        next: () => this.finalizaExito(),
+        error: err => this.finalizaError('al subir la imagen', err)
+      });
+    },
+    error: err => this.finalizaError('al guardar el menú', err)
+  });
+}
+
+private finalizaExito(): void {
+  this.isLoading = false;
+  Swal.fire({
+    icon: 'success',
+    title: 'Éxito',
+    text: this.esEdicion
+      ? 'Menú actualizado correctamente.'
+      : 'Menú agregado correctamente.'
+  }).then(() => {
+    if (this.esDialogo) this.dialogRef!.close(this.esEdicion ? 'saved' : 'added');
+    else this.irALista();
+  });
+}
+
+
 }
       
 

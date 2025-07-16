@@ -1,12 +1,22 @@
 <div class="registro-panel">
   <div class="registro-panel-content">
-    <h3>Agregar Producto</h3>
+    <!-- Título dinámico -->
+    <h3>{{ esEdicion ? 'Editar Producto' : 'Agregar Producto' }}</h3>
 
+    <!-- Un único submit → guardar() decide si crea o actualiza -->
     <form #prodForm="ngForm"
-          (ngSubmit)="agregar()"
+          (ngSubmit)="guardar()"
           autocomplete="on">
 
       <div class="form-grid">
+
+        <!-- Código (solo visible en edición) -->
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="codigoproducto" type="text"
+                 [(ngModel)]="productos.idproducto"
+                 disabled>
+        </div>
 
         <!-- Nombre -->
         <div class="form-group">
@@ -14,7 +24,8 @@
           <input id="nombre" name="nombre" type="text"
                  [(ngModel)]="productos.nombre"
                  placeholder="Ingrese el nombre"
-                 required cdkFocusInitial>
+                 required
+                 cdkFocusInitial>
         </div>
 
         <!-- Stock -->
@@ -30,7 +41,7 @@
         <div class="form-group">
           <label for="proveedor">Proveedor</label>
           <select id="proveedor" name="codigoproveedor"
-                  [(ngModel)]="productos.codigoproveedor"
+                  [(ngModel)]="productos.codigoproveedor" 
                   required>
             <option value="" disabled selected>Seleccione un proveedor</option>
             <option *ngFor="let p of prov" [value]="p.codigoproveedor">
@@ -39,12 +50,13 @@
           </select>
         </div>
 
-        <!-- Categoría (solo si no hay categoría fija) -->
+        <!-- Categoría (oculta si existe categoría fija) -->
         <ng-container *ngIf="!categoriaFijaId">
           <div class="form-group">
             <label for="categoria">Categoría</label>
             <select id="categoria" name="idcategoria"
                     [(ngModel)]="productos.idcategoria"
+                    
                     required>
               <option value="" disabled selected>Seleccione una categoría</option>
               <option *ngFor="let c of cat" [value]="c.idcategoria">
@@ -72,7 +84,9 @@
 
         <button type="submit"
                 class="btn-register"
-                [disabled]="!prodForm.valid">Registrar</button>
+                [disabled]="!prodForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
       </div>
 
     </form>

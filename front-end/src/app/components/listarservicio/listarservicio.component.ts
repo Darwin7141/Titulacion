@@ -120,10 +120,7 @@ volver(): void {
     this.displayedServicios = this.servFiltrados.slice(start, end);
   }
 
-  editarServicios(servicio: any): void {
-    this.isEditMode = true;
-    this.servSeleccionado = { ...servicio }; // Copia para evitar modificar el original
-  }
+  
 
   guardarEdicion(): void {
     if (this.servSeleccionado) {
@@ -320,17 +317,24 @@ async downloadPdf(): Promise<void> {
 
 abrirDialogoAgregar(): void {
     const dialogRef = this.dialog.open(ServiciocateringComponent, {
-      width: '600px',          // o el ancho que prefieras
+      width: '600px',          
        disableClose: true,
     autoFocus: false  
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === 'added') {   // se envía desde el diálogo
-        this.obtenerServicios();      // refresca la tabla
-      }
-    });
-  }
+    }).afterClosed().subscribe(flag => {
+              if (flag) this.obtenerServicios();   
+            });
+          }
+          
+            editarServicios(servicio: any): void {
+            this.dialog.open(ServiciocateringComponent, {
+              width: '600px',
+              disableClose: true,
+              autoFocus: false,
+              data: { servicio }                
+            }).afterClosed().subscribe(flag => {
+              if (flag) this.obtenerServicios();   
+            });
+          }
 
 }
 

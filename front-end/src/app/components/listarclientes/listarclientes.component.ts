@@ -77,10 +77,7 @@ export class ListarclientesComponent implements OnInit {
   }
 
 
-  editarClientes(cliente: any): void {
-    this.isEditMode = true;
-    this.cliSeleccionado = { ...cliente }; // Copia para evitar modificar el original
-  }
+  
 
   guardarEdicion(): void {
     if (this.cliSeleccionado) {
@@ -195,13 +192,20 @@ export class ListarclientesComponent implements OnInit {
       width: '600px',          // o el ancho que prefieras
        disableClose: true,
     autoFocus: false  
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === 'added') {   // se envía desde el diálogo
-        this.obtenerClientes();      // refresca la tabla
-      }
-    });
-  }
+    }).afterClosed().subscribe(flag => {
+        if (flag) this.obtenerClientes();   // ← refresca con 'saved' o el que envíes
+      });
+    }
+    
+      editarClientes(cliente: any): void {
+      this.dialog.open(ClientesComponent, {
+        width: '600px',
+        disableClose: true,
+        autoFocus: false,
+        data: { cliente }                 // enviamos el registro
+      }).afterClosed().subscribe(flag => {
+        if (flag) this.obtenerClientes();   // ← refresca con 'saved' o el que envíes
+      });
+    }
 }
 

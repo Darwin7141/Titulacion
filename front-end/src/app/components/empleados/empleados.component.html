@@ -1,13 +1,23 @@
+<!-- empleados.component.html -->
 <div class="registro-panel">
   <div class="registro-panel-content">
-    <h3>Agregar Empleado</h3>
+    <!-- Título dinámico -->
+    <h3>{{ esEdicion ? 'Editar Empleado' : 'Agregar Empleado' }}</h3>
 
+    <!-- Un único submit → guardar() decide si crea o actualiza -->
     <form #empleadoForm="ngForm"
-          (ngSubmit)="agregar()"
+          (ngSubmit)="guardar()"
           autocomplete="on">
 
-      <!-- 3 filas × 2 columnas = 6 campos -->
       <div class="form-grid">
+
+        <!-- Código (solo visible en edición) -->
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="codigoempleado" type="text"
+                 [(ngModel)]="empleado.codigoempleado"
+                 disabled>
+        </div>
 
         <!-- Cédula -->
         <div class="form-group">
@@ -15,7 +25,8 @@
           <input id="ci" name="ci" type="text"
                  [(ngModel)]="empleado.ci"
                  placeholder="Ingrese la cédula"
-                 required cdkFocusInitial>
+                 required
+                 cdkFocusInitial>
         </div>
 
         <!-- Dirección -->
@@ -36,12 +47,13 @@
                  required>
         </div>
 
-        <!-- Correo -->
+        <!-- Correo (lo bloqueamos en edición, como en Administrador) -->
         <div class="form-group">
           <label for="correo">Correo Electrónico</label>
           <input id="correo" name="e_mail" type="email"
                  [(ngModel)]="empleado.e_mail"
                  placeholder="Ingrese el correo"
+                 [disabled]="esEdicion"
                  required>
         </div>
 
@@ -77,7 +89,9 @@
 
         <button type="submit"
                 class="btn-register"
-                [disabled]="!empleadoForm.valid">Registrar</button>
+                [disabled]="!empleadoForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
       </div>
 
     </form>
