@@ -1,220 +1,210 @@
-/* Contenedor principal de la vista */
-.search-bar {
-  display: flex;
-  margin-bottom: 1rem;
-}
-.search-bar input {
-  flex: 1;
-  padding: 0.5rem;
-  font-size: 1rem;
-}
-.search-bar button {
-  margin-left: 0.5rem;
-  padding: 0.5rem;
-  font-size: 1rem;
+.welcome-card{
+  align-items:center;
+  font-family:"Roboto", sans-serif;
+  background:#28c2f1;
+  color:#fff;
+  display:flex;                 /* centra el texto */
+  justify-content:center;
+  padding:8px 12px;
+  border-radius:8px;
 }
 
-.container-mis-reservas {
-  max-width: 900px;
+/* ↓ aquí ajustas el tamaño del título */
+.welcome-card h1{
+  margin:6px 0;
+  font-size:28px;               /* antes era gigante; ajusta a gusto */
+  line-height:1.2;
+  font-weight:600;
+  text-align:center;
+}
+
+.container-mis-reservas{
+  max-width: 980px;
   margin: 20px auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 0 12px 24px;
 }
 
-.reserva-card {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+/* ───── Buscador pill ───── */
+.search-bar{
+  display:flex; align-items:center; gap:10px;
+  margin: 8px 0 18px;
+}
+.search-input-wrap{ position:relative; flex:1; }
+.search-left{
+  position:absolute; left:12px; top:50%; transform:translateY(-50%);
+  font-size:20px; color:#64748b;
+}
+.search-input{
+  width:100%; height:42px; padding:0 14px 0 40px;
+  border:1px solid #cbd5e1; border-radius:999px; outline:none;
+  font-size:14px; color:#111827; background:#fff;
+}
+.search-input:focus{ border-color:#3f51b5; box-shadow:0 0 0 3px rgba(63,81,181,.1); }
+.search-btn,
+.clear-btn{
+  display: grid;             /* centrado perfecto */
+  place-items: center;       /* centra X/Y el icono */
+  width: 44px;
+  height: 44px;
+  padding: 0;                /* evita empujes */
+  border: none;
+  border-radius: 50%;
+  background: #e8eaf6;
+  color: #3f51b5;
+  cursor: pointer;
 }
 
-h2 {
-  text-align: center;
+/* Tamaño y caja del mat-icon dentro del botón */
+.search-btn mat-icon,
+.clear-btn mat-icon{
+  margin: 0;
+  width: 24px;
+  height: 24px;
   font-size: 24px;
-  margin-bottom: 30px;
+  line-height: 24px;         /* evita desalineación vertical */
+}
+.clear-btn{ background:#f1f5f9; color:#64748b; }
+
+/* ───── Card / “modal” de reserva ───── */
+.reserva-card{
+  background:#fff; border-radius:12px; padding:18px 18px 14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+  border:1px solid #eee; margin-bottom:18px;
 }
 
-h3 {
-  margin-top: 10px;
-  margin-bottom: 10px;
+/* Cabecera */
+.res-header{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin-bottom:10px;
 }
-
-/* Tabla de detalles */
-table {
-  width: 100%;
-  margin-bottom: 20px;
-  border-collapse: collapse;
-}
-
-table th,
-table td {
-  text-align: center;
-  padding: 8px;
-  border: 1px solid #ddd;
-}
-
-table th {
-  background-color: #f1f1f1;
-  font-weight: bold;
-}
-
-/* Botones de acción (Editar, Eliminar) */
-.actions {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-button {
-  display: flex;
+.res-title,
+.meta-item{
+  display: grid;
+  grid-template-columns: 22px auto; /* ancho fijo para el ícono → el texto arranca igual en todas */
   align-items: center;
-  justify-content: center;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
+  column-gap: 10px;
+  margin: 2px 0;
 }
 
-button i {
-  margin-right: 5px;
+/* mismo tamaño y color para iconos y textos */
+.res-title mat-icon,
+.meta-item mat-icon{
+  width: 22px; height: 22px;
+  font-size: 22px; line-height: 22px;
+  color: #374151;            /* ← color unificado */
 }
 
-.edit-button {
-  background-color: #007bff;
-  color: white;
-}
-.edit-button:hover {
-  background-color: #0056b3;
-}
-
-.delete-button {
-  background-color: #dc3545;
-  color: white;
-}
-.delete-button:hover {
-  background-color: #c82333;
+/* texto de cada fila (incluye Reserva, Fecha, Dirección) */
+.res-title span,
+.meta-text{
+  font-size: 15px;
+  line-height: 1.25;
+  color: #374151;            /* ← mismo color que los iconos */
 }
 
-/* Badge para el estado */
-.estado-badge {
-  background-color: #d1ecf1; /* Color de fondo (azul claro) */
-  color: #0c5460;           /* Texto azul oscuro */
-  padding: 4px 8px;
-  border-radius: 12px;      /* Bordes redondeados */
-  font-weight: bold;        /* Resaltarlo un poco más */
-  display: inline-block;
+/* el rótulo en negrita (“Reserva:”, “Fecha:”, “Dirección:”) */
+.res-title span strong,
+.meta-text strong{
+  font-weight: 600;
+  color: #374151;            /* ← mismo color que todo */
 }
 
-/* Responsivo */
-@media screen and (max-width: 768px) {
-  .container-mis-reservas {
-    width: 100%;
-    padding: 15px;
-  }
+/* si tienes estado a la derecha de Dirección, lo dejamos igual */
+.meta-row{ display:flex; align-items:center; }
+.meta-row.with-status{ justify-content: space-between; }
 
-  .reserva-card {
-    padding: 15px;
-  }
 
-  table th,
-  table td {
-    padding: 5px;
-    font-size: 14px;
-  }
+.status-pill{
+  padding:6px 10px; border-radius:999px; font-weight:600; font-size:12px;
+  background:#e2e8f0; color:#334155; white-space:nowrap;
+}
+/* Colores por estado (ajusta a tus strings reales) */
+.status-pill.pagada{ background:#e6f7ef; color:#0f5132; }
+.status-pill.solicitada, .status-pill.pendiente{ background:#fff7e6; color:#ad6800; }
+.status-pill.cancelada{ background:#fde7e9; color:#842029; }
 
-  button {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
+/* Meta datos */
+
+.meta-row{ display:flex; align-items:center; }
+.meta-row.with-status{ justify-content:space-between; }
+
+.meta-item{ display:flex; align-items:center; gap:8px; color:#374151; }
+.meta-item mat-icon{ color:#6b7280; }
+
+/* Tabla */
+.table-wrapper{ overflow-x:auto; }
+.tabla{ width:100%; border-collapse:collapse; font-size:14px; }
+.tabla th, .tabla td{ border:1px solid #e5e7eb; padding:10px; text-align:left; }
+.tabla th{ background:#f7f7f7; font-weight:700; }
+.total-label{ text-align:right; font-weight:700; background:#fafafa; }
+.total-value{ font-weight:700; }
+
+/* Acciones */
+.actions{
+  display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:12px;
+}
+button{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:9px 14px; border:none; border-radius:8px; cursor:pointer; font-size:14px;
+}
+.edit-button{ background:#1976d2; color:#fff; }
+.cancel-button{ background:#ffc107; color:#212529; }
+.pay-button{ background:#28a745; color:#fff; }
+.download-button{ background:#455a64; color:#fff; }
+button:hover{ filter:brightness(.96); }
+
+/* Volver */
+.btn-back{ display:block; margin:22px auto 0; }
+
+/* Responsive */
+@media (min-width: 680px){
+  .res-meta{ grid-template-columns:1fr 1fr; }
 }
 
-.pay-button {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 4px;
+.carousel-wrapper{
+  position: relative;
+  padding: 0 56px;             /* deja espacio para las flechas */
 }
 
-.pay-button:hover {
-  background-color: #218838;
+.nav-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:44px; height:44px;
+  border-radius:50%;
+  display:grid; place-items:center;
+  background:#3f51b5; color:#fff; border:none;
+  cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,.2);
+  z-index:2;
 }
-/* Estilos para el formulario dentro del modal */
-::ng-deep .swal2-container {
-  max-width: 500px; /* Ajusta el tamaño máximo del modal */
-  padding: 20px;
-  border-radius: 10px;
-  position: fixed; /* Fijamos el modal en la pantalla */
-  top: 50%; /* Centrado verticalmente */
-  left: 50%; /* Centrado horizontalmente */
-  transform: translate(-50%, -50%); /* Ajustamos el centro exacto */
-  z-index: 9999; /* Asegura que el modal esté sobre otros elementos */
+.nav-arrow.left{  left:4px; }
+.nav-arrow.right{ right:4px; }
+.nav-arrow:hover{ filter:brightness(.95); }
+
+/* Tamaño del glifo y corrección óptica */
+.nav-arrow mat-icon{
+  display:block;
+  width:24px; height:24px;
+  font-size:18px; line-height:24px; margin:0;
+}
+.nav-arrow.left  mat-icon { transform: translateX( -3px); }  /* ← compensa hacia la izq */
+.nav-arrow.right mat-icon { transform: translateX( 0px); }  /* → compensa hacia la der */
+
+/* indicador página */
+.pager{
+  position:absolute; right:64px; top:8px;
+  background:#eef2ff; color:#3f51b5; font-weight:600;
+  padding:4px 10px; border-radius:999px; font-size:12px;
 }
 
-::ng-deep .swal2-title {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #333;
+/* mensaje vacío */
+.no-data{
+  text-align:center; color:#64748b; padding:20px 0;
 }
 
-::ng-deep .swal2-input-container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-::ng-deep .swal2-input {
-  font-size: 16px;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  width: 100%;
-  margin-bottom: 5px;
-}
-
-::ng-deep .swal2-input:focus {
-  outline: none;
-  border-color: #3b8a5f;
-}
-
-::ng-deep label {
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #555;
-}
-
-::ng-deep .swal2-confirm {
-  background-color: #3b8a5f;
-  color: white;
-}
-
-::ng-deep .swal2-cancel {
-  background-color: #f44336;
-  color: white;
-}
-
-::ng-deep .paypal-modal {
-  overflow-x: hidden;     /* elimina la barra inferior */
-  text-align: center;     /* centra el div de PayPal */
-}
-
-/* opcional: ajusta ancho máximo del botón para que no desborde */
-::ng-deep .paypal-hosted {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.cancel-button {
-  background-color: #ffc107;
-  color: #212529;
-}
-.cancel-button:hover {
-  background-color: #e0a800;
+/* responsive: flechas más pequeñas en móvil */
+@media (max-width: 640px){
+  .carousel-wrapper{ padding: 0 44px; }
+  .nav-arrow{ width:36px; height:36px; }
+  .pager{ right:52px; }
 }

@@ -1,170 +1,193 @@
-/* ==========================
-   CONTENEDOR PRINCIPAL
-========================== */
-.container-agendar {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+/* ===== contenedor general ===== */
+.agendar-wrapper{
+  max-width: 1100px;
+  margin: 5px auto;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+  padding:24px 28px;
   font-family: Arial, sans-serif;
 }
 
-.container-agendar h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 30px;
+.agendar-wrapper h2{
+  text-align:center;
+  margin:0 0 20px;
+  font-weight:600;
+  font-size:25px;
 }
 
-.container-agendar h3 {
-  margin: 25px 0 15px;
-  color: #333;
-  font-weight: normal;
+/* ===== grid con divisor ===== */
+.form-grid{
+  display:grid;
+  grid-template-columns: 1fr 1px 1fr; /* izq | divisor | der */
+  gap:24px;
+  align-items:start;
 }
 
-/* ==========================
-   FORMULARIO
-========================== */
-.container-agendar form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* Espaciado entre grupos de campos */
+.divider{
+  background:#e6e6e6;
+  width:1px;
+  height:100%;
 }
 
-.container-agendar label {
-  font-size: 14px;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #555;
+/* ===== campos ===== */
+.field{
+  display:flex;
+  flex-direction:column;
+  margin-bottom:14px;
 }
 
-.container-agendar input,
-.container-agendar select {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  font-size: 16px;
-  background-color: #f8f8f8;
-  width: 100%;
+.field.small{ 
+  max-width:130px;
+  }
+
+.field label{
+  font-size:14px;
+  color:#555;
+  margin-bottom:6px;
+  font-weight:600;
+}
+
+.field input,
+.field select{
+  padding:10px 12px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  background:#fafafa;
+  font-size:15px;
+}
+
+.field input:focus,
+.field select:focus{
+  outline:none;
+  border-color:#3f51b5;
+  background:#fff;
+}
+
+/* ícono del datepicker decorativo */
+.date-field{ position:relative; }
+.date-field .date-icon{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  font-size:20px;
+  color:#9e9e9e;
+  pointer-events:none;
+}
+
+/* ===== fila selección menú + cantidad + (+) ===== */
+.select-row{
+  display:flex;
+  align-items:flex-end;   /* alinea todos por la base */
+  gap:16px;
+  flex-wrap:wrap;
+}
+
+.select-row .field{ margin-bottom:0; }
+
+.select-row .field select,
+.select-row .field input[type="number"]{
+  height: 42px;           /* mismo alto para ambos */
+  line-height: 42px;
+  padding: 0 12px;        
   box-sizing: border-box;
-  margin-bottom: 10px;
+  border-radius: 8px;
 }
 
-.container-agendar input:focus,
-.container-agendar select:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.container-agendar hr {
-  border: none;
-  height: 1px;
-  background-color: #ddd;
-  margin: 20px 0;
-}
-
-/* Ajuste al contenedor donde están "Menú" y "Cantidad" */
-.container-agendar .menu-select-row {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap; /* Para pantallas pequeñas */
-}
-
-.container-agendar .menu-select-row select {
-  width: 180px; /* Ajusta según tu gusto */
-}
-
-/* Ajuste para el campo de cantidad */
-.container-agendar .menu-select-row input[type="number"] {
-  width: 80px; /* Más elegante que estilo inline */
-}
-
-/* ==========================
-   BOTONES E ÍCONOS
-========================== */
-/* Botón general de ícono */
-.icon-button {
-  padding: 8px 14px;
-  background-color: #007bff; 
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 16px;
-  display: inline-flex; 
+.select-row .icon-button{
+  height: 42px;
+  width: 42px;            /* cuadrado, opcional */
+  padding: 0;             /* que el alto/alto manden */
+  align-self: flex-end;   /* asegura alineación por la base */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  transition: background-color 0.3s ease;
 }
 
-.icon-button:hover {
-  background-color: #0056b3;
+/* botones */
+.icon-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:6px 12px;
+  border:none;
+  border-radius:8px;
+  background:#3f51b5;
+  color:#fff;
+  cursor:pointer;
+  transition:filter .2s;
+}
+.icon-button:hover{ filter:brightness(.95); }
+.icon-button.danger{ background:#dc3545; }
+
+/* ===== tabla ===== */
+.table-wrapper{ margin-top:10px; }
+.tabla{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+  color:#555;
+}
+.tabla th, .tabla td{
+  border:1px solid #e5e5e5;
+  padding:10px;
+  text-align:left;
+}
+.tabla th{ background:#f4f4f4; }
+.acciones-col{ width:60px; text-align:center; }
+
+/* totales + botón */
+.totales{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:12px;
+  margin:14px 0 10px;
+  font-size:16px;
+}
+.generate-button{
+  display:block;
+  margin:auto;
+  background:#28a745;
+  color:#fff;
+  border:none;
+  padding:12px 22px;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer;
+}
+.generate-button[disabled]{ opacity:.6; cursor:not-allowed; }
+
+/* botón volver */
+.btn-back{ display:block; margin:18px auto 0; }
+
+/* ===== responsive ===== */
+@media (max-width: 900px){
+  .form-grid{
+    grid-template-columns: 1fr;
+  }
+  .divider{ display:none; }
+}
+.section-title { 
+font-size: 18px; font-weight: 600; margin: 10px 0 8px; }
+
+.tabla .acciones-col .icon-button{
+  width: 28px;
+  height: 28px;
+  padding: 0;              /* quita relleno grande */
+  border-radius: 6px;      /* esquinas más compactas */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Versión "danger" (rojo) para el botón de Quitar */
-.icon-button.danger {
-  background-color: #dc3545;
-}
-.icon-button.danger:hover {
-  background-color: #c82333;
-}
-
-/* Generar Reserva - tamaño auto, no ocupa todo el ancho */
-
-
-.generate-button {
-  display: inline-block; /* Cambiar display a inline-block para que se ajuste al contenido */
-  width: auto;  /* Ancho automático para que el botón no ocupe todo el espacio */
-  max-width: 250px; /* Limitar el ancho máximo */
-  padding: 10px 20px;
-  margin: 15px auto; /* Centra el botón horizontalmente */
-  background-color: #28a745;
-  color: #fff;
-  font-size: 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  text-align: center;
+.tabla .acciones-col .icon-button mat-icon{
+  font-size: 18px;         /* icono más chico */
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
 }
 
-.generate-button:hover {
-  background-color: #218838;
-}
-
-/* ==========================
-   TABLA DE MENÚS SELECCIONADOS
-========================== */
-.container-agendar table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.container-agendar th,
-.container-agendar td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-  font-size: 14px;
-}
-
-.container-agendar th {
-  background-color: #f4f4f4;
-  font-weight: bold;
-}
-
-/* Opcional: Para centrar las celdas si gustas */
-.container-agendar tbody td {
-  background-color: #fafafa;
-}
-
-.container-agendar p {
-  margin-top: 15px;
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
-}
+/* opcional: estrecha la columna de acciones */
+.tabla .acciones-col{ width: 40px; text-align: center; }

@@ -1,6 +1,6 @@
 declare const paypal: any;
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { ReservasService } from '../../services/reservas.service';
 import { Router } from '@angular/router';
 import { ClientesService } from '../../services/clientes.service';
@@ -37,6 +37,8 @@ export class MisReservasComponent implements OnInit {
   mensajes: { remitente: 'user' | 'bot'; texto: string }[] = [];
   searchTerm: string = '';
   allReservas: any[] = [];
+  currentIndex = 0;
+  @Output() cerrar = new EventEmitter<void>();
 
   constructor(
     private reservasService: ReservasService,
@@ -51,9 +53,14 @@ export class MisReservasComponent implements OnInit {
     if (codigocliente) {
       this.cargarReservasCliente(codigocliente);
     }
+    
+  }
 
-    
-    
+  get hasReservas(): boolean {
+    return this.reservas && this.reservas.length > 0;
+  }
+  get current() {                             // ← reserva actual
+    return this.hasReservas ? this.reservas[this.currentIndex] : null;
   }
 
   cargarReservasCliente(codigocliente: string): void {
@@ -61,6 +68,7 @@ export class MisReservasComponent implements OnInit {
     next: (resp) => {
       this.reservas = resp;
       this.allReservas = resp;
+      this.currentIndex = 0;
 
       this.reservas.forEach(r => {
         const pagado = Number(r.primer_pago)    || 0;
@@ -107,25 +115,34 @@ export class MisReservasComponent implements OnInit {
   });
 }
 
+nextReserva(): void {
+    if (!this.hasReservas) return;
+    this.currentIndex = (this.currentIndex + 1) % this.reservas.length;
+  }
+  prevReserva(): void {
+    if (!this.hasReservas) return;
+    this.currentIndex = (this.currentIndex - 1 + this.reservas.length) % this.reservas.length;
+  }
   
 
-  search(): void {
-  const term = this.searchTerm.trim().toLowerCase();
-  if (!term) {
-    // si está vacío, recargo todo
-    this.reservas = [...this.allReservas];
-  } else {
-    this.reservas = this.allReservas.filter(r =>
-      r.idreserva.toLowerCase().includes(term)
-    );
+search(): void {
+    const term = this.searchTerm.trim().toLowerCase();
+    this.reservas = term
+      ? this.allReservas.filter(r => r.idreserva.toLowerCase().includes(term))
+      : [...this.allReservas];
+    this.currentIndex = 0;                    // ← resetea al 1.º resultado
   }
-}
 
 /** Limpia el filtro y vuelve a cargar todo */
 clearSearch(): void {
   this.searchTerm = '';
   this.reservas   = [...this.allReservas];
+  this.currentIndex = 0;
 }
+
+volver(): void {
+    this.cerrar.emit();
+  }
 
   descargarComprobante(reserva: any) {
     // 1) Llamamos al backend para obtener datos completos del cliente:
@@ -582,7 +599,7 @@ cancelarReserva(reserva: any) {
       this.enviarSolicitudCancelacion(reserva.idreserva, codigocliente);
     } else {
       // 3b) Si cancela: lo devuelves al listado
-      this.router.navigate(['/misReservas']);
+      this.router.navigate(['/inicioCliente']);
     }
   });
 }

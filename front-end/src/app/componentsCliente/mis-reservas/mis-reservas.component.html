@@ -1,98 +1,140 @@
+<mat-card class="welcome-card">
+  <h1>Mis&nbsp;Reservas</h1>
+</mat-card>
+
 <div class="container-mis-reservas">
-  <h2>Mis Reservas</h2>
-
+  <!-- ───────── Buscador pill ───────── -->
   <div class="search-bar">
-  <input
-    type="text"
-    placeholder="Buscar por código"
-    [(ngModel)]="searchTerm"
-    (keyup.enter)="search()"
-  />
-  <button (click)="search()"><i class="fa fa-search"></i></button>
-  <button (click)="clearSearch()"><i class="fa fa-refresh"></i></button>
-</div>
-
-  <div *ngFor="let reserva of reservas; let i = index" class="reserva-card">
-    
-
-    
-     <p><strong>Reserva:</strong> {{ reserva.idreserva }}</p>
-    <p><strong>Fecha:</strong> {{ reserva.fechaevento }}</p>
-    <p><strong>Dirección:</strong> {{ reserva.direccionevento }}</p>
-
-    
-    <p *ngIf="reserva.nombre">
-      <strong>Estado:</strong>
-      <span class="estado-badge">{{ reserva.nombre.estado_reserva }}</span>
-    </p>
-
-    <!-- Tabla de detalles -->
-    <table>
-      <thead>
-        <tr>
-          <th>Menú</th>
-          <th>Precio Unit.</th>
-          <th>Cant.</th>
-          <th>Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let det of reserva.detalles">
-          <td>{{ det.menu?.nombre }}</td>
-          <td>{{ det.preciounitario }}</td>
-          <td>{{ det.cantpersonas }}</td>
-          <td>{{ det.subtotal }}</td>
-        </tr>
-
-        <!-- 2) Última fila para el Total -->
-        <tr>
-          <!-- Span 3 columnas para que el "Total:" quede alineado al subtotal -->
-          <td colspan="3" style="text-align: right; font-weight: bold;">
-            Total:
-          </td>
-          <td>{{ reserva.total }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="actions">
-      
-      <button (click)="editarReserva(reserva.idreserva)" class="edit-button">
-        <i class="fa fa-edit"></i> Editar
-      </button>
-      
-
-      <button
-  class="cancel-button"
-  (click)="cancelarReserva(reserva)"
->
-  Cancelar
-</button>
-
-
-      <button *ngIf="reserva.mostrarBotonPagoInicial"
-        (click)="abrirPayPal('inicial', reserva)"
-        class="pay-button">
-  Pago Inicial
-</button>
-
-<!-- Pago final -->
-<button *ngIf="reserva.mostrarBotonPagoFinal"
-        (click)="abrirPayPal('final', reserva)"
-        class="pay-button">
-  Pago Final
-</button>
-
-<!-- Descargar comprobante -->
-<button *ngIf="reserva.mostrarComprobante"
-        (click)="descargarComprobante(reserva)"
-        class="download-button">
-  Descargar Comprobante
-</button>
-
-    
+    <div class="search-input-wrap">
+      <mat-icon class="search-left">search</mat-icon>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Buscar por código"
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="search()"
+      />
     </div>
-
-    <hr />
+    <button class="search-btn" (click)="search()" aria-label="Buscar">
+      <mat-icon>search</mat-icon>
+    </button>
+    
   </div>
+
+  <!-- ───────── Tarjetas de reserva ───────── -->
+  <ng-container *ngIf="hasReservas; else noData">
+
+  <div class="carousel-wrapper">
+    <!-- flechas -->
+    <button class="nav-arrow left" (click)="prevReserva()" aria-label="Anterior">
+      <mat-icon>arrow_back_ios_new</mat-icon>
+    </button>
+    <button class="nav-arrow right" (click)="nextReserva()" aria-label="Siguiente">
+      <mat-icon>arrow_forward_ios</mat-icon>
+    </button>
+
+    <!-- indicador -->
+    <div class="pager">{{ currentIndex + 1 }} / {{ reservas.length }}</div>
+
+    <!-- tarjeta actual -->
+    <ng-container *ngIf="current as reserva">
+      <div class="reserva-card">
+
+        <!-- Cabecera: sólo “Reserva” -->
+        <div class="res-header">
+          <div class="res-title">
+            <mat-icon>restaurant</mat-icon>
+            <span><strong>Reserva:</strong> {{ reserva.idreserva }}</span>
+          </div>
+        </div>
+
+        <!-- Meta (2 líneas): Fecha y luego Dirección + Estado a la derecha -->
+        <div class="res-meta">
+          <!-- línea 1: fecha -->
+          <div class="meta-row">
+            <div class="meta-item">
+              <mat-icon>event</mat-icon>
+              <span class="meta-text"><strong>Fecha:</strong> {{ reserva.fechaevento }}</span>
+            </div>
+          </div>
+
+          <!-- línea 2: dirección (izq) + estado (der) -->
+          <div class="meta-row with-status">
+            <div class="meta-item">
+              <mat-icon>place</mat-icon>
+              <span class="meta-text"><strong>Dirección:</strong> {{ reserva.direccionevento }}</span>
+            </div>
+
+            <span class="status-pill"
+                  [ngClass]="(reserva?.nombre?.estado_reserva || '').toLowerCase()">
+              {{ reserva?.nombre?.estado_reserva }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-wrapper">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Menú</th>
+                <th>Precio Unit.</th>
+                <th>Cant. Personas</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let det of reserva.detalles">
+                <td>{{ det.menu?.nombre }}</td>
+                <td>{{ det.preciounitario }}</td>
+                <td>{{ det.cantpersonas }}</td>
+                <td>{{ det.subtotal }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="total-label">Total:</td>
+                <td class="total-value">{{ reserva.total }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Acciones -->
+        <div class="actions">
+          <button class="edit-button" (click)="editarReserva(reserva.idreserva)">
+            <mat-icon>edit</mat-icon> Editar
+          </button>
+
+          <button class="cancel-button" (click)="cancelarReserva(reserva)">
+            Cancelar
+          </button>
+
+          <button *ngIf="reserva.mostrarBotonPagoInicial"
+                  class="pay-button" (click)="abrirPayPal('inicial', reserva)">
+            Pago Inicial
+          </button>
+
+          <button *ngIf="reserva.mostrarBotonPagoFinal"
+                  class="pay-button" (click)="abrirPayPal('final', reserva)">
+            Pago Final
+          </button>
+
+          <button *ngIf="reserva.mostrarComprobante"
+                  class="download-button" (click)="descargarComprobante(reserva)">
+            Descargar Comprobante
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+
+<ng-template #noData>
+  <div class="no-data">No se encontraron reservas.</div>
+</ng-template>
+
+  <button mat-icon-button class="btn-back" (click)="volver()" matTooltip="Volver">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
 </div>

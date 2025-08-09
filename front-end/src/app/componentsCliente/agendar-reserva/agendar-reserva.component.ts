@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, Output, EventEmitter} from '@angular/core';
 import { MenusService } from '../../services/menus.service';
 import { ClientesService } from '../../services/clientes.service';
 import { ReservasService } from '../../services/reservas.service';
@@ -30,6 +30,7 @@ export class AgendarReservaComponent implements OnInit{
 
   // Menús disponibles
   menus: any[] = [];
+  @Output() cerrar = new EventEmitter<void>();
 
   // Lista de menús seleccionados
   menusSeleccionados: Array<{
@@ -259,6 +260,10 @@ export class AgendarReservaComponent implements OnInit{
     });
   }
 
+  volver(): void {
+    this.cerrar.emit();
+  }
+
   private crearReservaConClienteExistente(codigocliente: string) {
     // IGUAL que antes
     const detalle = this.menusSeleccionados.map(item => ({
@@ -324,10 +329,7 @@ export class AgendarReservaComponent implements OnInit{
     });
   }
 
-  /**
-   * (B) CREAR CLIENTE + RESERVA + DETALLE en un solo endpoint 
-   * con rollback manual en el backend
-   */
+
   private crearClienteYReservaEnUnSoloPaso() {
     // 1) Construimos un objeto “dataCompleta” con CLIENTE + RESERVA
     const detalle = this.menusSeleccionados.map(item => ({

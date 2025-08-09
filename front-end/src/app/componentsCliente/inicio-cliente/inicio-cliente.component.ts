@@ -3,6 +3,8 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { NotificacionesService, NotifData } from '../../services/notificaciones.service';
 import Swal from 'sweetalert2';
+import { ServiciocateringService } from '../../services/serviciocatering.service';
+import { tap }                     from 'rxjs/operators';
 
 
 interface ClienteNoti {
@@ -11,6 +13,14 @@ interface ClienteNoti {
   idreserva: string;
   fecha: string;
 }
+
+interface SlideServicio {
+  url:  string;
+  nombre: string;
+  descripcion: string;
+}
+
+type VistaCliente = 'dashboard' | 'servicios' | 'generar' | 'reservas';
 
 @Component({
   selector: 'app-inicio-cliente',
@@ -24,15 +34,27 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
   hayNuevasNotificaciones = false;
   cantidadNotificacionesCliente = 0;
   notificaciones: ClienteNoti[] = [];
+  urls : string[] = [];
+  hover = false; 
+  slides: SlideServicio[] = [];
+  currentSlide = 0;
+  auto$?: any; 
 
   private codigocliente: string | null = null;
   private subscripciones: any[] = [];
+
+  activeView: VistaCliente = 'dashboard';     // vista por defecto
+
+  setView(view: VistaCliente): void {
+    this.activeView = view;
+  }
 
   constructor(
     private _auth: AuthService,
     private _router: Router,
     private notiSvc: NotificacionesService,
-    private _ngZone: NgZone
+    private _ngZone: NgZone,
+    private servCat : ServiciocateringService
   ) {}
 
   logout() {
@@ -41,6 +63,7 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+
     const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
     this.userEmail = user?.correo ?? 'Invitado';
     this.codigocliente = user?.codigocliente || null;
@@ -81,11 +104,14 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
     });
   });
     this.subscripciones.push(subCambioEstado);
+    this.cargarImagenesServicios();
+    
   }
 
   ngOnDestroy() {
     this.subscripciones.forEach(s => s.unsubscribe && s.unsubscribe());
     this.subscripciones = [];
+    clearInterval(this.auto$);
   }
 
   /** Botón “campanita” */
@@ -172,4 +198,31 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  private cargarImagenesServicios(): void {
+  this.servCat.getServicio()
+    .pipe(
+      tap(lista => {
+        this.slides = lista.map((s: any) => ({
+          url : `http://localhost:8010/api/getfotografia/${s.imagen}/false`,
+          nombre: s.nombre,                       // o el campo que uses
+          descripcion: s.descripcion ?? ''        // idem
+        }));
+      })
+    )
+    .subscribe({
+      next : () => this.iniciarAutoSlide(),
+      error: err => console.error('No se pudieron cargar imágenes', err)
+    });
+}
+
+prev() { this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length; }
+next() { this.currentSlide = (this.currentSlide + 1) % this.slides.length; }
+
+/* autoplay cada 7 s */
+private iniciarAutoSlide() {
+  this.auto$?.unsubscribe?.();
+  this.auto$ = setInterval(() => this.next(), 7000);
+}
+
 }

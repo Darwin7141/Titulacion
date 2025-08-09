@@ -1,65 +1,125 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página de Inicio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@angular/material/prebuilt-themes/indigo-pink.css">
-</head>
+<mat-sidenav-container class="sidenav-container">
 
-<body>
-  <!-- Barra superior -->
-  <ul>
-    <!-- Sección izquierda: Ícono de usuario + correo -->
-    <li style="float: left; display: flex; align-items: center; color: white; padding-left: 10px;">
-      <i class="material-icons" style="vertical-align: middle; padding-right: 8px;">person</i>
-      {{ userEmail }}
-    </li>
-    
-    <!-- Sección derecha: Contenedor para íconos de notificación y logout -->
-    <li style="float: right; display: flex; align-items: center; padding-right: 10px;">
-      <!-- Campana de notificaciones -->
+  <!-- ══════════════  LATERAL  ══════════════ -->
+  <mat-sidenav #drawer mode="side" opened class="sidenav">
+    <mat-nav-list>
 
-       <a class="campana-container" (click)="verNotificacionesCliente()">
-      <i class="material-icons" style="vertical-align: middle; color: white;">
-        {{ hayNuevasNotificaciones ? 'notifications_active' : 'notifications' }}
-      </i>
-      <span *ngIf="hayNuevasNotificaciones" class="badge">{{ cantidadNotificacionesCliente }}</span>
-    </a>
-     
-      <!-- Botón de logout -->
-      <a class="logout" (click)="logout()">
-        <i class="material-icons" type="button" style="vertical-align: middle; color: white;">power_settings_new</i>
+      <!-- Cada opción sólo cambia la vista central -->
+      <a mat-list-item (click)="setView('servicios'); drawer.close()">
+        <mat-icon matListIcon>restaurant_menu</mat-icon>
+        <span>Servicios</span>
       </a>
-    </li>
-  </ul>
-  
-  <!-- Barra lateral -->
-  <div class="sidenav">
-    <a [routerLink]="['/serviciosClientes']">Servicios</a>
-    <a [routerLink]="['/generarReserva']">Agendar Reserva</a>
-    <a [routerLink]="['/misReservas']">Mis Reservas</a>
-  </div>
 
-  <div class="content-admin">
-    <!-- Contorno con imagen de fondo -->
-    <div class="content-main">
-      <div class="background-image"></div>
-      <h1>Bienvenido A DAAYFOOD</h1>
-      <img src="https://scontent.fuio13-1.fna.fbcdn.net/v/t39.30808-6/244667863_115293174241931_2042471049205914810_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=YBw825BkB18Q7kNvwETV0Dp&_nc_oc=AdktERSHucO0eFLbSfxZraNrdHlRzfWr1Vto4XFpvLg77z4sx2BBQpIey4_vhDC60TfkWFUAd0Y0qtK5byMiu0uM&_nc_zt=23&_nc_ht=scontent.fuio13-1.fna&_nc_gid=jmIUaR373d4HvAVvMUZxNw&oh=00_AfRwrTXuZVY-D5jycAoUkLxEHA8vlyATkF02lDX45H-yRw&oe=68735D22" />
-      <p>Gracias por preferirnos</p>
-    </div>
-  </div>
-  
+      <a mat-list-item (click)="setView('generar'); drawer.close()">
+        <mat-icon matListIcon>event_available</mat-icon>
+        <span>Agendar&nbsp;Reserva</span>
+      </a>
 
-  <div class="content-admin">
-    <router-outlet></router-outlet>
-  </div>
+      <a mat-list-item (click)="setView('reservas'); drawer.close()">
+        <mat-icon matListIcon>assignment</mat-icon>
+        <span>Mis&nbsp;Reservas</span>
+      </a>
 
-  <script src="https://code.angularjs.org/1.8.2/angular.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@angular/material/bundles/material.umd.js"></script>
+    </mat-nav-list>
+  </mat-sidenav>
 
-</body>
-</html>
+  <!-- ══════════════  PRINCIPAL  ══════════════ -->
+  <mat-sidenav-content>
+
+    <!-- ───── Barra superior ───── -->
+    <mat-toolbar color="primary" class="toolbar">
+      <button mat-icon-button (click)="drawer.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span class="app-title">DAAYFOOD</span>
+      <span class="spacer"></span>
+
+      <button mat-icon-button (click)="verNotificacionesCliente()">
+        <mat-icon  [matBadge]="cantidadNotificacionesCliente"
+                   matBadgeColor="warn"
+                   [matBadgeHidden]="!hayNuevasNotificaciones">
+          {{ hayNuevasNotificaciones ? 'notifications_active' : 'notifications' }}
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="logout()">
+        <mat-icon>power_settings_new</mat-icon>
+      </button>
+
+      <button mat-button [matMenuTriggerFor]="profileMenu">
+        <mat-icon>person</mat-icon>
+        {{ userEmail }}
+      </button>
+      <mat-menu #profileMenu="matMenu">
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          Salir
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <!-- ══════════════════  ZONA CENTRAL  ══════════════════ -->
+    <div class="content-wrapper">
+
+      <!-- **********  SWITCH DE VISTAS  ********** -->
+      <ng-container [ngSwitch]="activeView">
+
+        <!-- ① DASHBOARD (portada con slider) -->
+        <ng-container *ngSwitchCase="'dashboard'">
+
+          <mat-card class="welcome-card">
+            <h1>Nuestros&nbsp;Servicios</h1>
+          </mat-card>
+          <br>
+
+          <mat-card class="slider-card" *ngIf="slides.length">
+
+            <!-- flechas -->
+            <button mat-icon-button class="nav prev" (click)="prev()">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button mat-icon-button class="nav next" (click)="next()">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+
+            <!-- imágenes -->
+            <ng-container *ngFor="let s of slides; let i = index">
+              <div class="slide" [class.active]="i === currentSlide">
+                <img [src]="s.url" alt="servicio {{ s.nombre }}" />
+                <div class="caption">
+                  <h2>{{ s.nombre }}</h2>
+                  <p>{{ s.descripcion }}</p>
+                </div>
+              </div>
+            </ng-container>
+
+          </mat-card>
+
+        </ng-container>
+
+        <!-- ② LISTA DE SERVICIOS -->
+        <ng-container *ngSwitchCase="'servicios'">
+          <app-servicios-cliente
+               (cerrar)="setView('dashboard')"></app-servicios-cliente>
+        </ng-container>
+
+        <!-- ③ FORMULARIO “AGENDAR RESERVA” -->
+        <ng-container *ngSwitchCase="'generar'">
+          <app-agendar-reserva
+               (cerrar)="setView('dashboard')"></app-agendar-reserva>
+        </ng-container>
+
+        <!-- ④ HISTORIAL DE RESERVAS -->
+        <ng-container *ngSwitchCase="'reservas'">
+          <app-mis-reservas
+               (cerrar)="setView('dashboard')"></app-mis-reservas>
+        </ng-container>
+
+      </ng-container>
+      <!-- **********  FIN SWITCH  ********** -->
+
+    </div> <!-- /content-wrapper -->
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

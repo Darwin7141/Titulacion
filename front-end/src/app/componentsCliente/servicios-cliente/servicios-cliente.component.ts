@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit , Output, EventEmitter } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { ServiciocateringService } from '../../services/serviciocatering.service';
@@ -12,8 +12,9 @@ import { tap } from 'rxjs/operators';
 })
 export class ServiciosClienteComponent implements OnInit {
   servicio: any[] = [];
+   @Output() cerrar = new EventEmitter<void>();
 
-  // NUEVO: para manejar el modal de detalle
+
   servicioSeleccionado: any = null;
   mostrarServicioNoDisponibleModal: boolean = false;
 
@@ -74,5 +75,9 @@ export class ServiciosClienteComponent implements OnInit {
 
   cerrarModalNoDisponible(): void {
     this.mostrarServicioNoDisponibleModal = false;
+  }
+
+  volver(): void {
+    this.cerrar.emit();
   }
 }

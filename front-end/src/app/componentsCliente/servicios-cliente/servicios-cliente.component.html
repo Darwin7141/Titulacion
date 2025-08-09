@@ -61,6 +61,13 @@
       <p>Por el momento, este servicio no se encuentra disponible.</p>
     </div>
   </div>
+
+  <button mat-icon-button
+          class="btn-back"
+          matTooltip="Volver"
+          (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
   
   <script src="https://code.angularjs.org/1.8.2/angular.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@angular/material/bundles/material.umd.js"></script>
@@ -68,6 +75,8 @@
   <div class="content-admin">
     <router-outlet></router-outlet>
   </div>
+
+
 
 </body>
 </html>
