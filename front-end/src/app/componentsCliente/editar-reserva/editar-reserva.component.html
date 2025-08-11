@@ -1,93 +1,111 @@
-<div class="container-editar">
-  <h2>Editar Reserva</h2> <!-- Mostrar el número de la reserva, basado en el índice -->
+<div class="edit-sheet">
+  <h2 class="sheet-title">Editar reserva</h2>
 
-  <!-- Formulario de cabecera -->
-  <div>
-    <label>Fecha del evento:</label>
-    <input 
-      type="date"
-      [(ngModel)]="reserva.fechaevento"
-      (change)="recalcularCabecera()" 
-    />
+  <!-- Cabecera -->
+  <div class="meta-grid">
+    <div class="form-field">
+      <label class="field-label">Fecha del evento</label>
+      <input
+        type="date"
+        [(ngModel)]="reserva.fechaevento"
+        (change)="recalcularCabecera()"
+        class="field-input"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="field-label">Dirección del evento</label>
+      <input
+        type="text"
+        [(ngModel)]="reserva.direccionevento"
+        (input)="recalcularCabecera()"
+        class="field-input"
+        placeholder="Calle, número y referencia"
+      />
+    </div>
   </div>
-  <div>
-    <label>Dirección del evento:</label>
-    <input 
-      type="text"
-      [(ngModel)]="reserva.direccionevento"
-      (input)="recalcularCabecera()"
-    />
+
+  <!-- Menús -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <h3 class="toolbar-title">Menús seleccionados</h3>
+    </div>
+    <button (click)="agregarDetalle()" class="btn add-button">
+      <i class="fa fa-plus"></i> Agregar Menú
+    </button>
   </div>
 
-  <hr>
+  <div class="table-wrap">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Menú</th>
+          <th>Cantidad</th>
+          <th>Precio</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
 
-  <!-- Tabla de detalles -->
-  <h3></h3>
-  <button (click)="agregarDetalle()" class="add-button">
-    <i class="fa fa-plus"></i> Agregar Menú
-  </button>
+      <tbody>
+        <tr *ngFor="let d of reserva.detalles; let i = index">
+          <!-- Menú -->
+          <td>
+            <select
+              class="field-input"
+              [(ngModel)]="d.idmenu"
+              (change)="onMenuSelectChange(i, d.idmenu)"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option value="">-- Seleccione --</option>
+              <option *ngFor="let m of menusDisponibles" [value]="m.idmenu">
+                {{ m.nombre }}
+              </option>
+            </select>
+          </td>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Menú</th>
-        <th>Cantidad</th>
-        <th>PrecioUnit</th>
-        <th>Subtotal</th>
-      
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let d of reserva.detalles; let i = index">
-        <td>
-          <select 
-            [(ngModel)]="d.idmenu"
-            (change)="onMenuSelectChange(i, d.idmenu)"
-            [ngModelOptions]="{standalone: true}"
-          >
-            <option value="">-- Seleccione --</option>
-            <option *ngFor="let m of menusDisponibles" [value]="m.idmenu">
-              {{ m.nombre }}
-            </option>
-          </select>
-        </td>
-        <td>
-          <input 
-            type="number" 
-            [(ngModel)]="d.cantpersonas" 
-            (input)="onCantidadChange(i, d.cantpersonas)"
-            [ngModelOptions]="{standalone: true}"
-          />
-        </td>
-        <td>
-          {{ d.preciounitario }}
-        </td>
-        <td>
-          {{ d.subtotal }}
-        </td>
-        <td>
-          <!-- Botón de eliminar menú -->
-          <button type="button" class="delete-button" (click)="quitarDetalle(i)">
-            <i class="fa fa-trash"></i> 
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          <!-- Cantidad -->
+          <td class="col-cantidad">
+            <input
+              type="number"
+              class="field-input qty-input"
+              [(ngModel)]="d.cantpersonas"
+              (input)="onCantidadChange(i, d.cantpersonas)"
+              [ngModelOptions]="{ standalone: true }"
+              min="1"
+            />
+          </td>
 
-  <p><strong>Total: {{ reserva.total }}</strong></p>
-  <p><strong>Cant.Pers: {{ reserva.cantpersonas }}</strong></p>
+          <!-- Precio -->
+          <td class="mono">{{ d.preciounitario }}</td>
 
-  <hr>
+          <!-- Subtotal -->
+          <td class="mono">{{ d.subtotal }}</td>
 
-  <!-- Botón para guardar -->
-  <div class="action-buttons">
-    <button (click)="guardarEdicion()" class="save-button">
+          <!-- Eliminar -->
+          <td class="col-actions">
+            <button type="button" class="btn icon danger" (click)="quitarDetalle(i)" aria-label="Eliminar">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Resumen -->
+  <div class="summary">
+    <div class="summary-item"><span>Total:</span> <strong>{{ reserva.total }}</strong></div>
+    <div class="summary-item"><span>Cantidad:</span> <strong>{{ reserva.cantpersonas }}</strong></div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="actions">
+    <button (click)="guardarEdicion()" class="btn primary">
       <i class="fa fa-save"></i> Guardar
     </button>
-    <button (click)="cancelarEdicion()" class="cancel-button">
+    <button (click)="cancelarEdicion()" class="btn ghost">
       <i class="fa fa-times"></i> Cancelar
     </button>
   </div>
 </div>
-

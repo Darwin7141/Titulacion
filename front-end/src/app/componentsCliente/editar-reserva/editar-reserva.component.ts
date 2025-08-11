@@ -1,15 +1,17 @@
-import { Component , OnInit } from '@angular/core';
+import { Component , OnInit, Inject, ViewEncapsulation   } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReservasService } from '../../services/reservas.service';
 import { MenusService } from '../../services/menus.service'; // si necesitas cargar menú
 import Swal from 'sweetalert2';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-editar-reserva',
   standalone: false,
   
   templateUrl: './editar-reserva.component.html',
-  styleUrl: './editar-reserva.component.css'
+  styleUrl: './editar-reserva.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class EditarReservaComponent implements OnInit {
 
@@ -33,21 +35,18 @@ export class EditarReservaComponent implements OnInit {
     private route: ActivatedRoute,
     private reservasService: ReservasService,
     private menusService: MenusService,
-    private router: Router
+    private router: Router,
+    private dialogRef: MatDialogRef<EditarReservaComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { idreserva: string }
   ) {}
 
   ngOnInit(): void {
     // 1) Leer param
-    this.idreserva = this.route.snapshot.paramMap.get('idreserva') || '';
-
-    // 2) Cargar la reserva con detalles
+   this.idreserva = this.data.idreserva;
     this.cargarReserva(this.idreserva);
 
-    // 3) Cargar menús si deseas que el usuario agregue menús extra
     this.menusService.getMenu().subscribe({
-      next: (data) => {
-        this.menusDisponibles = data;
-      },
+      next: (data) => this.menusDisponibles = data,
       error: (err) => console.error('Error al cargar menús:', err)
     });
   }
@@ -132,7 +131,7 @@ export class EditarReservaComponent implements OnInit {
   }
 
   cancelarEdicion() {
-    this.router.navigate(['/misReservas']);
+    this.dialogRef.close();
   }
 
   recalcularCabecera() {
@@ -149,7 +148,7 @@ export class EditarReservaComponent implements OnInit {
 
   // ================== Guardar cambios (PUT) ==================
   guardarEdicion() {
-    const detallesTransformados = this.reserva.detalles.map(d => ({
+    const detalle = this.reserva.detalles.map(d => ({
       idmenu: d.idmenu,
       cantpersonas: d.cantpersonas,
       preciounitario: d.preciounitario,
@@ -162,25 +161,17 @@ export class EditarReservaComponent implements OnInit {
       precio: this.reserva.precio, // El precio es calculado con base en los detalles
       cantpersonas: this.reserva.cantpersonas, // Total de personas
       total: this.reserva.total, // Total de la reserva
-      detalle: detallesTransformados // Detalles de los menús seleccionados
+      detalle // Detalles de los menús seleccionados
     };
   
     this.reservasService.editarReserva(this.idreserva, body).subscribe({
-      next: (resp) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Reserva actualizada',
-          text: 'Se guardaron los cambios correctamente'
-        }).then(() => {
-          this.router.navigate(['/misReservas']); // Redirige a la lista de reservas
-        });
+      next: () => {
+        Swal.fire({ icon:'success', title:'Reserva actualizada', text:'Se guardaron los cambios correctamente' })
+          .then(() => this.dialogRef.close({ updated: true, idreserva: this.idreserva }));
       },
       error: (err) => {
         console.error('Error al actualizar la reserva:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Ocurrió un error al actualizar la reserva.'
+        Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al actualizar la reserva.'
         });
       }
     });
