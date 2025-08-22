@@ -47,46 +47,134 @@ export class TipocateringComponent implements OnInit {
       
         }
 
-    agregar() {
-      this.serviceTipo.agregar(this.tipo).subscribe({
-             next: () => {
-               Swal.fire({ icon: 'success', title: 'Éxito', text: 'El tipo de catering se agregó correctamente.' })
-                   .then(() => this.dialogRef.close('added'));   // ⬅️  cerramos pasando flag
-             },
-        error: (err) => {
-          console.error('Error en enviar datos del tipo de catering:', err);
-          // Aquí puedes manejar el error, como mostrar un mensaje al usuario
-        },
+   agregar() {
+  // Validaciones mínimas
+  if (!this.tipo.nombre.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Nombre obligatorio</h2>
+        <p class="swal-pro-desc">Debes ingresar el nombre del tipo de catering.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+  if (!this.tipo.descripcion.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Descripción obligatoria</h2>
+        <p class="swal-pro-desc">Debes ingresar una descripción.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+  
+
+  this.serviceTipo.agregar(this.tipo).subscribe({
+    next: () => {
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-check"></div>
+          <h2 class="swal-pro-title">Tipo de catering agregado</h2>
+          <p class="swal-pro-desc">Se guardó correctamente.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      }).then(() => this.dialogRef.close('added'));
+    },
+    error: (err) => {
+      console.error('Error en enviar datos del tipo de catering:', err);
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-error"></div>
+          <h2 class="swal-pro-title">Error</h2>
+          <p class="swal-pro-desc">Ocurrió un error al agregar el tipo de catering.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
       });
-    }
+    },
+  });
+}
+
      cancelar(): void {
     this.dialogRef.close();     // simplemente cierra sin flag
   }
 
 
   guardar(): void {
-    
-    
-    const peticion$ = this.esEdicion
-        ? this.serviceTipo.editarTipo(this.tipo)
-        : this.serviceTipo.agregar(this.tipo);
+  // Validaciones mínimas
+  if (!this.tipo.nombre.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Nombre obligatorio</h2>
+        <p class="swal-pro-desc">Debes ingresar el nombre del tipo de catering.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+  if (!this.tipo.descripcion.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Descripción obligatoria</h2>
+        <p class="swal-pro-desc">Debes ingresar una descripción.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
   
-    peticion$.subscribe({
-      next : () => {
-        Swal.fire({
-          icon : 'success',
-          title: 'Éxito',
-          text : this.esEdicion
-                 ? 'Tipo de catering actualizado correctamente.'
-                 : 'Tipo de catering agregado correctamente.'
-        }).then(() => this.dialogRef.close('saved'));
-      },
-      error: err => {
-        console.error('Error al guardar el tipo:', err);
-        Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al guardar.' });
-      }
-    });
-  
-        }
 
+  const peticion$ = this.esEdicion
+    ? this.serviceTipo.editarTipo(this.tipo)
+    : this.serviceTipo.agregar(this.tipo);
+
+  peticion$.subscribe({
+    next: () => {
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-check"></div>
+          <h2 class="swal-pro-title">${this.esEdicion ? 'Tipo de catering actualizado' : 'Tipo de catering agregado'}</h2>
+          <p class="swal-pro-desc">Los cambios se guardaron correctamente.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      }).then(() => this.dialogRef.close('saved'));
+    },
+    error: err => {
+      console.error('Error al guardar el tipo:', err);
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-error"></div>
+          <h2 class="swal-pro-title">Error</h2>
+          <p class="swal-pro-desc">Ocurrió un error al guardar.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      });
+    }
+  });
+}
   }

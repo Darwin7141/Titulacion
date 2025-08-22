@@ -83,14 +83,65 @@ export class ServiciocateringComponent implements OnInit {
         
 
   agregar(): void {
-  this.isLoading = true;              // spinner ON
+  // ── Validaciones mínimas ──────────────────────────
+  if (!this.servicio.nombre.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Nombre obligatorio</h2>
+        <p class="swal-pro-desc">Debes ingresar el nombre del servicio.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+  if (!this.servicio.descripcion.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Descripción obligatoria</h2>
+        <p class="swal-pro-desc">Debes ingresar una descripción.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+  if (!this.servicio.idtipo) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Tipo obligatorio</h2>
+        <p class="swal-pro-desc">Selecciona un tipo de catering.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+  if (!this.servicio.idestado) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Estado obligatorio</h2>
+        <p class="swal-pro-desc">Selecciona un estado para el servicio.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+  // ─────────────────────────────────────────────────
+
+  this.isLoading = true; // spinner ON
 
   this.servCatering.agregar(this.servicio).subscribe({
     next: ({ idservicio }) => {
       // (A) si hay imagen, súbela primero
       const subir = this.nuevaImagen
         ? this.servCatering.subirImagenServicio(this.nuevaImagen, idservicio)
-        : of(null);                   // from 'rxjs'
+        : of(null);
 
       subir.subscribe({
         next: () => finalizaExito(),
@@ -100,25 +151,43 @@ export class ServiciocateringComponent implements OnInit {
     error: err => finalizaError('al crear el servicio', err)
   });
 
-  /* ---------- helpers internas ---------- */
+  /* ---------- helpers internas de este flujo ---------- */
   const finalizaExito = () => {
     this.isLoading = false;
-    Swal.fire({ icon:'success', title:'Éxito', text:'Servicio agregado correctamente.' })
-      .then(() => {
-        if (this.esDialogo) {
-          this.dialogRef!.close('added');   // notifica a la lista
-        } else {
-          this.irALista();                  // navegación normal
-        }
-      });
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-check"></div>
+        <h2 class="swal-pro-title">Servicio agregado</h2>
+        <p class="swal-pro-desc">Se guardó correctamente.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }).then(() => {
+      if (this.esDialogo) {
+        this.dialogRef!.close('added');
+      } else {
+        this.irALista();
+      }
+    });
   };
 
   const finalizaError = (msg: string, err: any) => {
     this.isLoading = false;
     console.error(`Error ${msg}:`, err);
-    Swal.fire({ icon:'error', title:'Error', text:`Ocurrió un error ${msg}.` });
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Error</h2>
+        <p class="swal-pro-desc">Ocurrió un error ${msg}.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    });
   };
 }
+
 
 cancelar(): void {
   this.esDialogo ? this.dialogRef!.close()
@@ -126,60 +195,113 @@ cancelar(): void {
 }
 
 guardar(): void {
-    this.isLoading = true;
-
-    // 1) Decide si crea o actualiza
-    const accion$ = this.esEdicion
-      ? this.servCatering.editarServicio(this.servicio)    // PUT /servicios/:id
-      : this.servCatering.agregar(this.servicio);          // POST /servicios
-
-    accion$.subscribe({
-      next: (res: any) => {
-        // 2) Obtén el idservicio
-        const idservicio = this.esEdicion
-          ? this.servicio.idservicio
-          : res.idservicio;
-
-        // 3) Si seleccionaste imagen, súbela ahora
-        const upload$ = this.nuevaImagen
-          ? this.servCatering.subirImagenServicio(this.nuevaImagen, idservicio)
-          : of(null);
-
-        upload$.subscribe({
-          next: () => this.finalizaExito(),
-          error: err => this.finalizaError('al subir la imagen', err)
-        });
-      },
-      error: err => this.finalizaError('al guardar el servicio', err)
-    });
-  }
-
-  private finalizaExito(): void {
-    this.isLoading = false;
+  // ── Validaciones mínimas (mismas que en agregar) ──
+  if (!this.servicio.nombre.trim()) {
     Swal.fire({
-      icon: 'success',
-      title: 'Éxito',
-      text: this.esEdicion
-        ? 'Servicio actualizado correctamente.'
-        : 'Servicio agregado correctamente.'
-    }).then(() => {
-      if (this.esDialogo) {
-        this.dialogRef!.close(this.esEdicion ? 'saved' : 'added');
-      } else {
-        this.irALista();
-      }
-    });
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Nombre obligatorio</h2>
+        <p class="swal-pro-desc">Debes ingresar el nombre del servicio.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
   }
-
-  private finalizaError(msg: string, err: any): void {
-    this.isLoading = false;
-    console.error(`Error ${msg}:`, err);
+  if (!this.servicio.descripcion.trim()) {
     Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: `Ocurrió un error ${msg}.`
-    });
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Descripción obligatoria</h2>
+        <p class="swal-pro-desc">Debes ingresar una descripción.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
   }
+  if (!this.servicio.idtipo) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Tipo obligatorio</h2>
+        <p class="swal-pro-desc">Selecciona un tipo de catering.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+  if (!this.servicio.idestado) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Estado obligatorio</h2>
+        <p class="swal-pro-desc">Selecciona un estado para el servicio.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+  // ─────────────────────────────────────────────────
 
+  this.isLoading = true;
+
+  const accion$ = this.esEdicion
+    ? this.servCatering.editarServicio(this.servicio)
+    : this.servCatering.agregar(this.servicio);
+
+  accion$.subscribe({
+    next: (res: any) => {
+      const idservicio = this.esEdicion ? this.servicio.idservicio : res.idservicio;
+
+      const upload$ = this.nuevaImagen
+        ? this.servCatering.subirImagenServicio(this.nuevaImagen, idservicio)
+        : of(null);
+
+      upload$.subscribe({
+        next: () => this.finalizaExito(),
+        error: err => this.finalizaError('al subir la imagen', err)
+      });
+    },
+    error: err => this.finalizaError('al guardar el servicio', err)
+  });
+}
+
+private finalizaExito(): void {
+  this.isLoading = false;
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-check"></div>
+      <h2 class="swal-pro-title">${this.esEdicion ? 'Servicio actualizado' : 'Servicio agregado'}</h2>
+      <p class="swal-pro-desc">Los cambios se guardaron correctamente.</p>
+    `,
+    showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+    customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+  }).then(() => {
+    if (this.esDialogo) {
+      this.dialogRef!.close(this.esEdicion ? 'saved' : 'added');
+    } else {
+      this.irALista();
+    }
+  });
+}
+
+private finalizaError(msg: string, err: any): void {
+  this.isLoading = false;
+  console.error(`Error ${msg}:`, err);
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-error"></div>
+      <h2 class="swal-pro-title">Error</h2>
+      <p class="swal-pro-desc">Ocurrió un error ${msg}.</p>
+    `,
+    showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+    customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+  });
+}
 }
 

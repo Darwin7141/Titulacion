@@ -38,42 +38,134 @@ export class CargosComponent implements OnInit {
       
     }
     agregar() {
-      this.cargoService.agregar(this.cargos).subscribe({
-              next: () => {
-                Swal.fire({ icon: 'success', title: 'Éxito', text: 'Cargo agregado correctamente.' })
-                    .then(() => this.dialogRef.close('added'));   
-              },
-        error: (err) => {
-          console.error('Error en enviar datos del cargo:', err);
-          
-        },
+  // Validaciones mínimas
+  if (!this.cargos.nombrecargo.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Nombre de cargo obligatorio</h2>
+        <p class="swal-pro-desc">Debes ingresar el nombre del cargo.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    });
+    return;
+  }
+  if (!this.cargos.descripcion.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Descripción obligatoria</h2>
+        <p class="swal-pro-desc">Debes ingresar la descripción del cargo.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    });
+    return;
+  }
+
+  this.cargoService.agregar(this.cargos).subscribe({
+    next: () => {
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-check"></div>
+          <h2 class="swal-pro-title">Cargo agregado</h2>
+          <p class="swal-pro-desc">Se guardó correctamente.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      }).then(() => this.dialogRef.close('added'));
+    },
+    error: (err) => {
+      console.error('Error en enviar datos del cargo:', err);
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-error"></div>
+          <h2 class="swal-pro-title">Error</h2>
+          <p class="swal-pro-desc">Ocurrió un error al agregar el cargo.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
       });
-    }
+    },
+  });
+}
+
     cancelar(): void {
     this.dialogRef.close();     
   }
 
 guardar(): void {
+  // Validaciones mínimas
+  if (!this.cargos.nombrecargo.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Nombre de cargo obligatorio</h2>
+        <p class="swal-pro-desc">Debes ingresar el nombre del cargo.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    });
+    return;
+  }
+  if (!this.cargos.descripcion.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Descripción obligatoria</h2>
+        <p class="swal-pro-desc">Debes ingresar la descripción del cargo.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    });
+    return;
+  }
 
   const peticion$ = this.esEdicion
-      ? this.cargoService.editarCargo(this.cargos)
-      : this.cargoService.agregar(this.cargos);
+    ? this.cargoService.editarCargo(this.cargos)
+    : this.cargoService.agregar(this.cargos);
 
   peticion$.subscribe({
-    next : () => {
+    next: () => {
       Swal.fire({
-        icon : 'success',
-        title: 'Éxito',
-        text : this.esEdicion
-               ? 'Cargo actualizado correctamente.'
-               : 'Cargo agregado correctamente.'
+        width: 480,
+        html: `
+          <div class="swal-pro-check"></div>
+          <h2 class="swal-pro-title">${this.esEdicion ? 'Cargo actualizado' : 'Cargo agregado'}</h2>
+          <p class="swal-pro-desc">Los cambios se guardaron correctamente.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
       }).then(() => this.dialogRef.close('saved'));
     },
     error: err => {
       console.error('Error al guardar el cargo:', err);
-      Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al guardar.' });
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-error"></div>
+          <h2 class="swal-pro-title">Error</h2>
+          <p class="swal-pro-desc">Ocurrió un error al guardar.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      });
     }
   });
-
-  }
+}
   }

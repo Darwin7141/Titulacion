@@ -23,9 +23,10 @@
 .registro-panel-content h3 {
   text-align: center;
   margin-bottom: 20px;
-  font-family: 'Playfair Display', serif;
+  font-family: "Roboto", sans-serif;
   font-size: 1.75rem;
   color: var(--verde);
+  font-weight: 550;
 }
 
 /* Grid 2 columnas */
@@ -38,16 +39,19 @@
 /* Inputs */
 .form-group { display: flex; flex-direction: column; }
 .form-group label {
-  font-weight: 600;
+  font-weight: 550;
   margin-bottom: 5px;
   color: #555;
+  font-family: "Roboto", sans-serif;
+
 }
 .form-group input {
   padding: 10px 12px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 14px;
   transition: border-color .3s;
+  font-family: "Roboto", sans-serif;
 }
 .form-group input:focus {
   outline: none;
@@ -66,16 +70,18 @@
   padding: 10px 24px;
   font-weight: 600;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background .3s, transform .2s;
+  font-family: "Roboto", sans-serif;
+
 }
 .btn-cancel {
-  background: #eee;
-  color: #333;
+  background: #ef4444;
+  color: white;
 }
 .btn-cancel:hover {
-  background: #ddd;
+  background: #b62f2f;
   transform: translateY(-2px);
 }
 .btn-register {
@@ -86,18 +92,13 @@
   background: #098123;
   transform: translateY(-2px);
 }
-.loading-overlay{
-  position:absolute;inset:0;background:rgba(255,255,255,.7);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;z-index:10
-}
-
 .form-group select{
   padding:10px 12px;
   border:1px solid #ccc;
-  border-radius:4px;
+  border-radius:10px;
   font-size:14px;
   transition:border-color .3s;
   background:#fff;
   color: #555;
+  font-family: "Roboto", sans-serif;
 }

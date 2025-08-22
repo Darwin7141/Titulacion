@@ -14,8 +14,9 @@
   color:#fff;
   display:flex;                 /* centra el texto */
   justify-content:center;
-  padding:8px 12px;
+  
   border-radius:8px;
+  height:50px;
 }
 
 /* ↓ aquí ajustas el tamaño del título */
@@ -358,3 +359,40 @@
 }
 .nav.prev{ left:12px;  }
 .nav.next{ right:12px; }
+
+:host ::ng-deep .sidenav .menu-item .mdc-list-item__primary-text{
+  font-size: 14px !important;     /* ↓ antes 15–18px */
+  line-height: 1.2;
+}
+:host ::ng-deep .sidenav .menu-item mat-icon[matListIcon]{
+  font-size: 16px !important;     /* ↓ antes 18–22px */
+  width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+}
+:host ::ng-deep .sidenav .menu-item{
+  height: 36px !important;        /* filas un poco más compactas */
+}
+
+/* Flecha de “Servicios” del mismo tamaño que los iconos */
+:host ::ng-deep .sidenav .menu-principal .expand-icon{
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+}
+
+/* ====== Submenú (items dentro de “Servicios”) ====== */
+:host ::ng-deep .sidenav .submenu .submenu-item .mdc-list-item__primary-text{
+  font-size: 13px !important;     /* un toque menor que el principal */
+}
+:host ::ng-deep .sidenav .submenu .submenu-item mat-icon[matListIcon]{
+  font-size: 15px !important;
+  width: 15px !important;
+  height: 15px !important;
+  line-height: 15px !important;
+}
+:host ::ng-deep .sidenav .submenu .submenu-item{
+  height: 30px !important;
+  padding-left: 44px !important;  /* ligera sangría */
+}

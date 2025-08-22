@@ -93,7 +93,7 @@
           <thead>
             <tr>
               <th>Menú</th>
-              <th>Servicio</th>
+         <!-- <th>Servicio</th> -->
               <th>Precio </th>
               <th>Cantidad</th>
               <th>Subtotal</th>
@@ -103,7 +103,7 @@
           <tbody>
             <tr *ngFor="let sel of menusSeleccionados; let i = index">
               <td>{{ sel.nombre }}</td>
-              <td>{{ sel.servicioName }}</td>
+        <!--  <td>{{ sel.servicioName }}</td> -->
               <td>{{ sel.precioUnitario }}</td>
               <td>{{ sel.cantpersonas }}</td>
               <td>{{ sel.subtotal }}</td>
@@ -122,13 +122,13 @@
         <strong>{{ formReserva.total | number:'1.2-2' }}</strong>
       </div>
 
-      <button
-        type="submit"
-        class="generate-button"
-        [disabled]="!reservaForm.form.valid"
-      >
-        Generar reserva
-      </button>
+      
+<div class="actions-bar">
+  <button type="button" class="cancel-button" (click)="cancelar()">Cancelar</button>
+  <button type="submit" class="generate-button" [disabled]="!reservaForm.form.valid">
+    Generar reserva
+  </button>
+</div>
     </section>
 
   </form>

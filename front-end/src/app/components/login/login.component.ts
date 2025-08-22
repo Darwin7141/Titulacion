@@ -113,26 +113,35 @@ abrirRegistro() {
 
   login() {
     if (this.bloquearCampos) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Demasiados intentos',
-            text: 'Has excedido el número máximo de intentos. Intenta nuevamente en un minuto.',
-        });
-        return;
-    }
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Demasiados intentos</h2>
+        <p class="swal-pro-desc">Has excedido el número máximo de intentos. Intenta nuevamente en un minuto.</p>
+      `,
+      showConfirmButton: true,
+      confirmButtonText: 'Entendido',
+      buttonsStyling: false,
+      customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+    });
+    return;
+  }
 
     this._serviceLogin.login(this.usuario).subscribe({
         next: (response) => {
             // Si el login es exitoso, se restablece el contador de intentos
             this.intentos = 0;
-
-            
-
             Swal.fire({
-                icon: 'success',
-                title: 'Inicio de sesión exitoso',
-                showConfirmButton: false,
-                timer: 1500,
+                 width: 480,
+                 html: `
+                <div class="swal-pro-check"></div>
+                <h2 class="swal-pro-title">Inicio de sesión exitoso</h2>
+                 <p class="swal-pro-desc">Bienvenido/a.</p>`,
+        showConfirmButton: true,
+        confirmButtonText: 'Listo',
+        buttonsStyling: false,
+        customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
             }).then(() => {
                 // Redirigir según el valor del rol
                 const rol = response.usuario.rol;
@@ -153,9 +162,16 @@ abrirRegistro() {
           }else {
             // otros roles (empleado, precliente, etc.)
             Swal.fire({
-              icon: 'error',
-              title: 'Rol desconocido',
-              text: 'No se reconoce el rol del usuario. Contacte al administrador.',
+             width: 480,
+            html: `
+              <div class="swal-pro-error"></div>
+              <h2 class="swal-pro-title">Usuario no registrado</h2>
+              <p class="swal-pro-desc">No se reconoce al usuario. Contacte al administrador.</p>
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Entendido',
+            buttonsStyling: false,
+            customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
             });
                 }
             });
@@ -165,21 +181,42 @@ abrirRegistro() {
 
             if (err.status === 401) {
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'Correo no encontrado',
-                    text: 'El correo ingresado no existe en la base de datos.',
+                    width: 480,
+          html: `
+            <div class="swal-pro-warn"></div>
+            <h2 class="swal-pro-title">Correo no encontrado</h2>
+            <p class="swal-pro-desc">El correo ingresado no se encuentra registrado.</p>
+          `,
+          showConfirmButton: true,
+          confirmButtonText: 'Entendido',
+          buttonsStyling: false,
+          customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
                 });
             } else if (err.status === 400) {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Contraseña incorrecta',
-                    text: 'La contraseña ingresada es incorrecta.',
+                    width: 480,
+          html: `
+            <div class="swal-pro-error"></div>
+            <h2 class="swal-pro-title">Contraseña incorrecta</h2>
+            <p class="swal-pro-desc">La contraseña ingresada es incorrecta.</p>
+          `,
+          showConfirmButton: true,
+          confirmButtonText: 'Entendido',
+          buttonsStyling: false,
+          customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
                 });
             } else {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Error inesperado',
-                    text: 'Ocurrió un error inesperado. Intenta nuevamente más tarde.',
+                    width: 480,
+          html: `
+            <div class="swal-pro-error"></div>
+            <h2 class="swal-pro-title">Error inesperado</h2>
+            <p class="swal-pro-desc">Ocurrió un error inesperado. Intenta nuevamente más tarde.</p>
+          `,
+          showConfirmButton: true,
+          confirmButtonText: 'Entendido',
+          buttonsStyling: false,
+          customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
                 });
             }
 
@@ -190,9 +227,16 @@ abrirRegistro() {
                 this.tiempoBloqueo = 60;
 
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Demasiados intentos',
-                    text: 'Has excedido el número máximo de intentos. Intenta nuevamente en un minuto.',
+                   width: 480,
+          html: `
+            <div class="swal-pro-warn"></div>
+            <h2 class="swal-pro-title">Demasiados intentos</h2>
+            <p class="swal-pro-desc">Has excedido el número máximo de intentos. Intenta nuevamente en un minuto.</p>
+          `,
+          showConfirmButton: true,
+          confirmButtonText: 'Entendido',
+          buttonsStyling: false,
+          customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
                 });
 
                 this.bloqueoTimeout = setInterval(() => {

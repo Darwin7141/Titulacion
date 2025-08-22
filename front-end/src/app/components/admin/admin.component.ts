@@ -1,5 +1,4 @@
 
-
 import { Component, OnInit, OnDestroy, NgZone} from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
@@ -21,6 +20,7 @@ import { ProveedoresService }    from '../../services/proveedores.service';
   
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css'] ,
+  
   animations: [
     trigger('slideToggle', [
       state('true', style({ height: '*', opacity: 1, overflow: 'hidden' })),
@@ -341,103 +341,93 @@ export class AdminComponent implements OnInit, OnDestroy{
   verNotificaciones() {
   if (!this.hayNotificaciones) {
     Swal.fire({
-      icon: 'info',
-      title: 'Sin novedades',
-      text: 'No hay reservas ni pagos nuevos.'
+      width: 480,
+      html: `
+        
+        <h2 class="swal-pro-title">Sin novedades</h2>
+        <p class="swal-pro-desc">No hay reservas, pagos ni alertas nuevas.</p>
+      `,
+      showConfirmButton: true,
+      confirmButtonText: 'Listo',
+      buttonsStyling: false,
+      customClass: {
+        popup: 'swal-pro',
+        confirmButton: 'swal-pro-confirm',
+        htmlContainer: 'swal-pro-html'
+      }
     });
     return;
   }
 
- 
-
-  let htmlContent = `<ul style="text-align: left; margin-left: 20px;">`;
-
-  // a) Reservas nuevas
-  if (this.reservasNuevas.length > 0) {
-    htmlContent += `<p style="font-weight: bold; margin:0 0 8px;">Reservas nuevas</p>`;
-    htmlContent += `<ul style="list-style: disc; padding-left:20px; margin:0 0 12px;">`;
-    this.reservasNuevas.forEach(id => {
-      htmlContent += `
-         <li style="display:flex; align-items:center; margin-bottom:8px;">
-           <span style="flex:1; color:#000;">
-             Se ha generado una nueva reserva con código: ${id}
-           </span>
-           <button
-             onclick="window.selectReserva('${id}')"
-             style="white-space:nowrap; background:#007bff; color:#fff; border:none; border-radius:4px; padding:6px 12px; margin-left:8px; cursor:pointer;"
-           >
-             Ver
-           </button>
-         </li>`;
-      });
-
-      htmlContent += `</ul>`;
-  }
-
-  if (this.cancelaciones.length) {
-    htmlContent += `<p><strong>Solicitudes de cancelación</strong></p><ul>`;
-    this.cancelaciones.forEach(msg => {
-      htmlContent += `<li>${msg}</li>`;   // aquí sale **solo** el mensaje puro
-    });
-    htmlContent += `</ul>`;
-  }
-
-  if (this.expiraciones.length) {
-    htmlContent += `<p style="font-weight:bold;margin:12px 0 8px;">Productos a punto de expirar</p><ul>`;
-    this.expiraciones.forEach(msg => {
-      htmlContent += `<li>${msg}</li>`;
-    });
-    htmlContent += `</ul>`;
-  }
-
-  // b) Pagos pendientes
-  if (this.pagosPendientes.length > 0) {
-   htmlContent += `<p style="font-weight: bold; margin:12px 0 8px;">Pagos realizados</p>`;
-     htmlContent += `<ul style="list-style: disc; padding-left:20px; margin:0 0 12px;">`;
-    this.pagosPendientes.forEach(p => {
-      const tipo = p.tipoPago.toLowerCase().replace(/_/g, ' ');  
-  htmlContent += `
-    <li style="display:flex;align-items:center;margin-bottom:8px;">
-      <span style="flex:1;color:#000;">
-        El cliente ${p.clienteNombre} ha realizado el ${tipo} de la reserva ${p.reservaId}
-      </span>
-      <button
-        onclick="window.verPago('${p.reservaId}','${p.tipoPago}')"
-        style="margin-left:8px;white-space:nowrap;background:#007bff;color:white;border:none;
-               border-radius:4px;padding:6px 12px;cursor:pointer;"
-      >Ver</button>
-    </li>
+  let html = `
+    
+    <h2 class="swal-pro-title">Notificaciones</h2>
   `;
+
+  // Reservas nuevas
+  if (this.reservasNuevas.length) {
+    html += `<p class="swal-pro-section">Reservas nuevas</p><ul class="swal-pro-list">`;
+    this.reservasNuevas.forEach(id => {
+      html += `
+        <li>
+          <span>Se ha generado una nueva reserva con código: <strong>${id}</strong></span>
+          <button class="swal-pro-see" onclick="window.selectReserva('${id}')">Ver</button>
+        </li>`;
     });
-     htmlContent += `</ul>`;
+    html += `</ul>`;
   }
 
-  htmlContent += `</ul>`;
+  // Pagos realizados
+  if (this.pagosPendientes.length) {
+    html += `<p class="swal-pro-section">Pagos realizados</p><ul class="swal-pro-list">`;
+    this.pagosPendientes.forEach(p => {
+      const tipo = (p.tipoPago || 'pago').toLowerCase().replace(/_/g,' ');
+      html += `
+        <li>
+          <span>El cliente <strong>${p.clienteNombre}</strong> ha realizado el ${tipo} de la reserva <strong>${p.reservaId}</strong></span>
+          <button class="swal-pro-see" onclick="window.verPago('${p.reservaId}','${p.tipoPago}')">Ver</button>
+        </li>`;
+    });
+    html += `</ul>`;
+  }
 
-  // Defino las funciones globales antes de mostrar el modal
-  (window as any).selectReserva = (idReserva: string) => {
-    this.irAListaReservas(idReserva);
-  };
-  (window as any).verPago = (idreserva: string, tipoPago: string) => {
-  this.irAPagoPendiente(idreserva, tipoPago);
-};
+  // Cancelaciones
+  if (this.cancelaciones.length) {
+    html += `<p class="swal-pro-section">Solicitudes de cancelación</p><ul class="swal-pro-list">`;
+    this.cancelaciones.forEach(m => html += `<li><span>${m}</span></li>`);
+    html += `</ul>`;
+  }
+
+  // Expiraciones
+  if (this.expiraciones.length) {
+    html += `<p class="swal-pro-section">Productos a punto de expirar</p><ul class="swal-pro-list">`;
+    this.expiraciones.forEach(m => html += `<li><span>${m}</span></li>`);
+    html += `</ul>`;
+  }
+
+  // funciones globales usadas por los botones "Ver"
+  (window as any).selectReserva = (id: string) => this.irAListaReservas(id);
+  (window as any).verPago = (id: string, tipo: string) => this.irAPagoPendiente(id, tipo);
 
   Swal.fire({
-    icon: 'info',
-    title: 'Notificaciones',
-    html: htmlContent,
-    showCloseButton: true,      // muestra la “X”
+    width: 520,
+    html,
+    showCloseButton: true,
     focusConfirm: false,
-    confirmButtonText: 'Marcar todas como vistas'
-  })
-  .then(result => {
+    confirmButtonText: 'Marcar todas como vistas',
+    buttonsStyling: false,
+    customClass: {
+      popup: 'swal-pro',
+      confirmButton: 'swal-pro-confirm',
+      htmlContainer: 'swal-pro-html'
+    }
+  }).then(result => {
     if (result.isConfirmed) {
       forkJoin({
         cancel: this.notiSvc.markAllCancelacionesAdminAsRead(),
         exp:    this.notiSvc.markAllExpiracionesAdminAsRead()
       }).subscribe({
         next: () => {
-          // limpio UI
           this.reservasNuevas  = [];
           this.pagosPendientes = [];
           this.cancelaciones   = [];
@@ -451,8 +441,8 @@ export class AdminComponent implements OnInit, OnDestroy{
       });
     }
   });
-  
 }
+
 
 
 // Este método sólo quita la reserva concreta y abre la vista de detalles

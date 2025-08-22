@@ -1,92 +1,189 @@
-.menus-cliente-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem;
-  }
-  
-  .menus-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
-    margin-top: 1rem;
-  }
-  
-  .menu-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    overflow: hidden;
-    text-align: center;
-    background-color: #fff;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  .menu-card:hover {
-    transform: scale(1.03);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  }
-  
-  .menu-img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    display: block;
-  }
-  
-  .menu-card h3 {
-    margin: 8px 0;
-    font-size: 1rem;
-  }
-  
-  /* Modal */
-  .modal-backdrop {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-  
-  .modal-content {
-    position: relative;
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 1.5rem;
-    width: 400px;
-    max-width: 90%;
-    text-align: center;
-  }
-  
-  .close-button {
-    position: absolute;
-    top: 8px; right: 12px;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-  
-  .modal-img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    margin-bottom: 1rem;
-  }
-  
-  .reservar-button {
-    background-color: #2196f3;
-    color: #fff;
-    border: none;
-    padding: 0.8rem 1.2rem;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 1rem;
-  }
-  
-  .reservar-button:hover {
-    background-color: #1976d2;
-  }
-  
+.welcome-card{
+  align-items:center;
+  font-family:"Roboto", sans-serif;
+  background:#28c2f1;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  height:50px;
+  border-radius:8px;
+  margin-top:-1rem;
+}
+.welcome-card h1{ margin:6px 0; font-size:28px; line-height:1.2; font-weight:600; text-align:center; }
+
+.menus-cliente-container{ max-width:1200px; margin:0 auto; padding:1rem; }
+
+.menus-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+  gap:16px;
+  margin-top:1rem;
+}
+
+.menu-card{
+  border-radius:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  overflow:hidden;
+  background:#fff;
+  cursor:pointer;
+  transition:transform .2s ease, box-shadow .2s ease;
+  text-align:center;
+}
+.menu-card:hover{ transform:scale(1.03); box-shadow:0 4px 16px rgba(0,0,0,.2); }
+
+.menu-img{ width:100%; height:150px; object-fit:cover; display:block; }
+
+.menu-info{ padding:.5rem .75rem .9rem; }
+.menu-title{ margin:.35rem 0 .25rem; font-size:1rem; font-weight:600; }
+.menu-price{ font-size:1rem; margin:0; }
+.iva-note{ font-size:.82rem; color:#6b7280; margin-top:.15rem; }
+
+/* Modal */
+.modal-backdrop{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.5);
+  display:flex; justify-content:center; align-items:center;
+  z-index:9999;
+  padding: 16px;   
+}
+
+.modal-content{
+  position:relative;
+  background:#fff;
+  border-radius:8px;
+  padding:1.25rem 1.25rem 1.5rem;
+  width:520px; max-width:92%;
+  font-family:"Roboto", sans-serif;
+  text-align:left; 
+  max-height: 88vh;              /* ← clave: límite de alto */
+  overflow-y: auto;              /* ← aparece scroll automáticamente */
+  overscroll-behavior: contain;  /* evita que haga scroll del fondo */
+  -webkit-overflow-scrolling: touch;           
+}
+
+.close-button{
+  position:absolute; top:8px; right:12px;
+  background:none; border:none; font-size:1.5rem; cursor:pointer;
+}
+
+.modal-img{
+  width:100%; 
+  height:180px; 
+  object-fit:cover; 
+  margin:.5rem 0 1rem;
+  border-radius: 18px; 
+}
+
+.modal-title{ 
+  margin:0 0 .25rem;
+  text-align:center;
+  font-weight:600;
+
+}
+
+.desc-title{
+  font-size:1.05rem; font-weight:700; margin:.25rem 0 .25rem;
+}
+
+.desc-list{ margin:.35rem 0 1rem 1rem; padding:0 .25rem 0 0; }
+.desc-list li{ margin: .25rem 0; }
+
+/* Botón agregar */
+.add-to-list{
+  display: flex;           /* mantiene icono + texto alineados */
+  align-items: center;
+  gap: .45rem;
+  background: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius:14px;   /* pastilla */
+  padding: .5rem .9rem;    /* más pequeño */
+  font-size: .95rem;       /* más pequeño */
+  width: fit-content;      /* se ajusta al contenido */
+  margin: .75rem auto 0;   /* ← centrado en el modal */
+  cursor: pointer;
+}
+.add-to-list:hover{ background:#1976d2; }
+
+.icon{ line-height:1; font-size:1rem; }
+@media (max-width: 600px){
+  .modal-content{ width: 94vw; max-height: 92vh; }
+}
+
+.nav-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;  /* ← a los extremos */
+  gap: .5rem;
+  width: 100%;
+  margin: 8px 0 0;
+}
+
+.nav-row .btn-back{ margin: 0; }
+.nav-row .go-reserve-btn{ margin: 0; }
+
+/* opcional: evita que se vayan a segunda línea */
+@media (max-width: 480px){
+  .nav-row{ flex-wrap: nowrap; }
+}
+
+
+.go-reserve-btn{
+  background:#22c55e; color:#fff; border:none; border-radius:10px;
+  padding:.45rem .9rem; cursor:pointer;
+}
+.go-reserve-btn:hover{ background:#16a34a; }
+
+/* Fila de acciones: centrado y poco espacio entre controles */
+.actions-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;               /* ← más juntos */
+  margin-top:.25rem;
+  flex-wrap:nowrap;
+}
+
+/* Elimina el auto-margin que separaba los botones */
+.actions-row .add-to-list{ margin:0; }
+
+/* Mismo alto para ambos controles */
+.qty-stepper,
+.add-to-list{
+  height:40px;             /* misma altura */
+}
+
+/* Stepper compacto y centrado visualmente */
+.qty-stepper{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  background:#959aa375;
+  border:1px solid #e5e7eb;
+  border-radius:9999px;
+  padding:.25rem .5rem;    /* más compacto */
+  min-width:110px;         /* puedes bajar más si quieres */
+}
+.qty-btn{
+  background:transparent;
+  border:none;
+  width:28px; height:28px; /* botones iguales */
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; line-height:1; cursor:pointer; color:#111827;
+}
+.qty-value{
+  min-width:1.75rem; text-align:center; font-weight:600;
+}
+
+/* Botón 'Agregar a reserva' compacto y con forma de pastilla */
+.add-to-list{
+  display:flex; align-items:center; gap:.45rem;
+  background:#2196f3; color:#fff; border:none;
+  border-radius:9999px; padding:.5rem .9rem;
+  font-size:.95rem; width:auto; cursor:pointer;
+}
+.add-to-list:hover{ background:#1976d2; }
+
+/* Icono alineado */
+.add-to-list mat-icon{ font-size:20px; width:20px; height:20px; line-height:20px; }

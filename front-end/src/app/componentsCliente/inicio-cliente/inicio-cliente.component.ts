@@ -4,7 +4,9 @@ import { Router } from '@angular/router';
 import { NotificacionesService, NotifData } from '../../services/notificaciones.service';
 import Swal from 'sweetalert2';
 import { ServiciocateringService } from '../../services/serviciocatering.service';
-import { tap }                     from 'rxjs/operators';
+import { MenusClienteComponent } from '../menus-cliente/menus-cliente.component';
+import { tap } from 'rxjs/operators';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 
 interface ClienteNoti {
@@ -20,13 +22,20 @@ interface SlideServicio {
   descripcion: string;
 }
 
-type VistaCliente = 'dashboard' | 'servicios' | 'generar' | 'reservas';
+type VistaCliente = 'dashboard' | 'servicios' | 'generar' | 'reservas'|'menus';
 
 @Component({
   selector: 'app-inicio-cliente',
   standalone: false,
   templateUrl: './inicio-cliente.component.html',
-  styleUrl: './inicio-cliente.component.css'
+  styleUrl: './inicio-cliente.component.css',
+  animations: [
+    trigger('slideToggle', [
+      state('true',  style({ height: '*',  opacity: 1, overflow: 'hidden' })),
+      state('false', style({ height: '0',  opacity: 0, overflow: 'hidden' })),
+      transition('true <=> false', animate('250ms ease-in-out'))
+    ])
+  ]
 })
 export class InicioClienteComponent implements OnInit, OnDestroy {
 
@@ -43,7 +52,12 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
   private codigocliente: string | null = null;
   private subscripciones: any[] = [];
 
-  activeView: VistaCliente = 'dashboard';     // vista por defecto
+  activeView: VistaCliente = 'dashboard';
+
+  showServicios = false;
+  serviciosSidebar: Array<{ idservicio:string; nombre:string }> = [];
+  selectedServicioId: string | null = null;
+  selectedServicioNombre = '';
 
   setView(view: VistaCliente): void {
     this.activeView = view;
@@ -105,6 +119,7 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
   });
     this.subscripciones.push(subCambioEstado);
     this.cargarImagenesServicios();
+    this.cargarServiciosSidebar(); 
     
   }
 
@@ -223,6 +238,29 @@ next() { this.currentSlide = (this.currentSlide + 1) % this.slides.length; }
 private iniciarAutoSlide() {
   this.auto$?.unsubscribe?.();
   this.auto$ = setInterval(() => this.next(), 7000);
+}
+
+private cargarServiciosSidebar(): void {
+  this.servCat.getServicio().subscribe({
+    next: (lista:any[]) => {
+      this.serviciosSidebar = lista.map(s => ({
+        idservicio: String(s.idservicio),   // ← guarda como string
+        nombre: s.nombre
+      }));
+    },
+    error: err => console.error('No se pudo cargar servicios para el lateral', err)
+  });
+}
+
+  // ── NUEVO: al elegir un servicio del submenú
+seleccionarServicio(s: {idservicio:string; nombre:string}) {
+  this.selectedServicioId = s.idservicio;     // ← string
+  this.selectedServicioNombre = s.nombre;
+  this.activeView = 'menus';
+}
+
+onIrAReserva(): void {
+  this.activeView = 'generar';  // abre Agendar reserva
 }
 
 }

@@ -159,6 +159,34 @@
 }
 .generate-button[disabled]{ opacity:.6; cursor:not-allowed; }
 
+.cancel-button{
+  display:block;
+  margin:auto;
+  background:#ee1d1d;
+  color:#fff;
+  border:none;
+  padding:12px 22px;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.col-right .actions-bar{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;           /* separación entre botones */
+  margin-top: 8px;
+}
+
+/* Solo dentro de .actions-bar anulamos el block+auto */
+.col-right .actions-bar .generate-button,
+.col-right .actions-bar .cancel-button{
+  display: inline-flex;  /* o 'flex' */
+  margin: 0;             /* evita el 'margin:auto' centrado individual */
+}
+
+
 /* botón volver */
 .btn-back{ display:block; margin:18px auto 0; }
 

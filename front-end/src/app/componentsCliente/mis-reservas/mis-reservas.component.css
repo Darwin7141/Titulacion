@@ -5,7 +5,7 @@
   color:#fff;
   display:flex;                 /* centra el texto */
   justify-content:center;
-  padding:8px 12px;
+  padding:4px 12px;
   border-radius:8px;
 }
 
@@ -209,3 +209,62 @@ button:hover{ filter:brightness(.96); }
   .pager{ right:52px; }
 }
 
+.swal-pro{
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+  box-shadow: 0 16px 44px rgba(16,24,40,.18);
+  font-family:"Roboto",sans-serif;
+}
+.swal-pro-title{
+  margin: 6px 0 4px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+}
+.swal-pro-desc, .swal-pro-html{
+  margin: 0 auto;
+  text-align: center;
+  font-size: 16px;
+  color: #374151;
+}
+
+/* Icono de advertencia (círculo + admiración) */
+.swal-pro-warn{
+  width: 80px; height: 80px;
+  margin: 4px auto 8px;
+  border-radius: 50%;
+  background: #fff7ed;                 /* ámbar muy claro */
+  position: relative;
+  box-shadow: inset 0 0 0 4px #fdba74;  /* aro ámbar */
+}
+.swal-pro-warn::before{
+  content:"";
+  position:absolute; left:50%; top:20px;
+  width:6px; height:28px; margin-left:-3px;
+  background:#f59e0b; border-radius:3px;
+}
+.swal-pro-warn::after{
+  content:"";
+  position:absolute; left:50%; bottom:18px;
+  width:8px; height:8px; margin-left:-4px;
+  background:#f59e0b; border-radius:50%;
+}
+
+/* Botones */
+.swal-pro-yes, .swal-pro-cancel{
+  display:inline-block;
+  margin: 18px 6px 4px;
+  min-width:112px;
+  padding:10px 22px;
+  border:0; border-radius:10px;
+  font-weight:600; font-size:16px;
+  letter-spacing:.2px; cursor:pointer;
+}
+.swal-pro-yes{ background:#5b6cf9; color:#fff; }
+.swal-pro-yes:hover{ filter:brightness(.96); }
+.swal-pro-yes:focus{ outline:none; box-shadow:0 0 0 4px rgba(91,108,249,.22); }
+
+.swal-pro-cancel{ background:#6b7280; color:#fff; }
+.swal-pro-cancel:hover{ filter:brightness(.95); }
+.swal-pro-cancel:focus{ outline:none; box-shadow:0 0 0 4px rgba(107,114,128,.22); }

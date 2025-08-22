@@ -42,169 +42,265 @@ export class ProveedoresComponent implements OnInit {
   }
     }
     agregar() {
-      if (!this.validaciones.validarCedulaEcuador(this.proveedor.ci)) {
-               Swal.fire({
-                 icon: 'error',
-                 title: 'Cédula no válida',
-                 text: 'La cédula ingresada no es válida.',
-               });
-               return;
-             }
-           
-             if (!this.proveedor.nombre.trim()) {
-               Swal.fire({
-                 icon: 'error',
-                 title: 'Nombre obligatorio',
-                 text: 'El nombre es obligatorio.',
-               });
-               return;
-             }
-           
-             if (!this.proveedor.direccion.trim()) {
-               Swal.fire({
-                 icon: 'error',
-                 title: 'Dirección obligatoria',
-                 text: 'La dirección es obligatoria.',
-               });
-               return;
-             }
-           
-             if (!this.validaciones.validarEmail(this.proveedor.e_mail)) {
-               Swal.fire({
-                 icon: 'error',
-                 title: 'Correo no válido',
-                 text: 'El correo electrónico no es válido.',
-               });
-               return;
-             }
-           
-             if (!this.validaciones.validarTelefono(this.proveedor.telefono)) {
-               Swal.fire({
-                 icon: 'error',
-                 title: 'Teléfono no válido',
-                 text: 'El número de teléfono debe tener 10 dígitos y comenzar con 0.',
-               });
-               return;
-             }
-           
-             // Lógica de verificación y envío
-             this.serviceProv.verificarCedula(this.proveedor.ci).subscribe((resp) => {
-               if (resp.existe) {
-                 Swal.fire({
-                   icon: 'warning',
-                   title: 'Cédula duplicada',
-                   text: 'La cédula ingresada ya se encuentra registrada.',
-                 });
-                 return;
-               }
-               this.serviceProv.verificarEmail(this.proveedor.e_mail).subscribe((resp) => {
-                 if (resp.existe) {
-                   Swal.fire({
-                     icon: 'warning',
-                     title: 'Correo duplicado',
-                     text: 'El correo ingresado ya se encuentra registrado.',
-                   });
-                   return;
-                 }
-                 this.serviceProv.verificarTelefono(this.proveedor.telefono).subscribe((resp) => {
-                   if (resp.existe) {
-                     Swal.fire({
-                       icon: 'warning',
-                       title: 'Teléfono duplicado',
-                       text: 'El número de teléfono ingresado ya se encuentra registrado.',
-                     });
-                     return;
-                   }
-           
-                   // Si todo es válido, agregar el administrador
-                   this.serviceProv.agregar(this.proveedor).subscribe({
-                           next: () => {
-                             Swal.fire({ icon: 'success', title: 'Éxito', text: 'Proveedor agregado correctamente.' })
-                                 .then(() => this.dialogRef.close('added'));   // ⬅️  cerramos pasando flag
-                           },
-                     error: (err) => {
-                       console.error('Error en enviar datos del proveedor:', err);
-                       Swal.fire({
-                         icon: 'error',
-                         title: 'Error',
-                         text: 'Ocurrió un error al agregar el proveedor.',
-                       });
-                     },
-                   });
-                 });
-               });
-             });
-           }
+  if (!this.validaciones.validarCedulaEcuador(this.proveedor.ci)) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Cédula no válida</h2>
+        <p class="swal-pro-desc">La cédula ingresada no es válida.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  if (!this.proveedor.nombre.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Nombre obligatorio</h2>
+        <p class="swal-pro-desc">El nombre es obligatorio.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  if (!this.proveedor.direccion.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Dirección obligatoria</h2>
+        <p class="swal-pro-desc">La dirección es obligatoria.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  if (!this.validaciones.validarEmail(this.proveedor.e_mail)) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Correo no válido</h2>
+        <p class="swal-pro-desc">El correo electrónico no es válido.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  if (!this.validaciones.validarTelefono(this.proveedor.telefono)) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Teléfono no válido</h2>
+        <p class="swal-pro-desc">El número debe tener 10 dígitos y comenzar con 0.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  // Verificaciones backend
+  this.serviceProv.verificarCedula(this.proveedor.ci).subscribe((resp) => {
+    if (resp.existe) {
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-warn"></div>
+          <h2 class="swal-pro-title">Cédula duplicada</h2>
+          <p class="swal-pro-desc">La cédula ingresada ya se encuentra registrada.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      }); return;
+    }
+
+    this.serviceProv.verificarEmail(this.proveedor.e_mail).subscribe((resp) => {
+      if (resp.existe) {
+        Swal.fire({
+          width: 480,
+          html: `
+            <div class="swal-pro-warn"></div>
+            <h2 class="swal-pro-title">Correo duplicado</h2>
+            <p class="swal-pro-desc">El correo ingresado ya se encuentra registrado.</p>
+          `,
+          showConfirmButton: true, confirmButtonText: 'Listo',
+          buttonsStyling: false, focusConfirm: true,
+          customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+        }); return;
+      }
+
+      this.serviceProv.verificarTelefono(this.proveedor.telefono).subscribe((resp) => {
+        if (resp.existe) {
+          Swal.fire({
+            width: 480,
+            html: `
+              <div class="swal-pro-warn"></div>
+              <h2 class="swal-pro-title">Teléfono duplicado</h2>
+              <p class="swal-pro-desc">El teléfono ingresado ya se encuentra registrado.</p>
+            `,
+            showConfirmButton: true, confirmButtonText: 'Listo',
+            buttonsStyling: false, focusConfirm: true,
+            customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+          }); return;
+        }
+
+        // Agregar proveedor
+        this.serviceProv.agregar(this.proveedor).subscribe({
+          next: () => {
+            Swal.fire({
+              width: 480,
+              html: `
+                <div class="swal-pro-check"></div>
+                <h2 class="swal-pro-title">Proveedor agregado</h2>
+                <p class="swal-pro-desc">Se guardó correctamente.</p>
+              `,
+              showConfirmButton: true, confirmButtonText: 'Listo',
+              buttonsStyling: false, focusConfirm: true,
+              customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+            }).then(() => this.dialogRef.close('added'));
+          },
+          error: (err) => {
+            console.error('Error en enviar datos del proveedor:', err);
+            Swal.fire({
+              width: 480,
+              html: `
+                <div class="swal-pro-error"></div>
+                <h2 class="swal-pro-title">Error</h2>
+                <p class="swal-pro-desc">Ocurrió un error al agregar el proveedor.</p>
+              `,
+              showConfirmButton: true, confirmButtonText: 'Listo',
+              buttonsStyling: false, focusConfirm: true,
+              customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+            });
+          },
+        });
+      });
+    });
+  });
+}
+
            cancelar(): void {
           this.dialogRef.close();     // simplemente cierra sin flag
         }
 
       guardar(): void {
-        if (!this.validaciones.validarCedulaEcuador(this.proveedor.ci)) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Cédula no válida',
-              text: 'La cédula ingresada no es válida.',
-            });
-            return;
-          }
-        
-          if (!this.proveedor.nombre.trim()) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Nombre obligatorio',
-              text: 'El nombre es obligatorio.',
-            });
-            return;
-          }
-        
-          if (!this.proveedor.direccion.trim()) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Dirección obligatoria',
-              text: 'La dirección es obligatoria.',
-            });
-            return;
-          }
-      
-      
-          if (!this.validaciones.validarEmail(this.proveedor.e_mail)) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Correo no válido',
-              text: 'El correo electrónico no es válido.',
-            });
-            return;
-          }
-        
-          if (!this.validaciones.validarTelefono(this.proveedor.telefono)) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Teléfono no válido',
-              text: 'El número de teléfono debe tener 10 dígitos y comenzar con 0.',
-            });
-            return;
-          }
-        
-        const peticion$ = this.esEdicion
-            ? this.serviceProv.editarProveedor(this.proveedor)
-            : this.serviceProv.agregar(this.proveedor);
-      
-        peticion$.subscribe({
-          next : () => {
-            Swal.fire({
-              icon : 'success',
-              title: 'Éxito',
-              text : this.esEdicion
-                     ? 'Proveedor actualizado correctamente.'
-                     : 'Proveedor agregado correctamente.'
-            }).then(() => this.dialogRef.close('saved'));
-          },
-          error: err => {
-            console.error('Error al guardar proveedor:', err);
-            Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al guardar.' });
-          }
-        });
-      
-            }
+  if (!this.validaciones.validarCedulaEcuador(this.proveedor.ci)) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Cédula no válida</h2>
+        <p class="swal-pro-desc">La cédula ingresada no es válida.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  if (!this.proveedor.nombre.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Nombre obligatorio</h2>
+        <p class="swal-pro-desc">El nombre es obligatorio.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  if (!this.proveedor.direccion.trim()) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Dirección obligatoria</h2>
+        <p class="swal-pro-desc">La dirección es obligatoria.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  if (!this.validaciones.validarEmail(this.proveedor.e_mail)) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Correo no válido</h2>
+        <p class="swal-pro-desc">El correo electrónico no es válido.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  if (!this.validaciones.validarTelefono(this.proveedor.telefono)) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Teléfono no válido</h2>
+        <p class="swal-pro-desc">El número debe tener 10 dígitos y comenzar con 0.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }); return;
+  }
+
+  const peticion$ = this.esEdicion
+    ? this.serviceProv.editarProveedor(this.proveedor)
+    : this.serviceProv.agregar(this.proveedor);
+
+  peticion$.subscribe({
+    next: () => {
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-check"></div>
+          <h2 class="swal-pro-title">${this.esEdicion ? 'Proveedor actualizado' : 'Proveedor agregado'}</h2>
+          <p class="swal-pro-desc">Los cambios se guardaron correctamente.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      }).then(() => this.dialogRef.close('saved'));
+    },
+    error: err => {
+      console.error('Error al guardar proveedor:', err);
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-error"></div>
+          <h2 class="swal-pro-title">Error</h2>
+          <p class="swal-pro-desc">Ocurrió un error al guardar.</p>
+        `,
+        showConfirmButton: true, confirmButtonText: 'Listo',
+        buttonsStyling: false, focusConfirm: true,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      });
+    }
+  });
+}
+
   }

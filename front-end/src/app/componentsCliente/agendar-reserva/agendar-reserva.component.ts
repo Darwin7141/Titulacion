@@ -4,6 +4,7 @@ import { ClientesService } from '../../services/clientes.service';
 import { ReservasService } from '../../services/reservas.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { SeleccionMenusService, SeleccionMenu } from '../../services/seleccion-menus.service';
 
 @Component({
   selector: 'app-agendar-reserva',
@@ -47,7 +48,8 @@ export class AgendarReservaComponent implements OnInit{
     private menusService: MenusService,
     private clientesService: ClientesService,
     private reservasService: ReservasService, // <--- con el nuevo método
-    private router: Router
+    private router: Router,
+    private carrito: SeleccionMenusService
   ) {}
 
   ngOnInit(): void {
@@ -80,6 +82,15 @@ export class AgendarReservaComponent implements OnInit{
       this.formReserva.e_mail = usuario.correo || '';
       this.formReserva.idprecliente = usuario.idprecliente || '';
     } 
+
+    this.menusSeleccionados = this.carrito.snapshot().map(x => ({ ...x }));
+    this.calcularTotalesCabecera();
+
+    // Si quieres que se actualice en vivo si el usuario sigue agregando:
+    this.carrito.items$.subscribe(items => {
+      this.menusSeleccionados = items.map(x => ({ ...x }));
+      this.calcularTotalesCabecera();
+    });
    
   }
   
@@ -300,6 +311,7 @@ export class AgendarReservaComponent implements OnInit{
     // Llama a tu “createReserva” normal
     this.reservasService.createReserva(dataReserva).subscribe({
       next: (respReserva) => {
+        this.carrito.clear(); 
         const nuevas = JSON.parse(localStorage.getItem('nuevasReservas') || '[]');
 
       // 2) Agregar la nueva ID de reserva
@@ -310,13 +322,26 @@ export class AgendarReservaComponent implements OnInit{
 
       window.dispatchEvent(new CustomEvent('nuevasReservasActualizado'));
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Reserva generada',
-          text: `Su reserva ha sido creada con éxito`,
-        }).then(() => {
-          this.router.navigate(['/inicioCliente']);
-        });
+       Swal.fire({
+  width: 480,
+  html: `
+    <div class="swal-pro-check"></div>
+    <h2 class="swal-pro-title">Reserva generada</h2>
+    <p class="swal-pro-desc">Su reserva ha sido creada con éxito</p>
+  `,
+  showConfirmButton: true,
+  confirmButtonText: 'Listo',
+  showCancelButton: false,
+  buttonsStyling: false,
+  focusConfirm: true,
+  customClass: {
+    popup: 'swal-pro',
+    confirmButton: 'swal-pro-confirm',
+    htmlContainer: 'swal-pro-html'
+  }
+}).then(() => {
+  this.router.navigate(['/inicioCliente']);
+});
       },
       error: (err) => {
         console.error('Error al crear reserva:', err);
@@ -364,6 +389,7 @@ export class AgendarReservaComponent implements OnInit{
     // 2) Llamar al nuevo método “crearClienteYReserva” (todo en uno)
     this.reservasService.crearClienteYReserva(dataCompleta).subscribe({
       next: (resp) => {
+        this.carrito.clear(); 
         const nuevas = JSON.parse(localStorage.getItem('nuevasReservas') || '[]');
       nuevas.push(resp.idreserva);
       localStorage.setItem('nuevasReservas', JSON.stringify(nuevas));
@@ -374,12 +400,25 @@ export class AgendarReservaComponent implements OnInit{
     user.codigocliente = resp.codigocliente;
     localStorage.setItem('identity_user', JSON.stringify(user))
         Swal.fire({
-          icon: 'success',
-          title: 'Reserva generada',
-          text: `Su reserva fue creada`
-        }).then(() => {
-          this.router.navigate(['/inicioCliente']);
-        });
+  width: 480,
+  html: `
+    <div class="swal-pro-check"></div>
+    <h2 class="swal-pro-title">Reserva generada</h2>
+    <p class="swal-pro-desc">Su reserva ha sido creada con éxito</p>
+  `,
+  showConfirmButton: true,
+  confirmButtonText: 'Listo',
+  showCancelButton: false,
+  buttonsStyling: false,
+  focusConfirm: true,
+  customClass: {
+    popup: 'swal-pro',
+    confirmButton: 'swal-pro-confirm',
+    htmlContainer: 'swal-pro-html'
+  }
+}).then(() => {
+  this.router.navigate(['/inicioCliente']);
+});
       },
       error: (err) => {
         console.error('Error al crear reserva:', err);
@@ -390,6 +429,14 @@ export class AgendarReservaComponent implements OnInit{
         });
       }
     });
+  }
+
+   cancelar(): void {
+    
+    this.carrito.clear();                 
+    this.menusSeleccionados = [];          
+    this.calcularTotalesCabecera();        
+    this.cerrar.emit();
   }
 }
 

@@ -1,76 +1,144 @@
-<h2 mat-dialog-title>Gestionar productos</h2>
-<mat-dialog-content>
+<h2 mat-dialog-title>Asignar productos</h2>
 
-  <!-- Buscador -->
-  <mat-form-field style="width:100%">
-    <mat-label>Buscar</mat-label>
-    <input matInput [(ngModel)]="search" (ngModelChange)="filtrar()" placeholder="Código o nombre">
-    <button mat-icon-button matSuffix (click)="filtrar()">
-      <mat-icon>search</mat-icon>
-    </button>
-  </mat-form-field>
+<mat-dialog-content class="drawer-content">
+  <div class="drawer-grid">
 
-  <!-- Lista filtrada -->
- <mat-selection-list [multiple]="false" style="max-height:200px; overflow:auto">
-  <mat-list-option
-    *ngFor="let p of filtrados"
-    [disabled]="p.stock === 0"
-    (click)="select(p)"
-  >
-    {{ p.idproducto }} — {{ p.nombre }}
-    <span *ngIf="p.stock > 0" class="stock-info">
-      (stock: {{ p.stock }})
-    </span>
-    <span *ngIf="p.stock === 0" class="no-stock">
-      No disponible
-    </span>
-  </mat-list-option>
-</mat-selection-list>
+    <!-- ===== Columna izquierda: Productos ===== -->
+    <section class="panel">
+      <header class="panel-head">
+        <div class="head-title">Productos</div>
+        <mat-form-field appearance="outline" class="search-field">
+          <input
+            #searchBox
+            matInput
+            placeholder="Nombre del producto"
+            [(ngModel)]="search"
+            (ngModelChange)="filtrar()"
+          />
+          <button mat-icon-button matSuffix (click)="filtrar()" aria-label="Buscar">
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
+      </header>
 
+      <div class="list-wrap" #listScroll (keydown)="$event.stopPropagation()" tabindex="0">
+        <div
+          class="dp-row"
+          *ngFor="let p of filtrados; let i = index"
+          [class.active]="i === selectedIndex"
+          [class.disabled]="p.stock === 0"
+          (click)="select(p, i)"
+        >
+         <div class="dp-name">{{ p.nombre }}</div>
+          <div class="dp-stock">
+            <ng-container *ngIf="p.stock > 0; else agotado">
+              Stock: {{ p.stock }}
+            </ng-container>
+            <ng-template #agotado>
+              <span class="no-stock">Sin stock</span>
+            </ng-template>
+          </div>
+        </div>
+        <div *ngIf="!filtrados.length" class="empty">Sin resultados</div>
+      </div>
+    </section>
 
-  <!-- Cantidad + agregar -->
-  <div *ngIf="seleccionado" style="margin-top:1em">
-    <p>Seleccionado: <strong>{{seleccionado.nombre}}</strong></p>
-    <mat-form-field appearance="outline">
-      <mat-label>Cantidad</mat-label>
-      <input matInput type="number" [(ngModel)]="cantidad" [min]="1" [max]="seleccionado.stock">
-    </mat-form-field>
-    <button mat-raised-button color="primary" (click)="agregar()">Agregar</button>
+    <!-- ===== Columna derecha: Seleccionado + Asignados ===== -->
+    <div class="right-col">
+
+      <!-- Seleccionado -->
+      <section class="panel" *ngIf="seleccionado as s">
+        <header class="panel-head"><div class="head-title">Seleccionado</div></header>
+        <div class="sel-head">
+        <div class="sel-name">{{ s.nombre }}</div>
+        <span class="badge badge-stock">Stock: {{ s.stock }}</span>
+        </div>
+
+        <div class="sel-meta">
+        <span class="badge" *ngIf="s?.precio as pr">{{ pr | currency:'USD' }}/u</span>
+        </div>
+
+        <div class="qty-row">
+          <button mat-icon-button (click)="stepCantidad(-1)" [disabled]="cantidad<=1" aria-label="Disminuir">
+            <mat-icon>remove</mat-icon>
+          </button>
+
+          <input class="qty-input" type="number" min="1" [max]="s.stock" [(ngModel)]="cantidad"/>
+
+          <button mat-icon-button (click)="stepCantidad(+1)" aria-label="Aumentar">
+            <mat-icon>add</mat-icon>
+          </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            class="btn-add-list"
+            [disabled]="!canAdd"
+            (click)="agregar()"
+          >
+            Agregar
+          </button>
+        </div>
+
+        <div *ngIf="excedeStock" class="badge-error">Excede stock</div>
+      </section>
+
+      <!-- Asignados -->
+      <section class="panel">
+        <header class="panel-head"><div class="head-title">Asignados</div></header>
+
+        <table class="cart-table" *ngIf="asignados.length; else noAsig">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="num">Cantidad</th>
+              <th *ngIf="showPrecios" class="num">Subtotal</th>
+              <th class="acc">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let it of asignados">
+              <td>{{ it.producto.nombre }}</td>
+              <td class="num">{{ it.cantidad }}</td>
+              <td *ngIf="showPrecios" class="num">{{ subtotal(it) | currency:'USD' }}</td>
+              <td class="acc">
+                <button mat-icon-button (click)="incrementar(it)" [disabled]="it.producto.stock<=0" aria-label="Añadir">
+                  <mat-icon>add</mat-icon>
+                </button>
+                <button mat-icon-button (click)="disminuir(it)" aria-label="Quitar">
+                  <mat-icon>remove</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="eliminar(it)" aria-label="Eliminar">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot *ngIf="showPrecios">
+            <tr>
+              <td colspan="2" class="num total-label">Total:</td>
+              <td class="num">{{ total() | currency:'USD' }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        <ng-template #noAsig>
+          <div class="empty">Sin productos asignados</div>
+        </ng-template>
+      </section>
+
+    </div>
   </div>
-
-  <!-- Tabla de asignados con acciones -->
-  <div *ngIf="asignados.length > 0" style="margin-top:2em;">
-    <h3>Asignados</h3>
-    <table style="width:100%; border-collapse: collapse;">
-      <thead>
-        <tr>
-          <th style="border:1px solid #ddd; padding:8px">Producto</th>
-          <th style="border:1px solid #ddd; padding:8px; text-align:right">Cant.</th>
-          <th style="border:1px solid #ddd; padding:8px; text-align:center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of asignados">
-          <td style="border:1px solid #ddd; padding:8px">{{ item.producto.nombre }}</td>
-          <td style="border:1px solid #ddd; padding:8px; text-align:right">{{ item.cantidad }}</td>
-          <td style="border:1px solid #ddd; padding:8px; text-align:center">
-            <button mat-icon-button (click)="incrementar(item)">
-              <mat-icon>add</mat-icon>
-            </button>
-            <button mat-icon-button (click)="disminuir(item)">
-              <mat-icon>remove</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="eliminar(item)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
 </mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-button (click)="cancel()"><mat-icon>close</mat-icon> Cancelar</button>
-  <button mat-icon-button color="primary" (click)="save()"><mat-icon>save</mat-icon></button>
+
+<!-- Footer sticky -->
+<mat-dialog-actions align="end" class="sticky-actions">
+  <button mat-stroked-button (click)="cancel()">
+    <mat-icon>close</mat-icon>
+    Cancelar
+  </button>
+  <button mat-raised-button color="primary" (click)="save()">
+    <mat-icon>save</mat-icon>
+    Guardar
+  </button>
 </mat-dialog-actions>

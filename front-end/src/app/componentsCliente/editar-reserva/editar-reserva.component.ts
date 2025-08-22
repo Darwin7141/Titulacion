@@ -165,15 +165,32 @@ export class EditarReservaComponent implements OnInit {
     };
   
     this.reservasService.editarReserva(this.idreserva, body).subscribe({
-      next: () => {
-        Swal.fire({ icon:'success', title:'Reserva actualizada', text:'Se guardaron los cambios correctamente' })
-          .then(() => this.dialogRef.close({ updated: true, idreserva: this.idreserva }));
-      },
-      error: (err) => {
-        console.error('Error al actualizar la reserva:', err);
-        Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al actualizar la reserva.'
-        });
+  next: () => {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-check"></div>
+        <h2 class="swal-pro-title">Reserva actualizada</h2>
+        <p class="swal-pro-desc">Los cambios se guardaron correctamente</p>
+      `,
+      showConfirmButton: true,
+      confirmButtonText: 'Listo',
+      showCancelButton: false,
+      buttonsStyling: false,
+      focusConfirm: true,
+      customClass: {
+        popup: 'swal-pro',
+        confirmButton: 'swal-pro-confirm',
+        htmlContainer: 'swal-pro-html'
       }
-    });
+    }).then(() =>
+      this.dialogRef.close({ updated: true, idreserva: this.idreserva })
+    );
+  },
+  error: (err) => {
+    console.error('Error al actualizar la reserva:', err);
+    Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al actualizar la reserva.' });
+  }
+});
   }
 }

@@ -1,41 +1,75 @@
 <div class="menus-cliente-container">
-    <!-- Mensaje si no hay menús -->
-    <div *ngIf="mensajeSinMenus">
-      <p>{{ mensajeSinMenus }}</p>
-    </div>
-  
-    <!-- Grid de menús -->
-    <div class="menus-grid">
-      <div
-        class="menu-card"
-        *ngFor="let m of menusFiltrados"
-        (click)="verDetalleMenu(m)"
-      >
-        <img
-          [src]="m.fotografiaUrl"
-          alt="Menú: {{ m.nombre }}"
-          class="menu-img"
-        />
-        <h3>{{ m.nombre }}</h3>
-      </div>
-    </div>
-  
-    <!-- Modal (detalle) -->
-    <div class="modal-backdrop" *ngIf="menuSeleccionado">
-      <div class="modal-content">
-        <button class="close-button" (click)="cerrarDetalleMenu()">×</button>
-        <h3>{{ menuSeleccionado.nombre }}</h3>
-        <img
-          [src]="menuSeleccionado.fotografiaUrl"
-          alt="Menú: {{ menuSeleccionado.nombre }}"
-          class="modal-img"
-        />
-        <p> {{ menuSeleccionado.descripcion }}</p> 
-        <p>Costo: {{ menuSeleccionado.precio }} $</p>
+  <mat-card class="welcome-card">
+    <h1>Menús</h1>
+  </mat-card>
 
-  
-        
+  <div *ngIf="mensajeSinMenus">
+    <p>{{ mensajeSinMenus }}</p>
+  </div>
+
+  <!-- Grid de menús -->
+  <div class="menus-grid">
+    <div
+      class="menu-card"
+      *ngFor="let m of menusFiltrados"
+      (click)="verDetalleMenu(m)"
+    >
+      <img
+        [src]="m.fotografiaUrl"
+        alt="Menú: {{ m.nombre }}"
+        class="menu-img"
+      />
+
+      <div class="menu-info">
+        <h3 class="menu-title">{{ m.nombre }}</h3>
+        <div class="menu-price"><strong>{{ m.precio }} $</strong></div>
+        <div class="iva-note">(Incluido IVA)</div>
       </div>
     </div>
   </div>
-  
+
+  <!-- Modal (detalle) -->
+  <div class="modal-backdrop" *ngIf="menuSeleccionado">
+    <div class="modal-content">
+      <button class="close-button" (click)="cerrarDetalleMenu()">×</button>
+
+      <h3 class="modal-title">{{ menuSeleccionado.nombre }}</h3>
+      <img
+        [src]="menuSeleccionado.fotografiaUrl"
+        alt="Menú: {{ menuSeleccionado.nombre }}"
+        class="modal-img"
+      />
+
+      <h4 class="desc-title">Ingredientes</h4>
+      <ul class="desc-list">
+        <li *ngFor="let it of descripcionItems(menuSeleccionado.descripcion)">
+          {{ it }}
+        </li>
+      </ul>
+
+      <div class="actions-row">
+  <div class="qty-stepper" aria-label="Cantidad">
+    <button type="button" class="qty-btn" (click)="decQty()" aria-label="Disminuir">−</button>
+    <div class="qty-value">{{ selectedQty }}</div>
+    <button type="button" class="qty-btn" (click)="incQty()" aria-label="Aumentar">+</button>
+  </div>
+
+  <button class="add-to-list" (click)="agregarALista(menuSeleccionado)">
+    <mat-icon>shopping_cart</mat-icon>
+    Agregar a reserva
+  </button>
+</div>
+    
+  </div>
+  </div>
+  <div class="nav-row">
+<button mat-icon-button class="btn-back" (click)="volver()" matTooltip="Volver">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <button class="go-reserve-btn" type="button" (click)="irAReservaClick()">
+    Ir a reserva
+  </button>
+
+</div>
+</div>

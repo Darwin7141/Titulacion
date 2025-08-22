@@ -1,4 +1,4 @@
-import { Component , OnInit,EventEmitter, Output  } from '@angular/core';
+import { Component , OnInit,EventEmitter, Output,  } from '@angular/core';
 import { ReservasService } from '../../services/reservas.service';
 import { ActivatedRoute } from '@angular/router';
 import { EstadoReservaService } from '../../services/estado-reserva.service';
@@ -197,21 +197,44 @@ window.dispatchEvent(new CustomEvent('nuevasNotificacionesClienteActualizado'));
 
       // ————— FIN CÓDIGO NUEVO —————
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Cambios guardados',
-        text: 'Los cambios se han guardado correctamente.',
-        confirmButtonText: 'Aceptar'
-      });
+     Swal.fire({
+  width: 480,
+  html: `
+    <div class="swal-pro-check"></div>
+    <h2 class="swal-pro-title">Cambios guardados</h2>
+    <p class="swal-pro-desc">Los cambios se han guardado correctamente.</p>
+  `,
+  showConfirmButton: true,
+  confirmButtonText: 'Listo',
+  showCancelButton: false,
+  buttonsStyling: false,
+  focusConfirm: true,
+  customClass: {
+    popup: 'swal-pro',
+    confirmButton: 'swal-pro-confirm',
+    htmlContainer: 'swal-pro-html'
+  }
+});
     },
     error: (err) => {
       console.error('Error al actualizar estado:', err);
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo guardar los cambios. Inténtelo nuevamente.',
-        confirmButtonText: 'Cerrar'
-      });
+  width: 480,
+  html: `
+    <div class="swal-pro-error"></div>
+    <h2 class="swal-pro-title">Error al guardar</h2>
+    <p class="swal-pro-desc">No se pudo guardar los cambios. Inténtalo nuevamente.</p>
+  `,
+  showConfirmButton: true,
+  confirmButtonText: 'Listo',
+  buttonsStyling: false,
+  focusConfirm: true,
+  customClass: {
+    popup: 'swal-pro',
+    confirmButton: 'swal-pro-confirm',
+    htmlContainer: 'swal-pro-html'
+  }
+});
     }
   });
 }
@@ -227,130 +250,128 @@ window.dispatchEvent(new CustomEvent('nuevasNotificacionesClienteActualizado'));
     }
   }
 
-  verDetalles(idreserva: string) {
-    forkJoin({
-      reserva: this.resService.getReservaById(idreserva),
-      asignados: this.resService.getProductosDeReserva(idreserva)
-    }).subscribe({
-      next: ({ reserva: resCompleta, asignados }) => {
-        // ——— 1) Agrupo duplicados en un Map ———
-        const map = new Map<string, { producto: any, cantidad: number }>();
-        asignados.forEach(item => {
-          const key = item.producto.idproducto;
-          if (map.has(key)) {
-            map.get(key)!.cantidad += item.cantidad;
-          } else {
-            map.set(key, { producto: item.producto, cantidad: item.cantidad });
-          }
-        });
-        const agregados = Array.from(map.values());
+verDetalles(idreserva: string) {
+  forkJoin({
+    reserva:   this.resService.getReservaById(idreserva),
+    asignados: this.resService.getProductosDeReserva(idreserva)
+  }).subscribe({
+    next: ({ reserva: resCompleta, asignados }) => {
+      // Agrupar productos repetidos
+      const map = new Map<string, { producto: any, cantidad: number }>();
+      asignados.forEach(it => {
+        const k = it.producto.idproducto;
+        map.set(k, map.has(k)
+          ? { producto: it.producto, cantidad: map.get(k)!.cantidad + it.cantidad }
+          : { producto: it.producto, cantidad: it.cantidad });
+      });
+      const agregados = Array.from(map.values());
 
-        // ——— 2) Construyo el HTML ———
-        let html = `
-          <div style="text-align:left; font-family:Arial,sans-serif;">
-          <p><strong>Reserva:</strong> ${resCompleta.idreserva}</p>
-            <p><strong>Fecha:</strong> ${resCompleta.fechaevento}</p>
-            <p><strong>Dirección:</strong> ${resCompleta.direccionevento}</p>
-        `;
-        if (resCompleta.nombre?.estado_reserva) {
-          html += `
-            <p><strong>Estado:</strong>
-              <span style="
-                background:#d1ecf1; color:#0c5460;
-                padding:4px 8px; border-radius:12px;
-                font-weight:bold; display:inline-block;">
-                ${resCompleta.nombre.estado_reserva}
-              </span>
-            </p>
-          `;
+      const fmt   = (n: any) => Number(n ?? 0).toFixed(2);
+      const fecha = new Date(resCompleta.fechaevento).toLocaleDateString();
+
+      const filasMenus = (resCompleta.detalles || []).map((d: any) => `
+        <tr>
+          <td>${d.menu?.nombre ?? ''}</td>
+          <td>$${fmt(d.preciounitario)}</td>
+          <td>${d.cantpersonas ?? 0}</td>
+          <td>$${fmt(d.subtotal)}</td>
+        </tr>
+      `).join('');
+
+      const filasProd = agregados.map(it => `
+        <tr>
+          <td>${it.producto.nombre}</td>
+          <td>${it.cantidad}</td>
+        </tr>
+      `).join('');
+
+      const html = `
+        <div class="sr-modal">
+          <h2 class="swal-pro-title">Detalle y Asignaciones</h2>
+          <p></p>
+
+          <div class="sr-meta">
+            <div><span class="k">Reserva:</span> ${resCompleta.idreserva}</div>
+            <div><span class="k">Fecha:</span> ${fecha}</div>
+            <div><span class="k">Dirección:</span> ${resCompleta.direccionevento ?? ''}</div>
+          </div>
+
+          <p class="sr-section">Menús contratados</p>
+          <div class="sr-card">
+            <table class="sr-table sr-table-menus">
+              <thead>
+                <tr>
+                  <th>Menú</th>
+                  <th>Precio</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filasMenus || `<tr><td colspan="4" style="text-align:center;color:#6b7280;padding:10px;">Sin menús</td></tr>`}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3">Total:</td>
+                  <td>$${fmt(resCompleta.total)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <p class="sr-section">Productos asignados</p>
+          <div class="sr-card">
+            <table class="sr-table sr-table-prod">
+              <thead>
+                <tr><th>Producto</th><th>Cantidad</th></tr>
+              </thead>
+              <tbody>
+                ${filasProd || `<tr><td colspan="2" style="text-align:center;color:#6b7280;padding:10px;">Sin productos asignados</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      Swal.fire({
+         width: 560,                             // más compacto que 640
+  html,
+  showDenyButton: true,
+  denyButtonText: 'Gestionar',
+  confirmButtonText: 'Cerrar',
+  buttonsStyling: false,
+  customClass: {
+    popup: 'swal-pro sr-popup',           // <- anchura y acciones scoped
+    htmlContainer: 'swal-pro-html',
+    confirmButton: 'swal-pro-confirm',    // "Cerrar" (morado)
+    denyButton: 'swal-pro-confirm'        // "Gestionar" con el mismo estilo
+  }
+      }).then(res => {
+        if (res.isDenied) {
+          const ref = this.dialog.open(GestionProductosComponent, {
+            width: '800px',
+            panelClass: 'gp-assign-dialog',
+            data: { idreserva }
+          });
+          ref.afterClosed().subscribe(saved => saved && this.cargarReservas());
         }
-        // tabla de detalles de menú
-        html += `
-          <table style="width:100%; border-collapse:collapse; margin-top:16px;">
-            <thead>
-              <tr style="background:#f1f1f1; font-weight:bold;">
-                <th style="border:1px solid #ddd; padding:8px;">Menú</th>
-                <th style="border:1px solid #ddd; padding:8px;">Precio Unit.</th>
-                <th style="border:1px solid #ddd; padding:8px;">Cant.</th>
-                <th style="border:1px solid #ddd; padding:8px;">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
-        resCompleta.detalles.forEach((d: any) => {
-          html += `
-            <tr>
-              <td style="border:1px solid #ddd; padding:8px;">${d.menu?.nombre}</td>
-              <td style="border:1px solid #ddd; padding:8px;">${d.preciounitario}</td>
-              <td style="border:1px solid #ddd; padding:8px;">${d.cantpersonas}</td>
-              <td style="border:1px solid #ddd; padding:8px;">${d.subtotal}</td>
-            </tr>
-          `;
-        });
-        html += `
-            <tr>
-              <td colspan="3" style="border:1px solid #ddd; padding:8px; text-align:right; font-weight:bold;">
-                Total:
-              </td>
-              <td style="border:1px solid #ddd; padding:8px;">
-                ${resCompleta.total ?? '0.00'}
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        `;
+      });
+    },
+    error: () => Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">No se pudo cargar la reserva</h2>
+        <p class="swal-pro-desc">Inténtalo nuevamente.</p>
+      `,
+      showConfirmButton: true,
+      confirmButtonText: 'Listo',
+      buttonsStyling: false,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    })
+  });
+}
 
-        // tabla de productos asignados (agrupados)
-        html += `
-          <h4 style="margin-top:24px;">Productos asignados</h4>
-          <table style="width:100%; border-collapse:collapse;">
-            <thead>
-              <tr>
-                <th style="border:1px solid #ddd; padding:8px;">Producto</th>
-                <th style="border:1px solid #ddd; padding:8px;">Cantidad</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
-        agregados.forEach(item => {
-          html += `
-            <tr>
-              <td style="border:1px solid #ddd; padding:8px;">${item.producto.nombre}</td>
-              <td style="border:1px solid #ddd; padding:8px;">${item.cantidad}</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
-
-        // ——— 3) Muestro SweetAlert2 ———
-        Swal.fire({
-          title: '',
-          html,
-          icon: 'info',
-          width: 600,
-          showDenyButton: true,
-          denyButtonText: 'Gestionar',
-          confirmButtonText: 'Cerrar'
-        })
-        .then(res => {
-          if (res.isDenied) {
-            const ref = this.dialog.open(GestionProductosComponent, {
-  width: '800px',
-  data: { idreserva }
-});
-
-ref.afterClosed().subscribe(saved => {
-  if (saved) {
-    // el usuario pulsó Guardar → recarga tu lista de reservas
-    this.cargarReservas();
-  }
-});
-          }
-        });
-      },
-      error: () => Swal.fire('Error', 'No se pudo cargar la reserva', 'error')
-    });
-  }
 
 private fmtMoneda = (v: number) =>
   new Intl.NumberFormat('es-EC',
@@ -557,6 +578,6 @@ async downloadPdf(filtrarIdEstado?: number): Promise<void> {
     doc.save('Pagos.pdf');
   }
 
-  /* ══════════════════════════════════════════════════════════ */
+ 
 }
 

@@ -102,28 +102,44 @@
 
         <!-- Acciones -->
         <div class="actions">
-          <button class="edit-button" (click)="editarReserva(reserva.idreserva)">
-            <mat-icon>edit</mat-icon> Editar
-          </button>
+          <!-- Si está CANCELADA: no mostrar NINGÚN botón -->
+          <ng-container *ngIf="!esCancelada(reserva)">
 
-          <button class="cancel-button" (click)="cancelarReserva(reserva)">
-            Cancelar
-          </button>
+            <!-- Si está PAGADA: mostrar SOLO el comprobante -->
+            <ng-container *ngIf="esPagada(reserva); else accionesNormales">
+              <button class="download-button" (click)="descargarComprobante(reserva)">
+                Descargar Comprobante
+              </button>
+            </ng-container>
 
-          <button *ngIf="reserva.mostrarBotonPagoInicial"
-                  class="pay-button" (click)="abrirPayPal('inicial', reserva)">
-            Pago Inicial
-          </button>
+            <!-- Si NO está pagada (ni cancelada): botones normales -->
+            <ng-template #accionesNormales>
+              <button class="edit-button"
+                      *ngIf="puedeEditar(reserva)"
+                      (click)="editarReserva(reserva.idreserva)">
+                <mat-icon>edit</mat-icon> Editar
+              </button>
 
-          <button *ngIf="reserva.mostrarBotonPagoFinal"
-                  class="pay-button" (click)="abrirPayPal('final', reserva)">
-            Pago Final
-          </button>
+              <button class="cancel-button" (click)="cancelarReserva(reserva)">
+                Cancelar
+              </button>
 
-          <button *ngIf="reserva.mostrarComprobante"
-                  class="download-button" (click)="descargarComprobante(reserva)">
-            Descargar Comprobante
-          </button>
+              <button *ngIf="reserva.mostrarBotonPagoInicial"
+                      class="pay-button" (click)="abrirPayPal('inicial', reserva)">
+                Pago Inicial
+              </button>
+
+              <button *ngIf="reserva.mostrarBotonPagoFinal"
+                      class="pay-button" (click)="abrirPayPal('final', reserva)">
+                Pago Final
+              </button>
+
+              <button *ngIf="reserva.mostrarComprobante && !esPagada(reserva)"
+                      class="download-button" (click)="descargarComprobante(reserva)">
+                Descargar Comprobante
+              </button>
+            </ng-template>
+          </ng-container>
         </div>
       </div>
     </ng-container>

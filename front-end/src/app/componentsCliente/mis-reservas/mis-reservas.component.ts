@@ -1,6 +1,6 @@
 declare const paypal: any;
 
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewEncapsulation  } from '@angular/core';
 import { ReservasService } from '../../services/reservas.service';
 import { Router } from '@angular/router';
 import { ClientesService } from '../../services/clientes.service';
@@ -13,7 +13,8 @@ import jsPDF from 'jspdf';
   selector: 'app-mis-reservas',
   standalone: false,
   templateUrl: './mis-reservas.component.html',
-  styleUrls: ['./mis-reservas.component.css']
+  styleUrls: ['./mis-reservas.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class MisReservasComponent implements OnInit {
 
@@ -148,51 +149,187 @@ export class MisReservasComponent implements OnInit {
     });
   }
 
-  private generarPDFconDatosCliente(reserva: any, clienteData: any) {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
+private generarPDFconDatosCliente(reserva: any, cliente: any) {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  const M = 12;                // margen
+  const GAP = 6;               // separación entre cajas
+  const rightBoxW = 78;        // ancho caja derecha (fecha/estado)
+  const topBoxH = 34;          // alto de ambas cajas
+  const leftBoxW = W - (M * 2) - rightBoxW - GAP;
 
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    const titleText = 'COMPROBANTE DE PAGO';
-    doc.text(titleText, (pageWidth - doc.getTextWidth(titleText)) / 2, 20);
+  // Helpers
+  const dinero = (n: number) => `$${(Number(n) || 0).toFixed(2)}`;
+  const txt = (s: any) => String(s ?? '').trim();
 
-    const fechaActual = new Date().toLocaleDateString();
-    doc.setFontSize(12);
+  const fechaActual = new Date().toLocaleDateString();
+  const estado = txt(reserva?.nombre?.estado_reserva || reserva?.estado || reserva?.idestado);
+  const nroComp = txt(reserva?.idreserva);
+
+  // ⬇️ tu logo en assets (tal como lo mostraste en la captura)
+  const LOGO_SRC = 'assets/LOGOMODIDFICADO.png';
+
+  // Texto bajo el logo
+  const DIR1 = 'Dayuma, Vía principal, Calle C N/A y Km 40';
+  //const DIR2 = 'Orellana – Ecuador';
+  const TEL  = 'Teléfonos: 0992268003 – 0989989254';
+
+  const render = (logoImg?: HTMLImageElement, logoSize = { w: 0, h: 0 }) => {
+    /* ─────────────────────── Encabezado sin franja ─────────────────────── */
+    let y = M; // punto de inicio arriba
+
+    // Logo centrado
+    if (logoImg && logoSize.w > 0 && logoSize.h > 0) {
+      const x = (W - logoSize.w) / 2;
+      doc.addImage(logoImg, 'PNG', x, y, logoSize.w, logoSize.h);
+      y += logoSize.h + 4; // espacio bajo el logo
+    }
+
+    // Dirección (negrita) y teléfonos centrados
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+    doc.text(DIR1, W / 2, y, { align: 'center' }); y += 5;
+   // doc.text(DIR2, W / 2, y, { align: 'center' }); y += 6;
     doc.setFont('helvetica', 'normal');
-    doc.text(`Fecha: ${fechaActual}`, 10, 30);
+    doc.text(TEL,  W / 2, y, { align: 'center' }); y += 10;
 
-    doc.text(`Nombre: ${clienteData.nombre}`, 10, 35);
-    doc.text(`Cédula: ${clienteData.ci}`, 10, 40);
-    doc.text(`Dirección: ${clienteData.direccion}`, 10, 45);
-    doc.text(`Teléfono: ${clienteData.telefono}`, 10, 50);
+    // Título
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text('COMPROBANTE DE PAGO', W / 2, y, { align: 'center' });
+    y += 8;
 
-    let yPos = 60;
-    doc.setFont('helvetica', 'bold');
-    doc.text('MENÚ', 10, yPos);
-    doc.text('CANTIDAD', 60, yPos);
-    doc.text('PRECIO UNIT.', 110, yPos);
-    doc.text('SUBTOTAL', 160, yPos);
-    doc.line(10, yPos + 2, pageWidth - 10, yPos + 2);
-    yPos += 10;
+    /* ──────────── Caja izquierda: datos del cliente ──────────── */
+    doc.setLineWidth(0.4);
+    doc.rect(M, y, leftBoxW, topBoxH);
+
+    let x = M + 4;
+    let yc = y + 8;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+    doc.text('Cliente', x, yc);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+
+    yc += 6;  doc.text(`Nombre: ${txt(cliente?.nombre)}`, x, yc);
+    yc += 5;  doc.text(`Cédula: ${txt(cliente?.ci)}`, x, yc);
+    yc += 5;  doc.text(`Dirección: ${txt(cliente?.direccion)}`, x, yc);
+    yc += 5;  doc.text(`Teléfono: ${txt(cliente?.telefono)}`, x, yc);
+
+    /* ──────────── Caja derecha: cabecera del comprobante ──────────── */
+    const boxX = M + leftBoxW + GAP;
+    const boxY = y;
+
+    doc.rect(boxX, boxY, rightBoxW, topBoxH);
+    const rowH = topBoxH / 3;
+    doc.line(boxX, boxY + rowH,     boxX + rightBoxW, boxY + rowH);
+    doc.line(boxX, boxY + rowH * 2, boxX + rightBoxW, boxY + rowH * 2);
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+    doc.text('N° Comprobante:', boxX + 4,         boxY + 6);
+    doc.text('Fecha:',          boxX + 4,         boxY + rowH + 6);
+    doc.text('Estado:',         boxX + 4,         boxY + rowH * 2 + 6);
 
     doc.setFont('helvetica', 'normal');
-    reserva.detalles.forEach((item: any) => {
-      doc.text(item.menu.nombre, 10, yPos);
-      doc.text(item.cantpersonas.toString(), 60, yPos);
-      doc.text(`$${item.preciounitario.toFixed(2)}`, 110, yPos);
-      doc.text(`$${item.subtotal.toFixed(2)}`, 160, yPos);
-      yPos += 10;
-    });
+    doc.text(nroComp,       boxX + rightBoxW - 4, boxY + 6,            { align: 'right' });
+    doc.text(fechaActual,   boxX + rightBoxW - 4, boxY + rowH + 6,     { align: 'right' });
+    doc.text(estado || '-', boxX + rightBoxW - 4, boxY + rowH * 2 + 6, { align: 'right' });
 
-    doc.line(10, yPos, pageWidth - 10, yPos);
-    yPos += 10;
+    const tableX = M;
+const tableY = boxY + topBoxH + 10;
+const tableW = W - M * 2;
 
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Total: $${reserva.total.toFixed(2)}`, pageWidth - 40, yPos);
+// Definición de columnas
+const cols = [
+  { title: 'MENÚ',         w: tableW * 0.48, align: 'left'  as const },
+  { title: 'CANTIDAD',     w: tableW * 0.16, align: 'right' as const },
+  { title: 'PRECIO UNIT.', w: tableW * 0.18, align: 'right' as const },
+  { title: 'SUBTOTAL',     w: tableW * 0.18, align: 'right' as const },
+];
 
-    doc.save('comprobante_reserva.pdf');
-  }
+// Encabezado
+let cx = tableX;
+const th = 8;
+doc.setLineWidth(0.4);
+doc.setFillColor(245, 245, 245);
+
+// ⬅️ antes: 'F'. Ahora 'FD' = fill + draw (para que se vea la línea superior)
+doc.rect(tableX, tableY, tableW, th, 'FD');
+
+doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+cols.forEach(c => {
+  const tx = cx + (c.align === 'right' ? c.w - 2 : 2);
+  doc.text(c.title, tx, tableY + 5, { align: c.align });
+  cx += c.w;
+});
+
+// Líneas verticales del header (opcional, ya hay borde por el rect, pero lo dejamos)
+cx = tableX;
+doc.line(tableX, tableY, tableX, tableY + th);
+cols.forEach(c => { cx += c.w; doc.line(cx, tableY, cx, tableY + th); });
+
+// Cuerpo
+doc.setFont('helvetica', 'normal');
+const rowH2 = 8;
+let yRow = tableY + th;
+
+reserva?.detalles?.forEach((it: any) => {
+  // marco de fila
+  doc.rect(tableX, yRow, tableW, rowH2);
+
+  // separadores por columna
+  let vx = tableX;
+  cols.forEach(c => { vx += c.w; doc.line(vx, yRow, vx, yRow + rowH2); });
+
+  // textos de la fila
+  let txStart = tableX;
+  const valores = [
+    txt(it?.menu?.nombre || it?.nombre || '-'),
+    String(it?.cantpersonas ?? it?.cantidad ?? 0),
+    dinero(it?.preciounitario),
+    dinero(it?.subtotal),
+  ];
+  cols.forEach((c, i) => {
+    const cellX = txStart + (c.align === 'right' ? c.w - 2 : 2);
+    doc.text(valores[i], cellX, yRow + 5, { align: c.align });
+    txStart += c.w;
+  });
+
+  yRow += rowH2;
+});
+
+/* ─────────────────────── Total alineado por columnas ─────────────────────── */
+const pad = 2; // pequeño padding interno a la derecha
+const col1Right = tableX + cols[0].w;
+const col2Right = col1Right + cols[1].w;
+const col3Right = col2Right + cols[2].w; 
+const col4Right = col3Right + cols[3].w; 
+
+const totalY = yRow + 6;
+doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+
+// “Total:” alineado al borde derecho de la col. 3
+doc.text('Total:', col3Right - pad, totalY, { align: 'right' });
+
+// Monto alineado al borde derecho de la col. 4 (subtotal)
+doc.text(dinero(reserva?.total), col4Right - pad, totalY, { align: 'right' });
+    
+
+    doc.save(`comprobante_${nroComp || 'reserva'}.pdf`);
+  };
+
+  // Cargar logo (si falla, render sin logo)
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = LOGO_SRC;
+
+  img.onload = () => {
+    const logoW = 55;                            // tamaño del logo (ajustable)
+    const ratio  = img.width ? (img.height / img.width) : 0.36;
+    const logoH = +(logoW * ratio).toFixed(2);
+    render(img, { w: logoW, h: logoH });
+  };
+  img.onerror = () => render();
+}
+
 
   /** Editar ahora abre un modal y no navega */
   editarReserva(idreserva: string) {
@@ -225,6 +362,27 @@ export class MisReservasComponent implements OnInit {
       }
     });
   }
+
+
+  private swalOk(titulo: string, desc = '') {
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-check"></div>
+      <h2 class="swal-pro-title">${titulo}</h2>
+      ${desc ? `<p class="swal-pro-desc">${desc}</p>` : ''}
+    `,
+    showConfirmButton: true,
+    confirmButtonText: 'Listo',
+    showCancelButton: false,
+    buttonsStyling: false,
+    customClass: {
+      popup: 'swal-pro',
+      confirmButton: 'swal-pro-confirm',
+      htmlContainer: 'swal-pro-html'
+    }
+  });
+}
 
   realizarPrimerPago(reservaId: string, saldopendiente: number): void {
     Swal.fire({
@@ -445,8 +603,37 @@ export class MisReservasComponent implements OnInit {
   }
 
   mostrarPayPal(_reserva: any) {
-    // reservado por si lo necesitas
   }
+
+  private swalError(titulo: string, desc = 'Intenta nuevamente en unos minutos.') {
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-error"></div>
+      <h2 class="swal-pro-title">${titulo}</h2>
+      ${desc ? `<p class="swal-pro-desc">${desc}</p>` : ''}
+    `,
+    showConfirmButton: true,
+    confirmButtonText: 'Entendido',
+    buttonsStyling: false,
+    customClass: {
+      popup: 'swal-pro',
+      confirmButton: 'swal-pro-confirm',
+      htmlContainer: 'swal-pro-html'
+    }
+  });
+}
+
+ private swalLoading(msg = 'Procesando...') {
+  Swal.fire({
+    width: 360,
+    html: `<div class="spinner"></div><div class="msg">${msg}</div>`,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    customClass: { popup: 'swal-loading' }
+  });
+}
 
   abrirPayPal(tipo: 'inicial' | 'final', reserva: any) {
     const montoPago = tipo === 'inicial'
@@ -475,6 +662,8 @@ export class MisReservasComponent implements OnInit {
             }),
           onApprove: async (_data: any, actions: any) => {
             try {
+              
+              
               const detalle = await actions.order.capture();
               const pagado = +detalle.purchase_units[0].amount.value;
 
@@ -506,7 +695,7 @@ export class MisReservasComponent implements OnInit {
                   window.dispatchEvent(new CustomEvent('nuevosPagosActualizado'));
 
                   Swal.close();
-                  Swal.fire('¡Pago registrado!', 'Gracias por tu pago.', 'success');
+                  this.swalOk('Pago realizado', 'Tu pago se realizó exitosamente.');
                 },
                 error: err => {
                   console.error('Error al notificar backend:', err);
@@ -528,47 +717,94 @@ export class MisReservasComponent implements OnInit {
   }
 
   cancelarReserva(reserva: any) {
-    const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
-    const nombre = user.nombre || 'Cliente';
-    const codigocliente = user.codigocliente;
+  const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
+  const nombre = user.nombre || 'Cliente';
+  const codigocliente = user.codigocliente;
 
-    Swal.fire({
-      icon: 'warning',
-      title: `Estimado/a ${nombre}`,
-      text: `Por políticas internas de la empresa, le informamos que al solicitar la cancelación de su reserva, perderá cualquier abono económico realizado anteriormente. ¿Deseas continuar con la cancelación de tu reserva?`,
-      showCancelButton: true,
-      confirmButtonText: 'Sí',
-      cancelButtonText: 'No'
-    }).then(result => {
-      if (result.isConfirmed) {
-        this.enviarSolicitudCancelacion(reserva.idreserva, codigocliente);
-      } else {
-        this.router.navigate(['/inicioCliente']);
+  Swal.fire({
+    width: 520,
+    html: `
+      <div class="swal-pro-warn"></div>
+      <h2 class="swal-pro-title">Estimado/a ${nombre}</h2>
+      <p class="swal-pro-desc">
+        Por políticas internas de la empresa, le informamos que al solicitar la cancelación de su reserva,
+        perderá cualquier abono económico realizado anteriormente. ¿Deseas continuar con la cancelación de tu
+        reserva?
+      </p>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Sí',
+    cancelButtonText: 'No',
+    buttonsStyling: false,
+    customClass: {
+      popup: 'swal-pro',
+      confirmButton: 'swal-pro-yes',
+      cancelButton: 'swal-pro-cancel',
+      htmlContainer: 'swal-pro-html'
+    }
+  }).then(result => {
+    if (result.isConfirmed) {
+      this.enviarSolicitudCancelacion(reserva.idreserva, codigocliente);
+    } else {
+      this.router.navigate(['/inicioCliente']);
+    }
+  });
+}
+
+  private enviarSolicitudCancelacion(idreserva: string, codigocliente: string) {
+    this.reservasService.solicitarCancelacion(idreserva, codigocliente)
+    .subscribe({
+      next: () => {
+        Swal.fire({
+          width: 480,
+          html: `
+            <div class="swal-pro-check"></div>
+            <h2 class="swal-pro-title">Enviado</h2>
+            <p class="swal-pro-desc">
+              Su solicitud para cancelar su reserva ha sido enviada.
+            </p>
+          `,
+          showConfirmButton: true,
+          confirmButtonText: 'Listo',
+          showCancelButton: false,
+          buttonsStyling: false,
+          customClass: {
+            popup: 'swal-pro',
+            confirmButton: 'swal-pro-confirm',
+            htmlContainer: 'swal-pro-html'
+          }
+        });
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo enviar la solicitud. Intente más tarde.',
+          confirmButtonText: 'Entendido'
+        });
       }
     });
   }
 
-  private enviarSolicitudCancelacion(idreserva: string, codigocliente: string) {
-    this.reservasService.solicitarCancelacion(idreserva, codigocliente)
-      .subscribe({
-        next: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Enviado',
-            text: 'Su solicitud para cancelar su reserva ha sido enviada.',
-            confirmButtonText: 'OK'
-          });
-        },
-        error: () => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo enviar la solicitud. Intente más tarde.',
-            confirmButtonText: 'OK'
-          });
-        }
-      });
-  }
+  private estadoPlano(r: any): string {
+  const v = r?.nombre?.estado_reserva
+         ?? r?.estado_reserva
+         ?? r?.estado?.nombre
+         ?? r?.idestado
+         ?? '';
+  return String(v).trim().toLowerCase();
+}
+
+puedeEditar(r: any): boolean {
+  return !['en proceso','cancelada','pagada'].includes(this.estadoPlano(r));
+}
+
+esCancelada(r: any): boolean {
+  return this.estadoPlano(r) === 'cancelada';
+}
+esPagada(r: any): boolean {
+  return this.estadoPlano(r) === 'pagada';
+}
 }
 
 

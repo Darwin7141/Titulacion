@@ -4,18 +4,40 @@
   <mat-sidenav #drawer mode="side" opened class="sidenav">
     <mat-nav-list>
 
-      <!-- Cada opción sólo cambia la vista central -->
-      <a mat-list-item (click)="setView('servicios'); drawer.close()">
+      <!-- Servicios como acordeón con submenú -->
+      <mat-list-item class="menu-item menu-principal"
+                     (click)="showServicios = !showServicios"
+                     [class.open]="showServicios">
         <mat-icon matListIcon>restaurant_menu</mat-icon>
         <span>Servicios</span>
-      </a>
+        <mat-icon class="expand-icon">
+          {{ showServicios ? 'expand_less' : 'expand_more' }}
+        </mat-icon>
+      </mat-list-item>
 
-      <a mat-list-item (click)="setView('generar'); drawer.close()">
+      <div class="submenu" [@slideToggle]="showServicios">
+        
+        <!-- Ver todos (tarjetas) 
+        <a mat-list-item (click)="setView('servicios'); drawer.close()">
+          <mat-icon matListIcon>view_module</mat-icon>
+          <span>Todos</span>
+        </a> -->
+
+        <!-- Lista dinámica de servicios -->
+        <a mat-list-item class="submenu-item"
+          *ngFor="let s of serviciosSidebar"
+           (click)="seleccionarServicio(s); drawer.close()">
+          <mat-icon matListIcon>room_service</mat-icon>
+          <span>{{ s.nombre }}</span>
+        </a>
+      </div>
+
+      <a mat-list-item class="menu-item" (click)="setView('generar'); drawer.close()">
         <mat-icon matListIcon>event_available</mat-icon>
         <span>Agendar&nbsp;Reserva</span>
       </a>
 
-      <a mat-list-item (click)="setView('reservas'); drawer.close()">
+      <a mat-list-item class="menu-item" (click)="setView('reservas'); drawer.close()">
         <mat-icon matListIcon>assignment</mat-icon>
         <span>Mis&nbsp;Reservas</span>
       </a>
@@ -104,6 +126,8 @@
                (cerrar)="setView('dashboard')"></app-servicios-cliente>
         </ng-container>
 
+        
+
         <!-- ③ FORMULARIO “AGENDAR RESERVA” -->
         <ng-container *ngSwitchCase="'generar'">
           <app-agendar-reserva
@@ -115,6 +139,18 @@
           <app-mis-reservas
                (cerrar)="setView('dashboard')"></app-mis-reservas>
         </ng-container>
+
+        <!-- ⑤ MENÚS por servicio (nuevo) -->
+        <ng-container *ngSwitchCase="'menus'">
+  <app-menus-cliente
+    *ngIf="selectedServicioId !== null"
+    [idServicio]="selectedServicioId"
+    [nombreServicio]="selectedServicioNombre"
+    (cerrar)="setView('dashboard')"
+    (irAReserva)="onIrAReserva()"
+    >
+  </app-menus-cliente>
+</ng-container>
 
       </ng-container>
       <!-- **********  FIN SWITCH  ********** -->

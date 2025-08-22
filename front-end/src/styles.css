@@ -1,0 +1,133 @@
+.swal-pro{
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+  box-shadow: 0 16px 44px rgba(16,24,40,.18);
+  font-family:"Roboto",sans-serif;
+}
+
+/* Check dentro de un círculo suave */
+.swal-pro-check{
+  width: 80px; height: 80px; margin: 4px auto 8px;
+  border-radius: 50%;
+  background: #eaf7ef;               /* verde muy claro */
+  position: relative;
+}
+.swal-pro-check::after{
+  content:""; position:absolute; inset:0;
+  width: 34px; height: 18px;
+  border-left: 5px solid #16a34a;    /* verde principal */
+  border-bottom: 5px solid #16a34a;
+  left: 24px; top: 28px; transform: rotate(-45deg);
+}
+
+.swal-pro-title{
+  margin: 6px 0 4px;
+  text-align: center;
+  font-size: 24px;                    /* como en el mock */
+  font-weight: 600;
+  color: #111827;
+}
+.swal-pro-desc, .swal-pro-html{
+  margin: 0 auto;
+  text-align: center;
+  font-size: 16px;                    /* como en el mock */
+  color: #374151;
+}
+
+/* ÚNICO botón “Listo”, centrado */
+.swal-pro-confirm{
+  display: block;
+  margin: 18px auto 4px;              /* centrado */
+  min-width: 112px;
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: #5b6cf9;                /* morado del mock */
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;                    /* misma altura óptica que el mock */
+  letter-spacing: .2px;
+  cursor: pointer;
+}
+.swal-pro-confirm:hover{ filter: brightness(.96); }
+.swal-pro-confirm:focus{ outline: none; box-shadow: 0 0 0 4px rgba(91,108,249,.22); }
+
+--------------------------------------------------------------------------------
+.swal-pro-warn{
+  width:80px;height:80px;margin:4px auto 8px;border-radius:50%;
+  background:#fff7ed; /* amarillo muy suave */
+  position:relative;
+}
+.swal-pro-warn::after{ /* palo del “!” */
+  content:"";position:absolute;left:38px;top:18px;width:4px;height:28px;
+  background:#f59e0b;border-radius:2px;
+}
+.swal-pro-warn::before{ /* punto del “!” */
+  content:"";position:absolute;left:38px;top:52px;width:4px;height:4px;
+  background:#f59e0b;border-radius:50%;
+}
+
+/* Círculo de error (rojo, “X”) */
+.swal-pro-error{
+  width:80px;height:80px;margin:4px auto 8px;border-radius:50%;
+  background:#fee2e2; /* rojo muy suave */
+  position:relative;
+}
+.swal-pro-error::before,
+.swal-pro-error::after{
+  content:"";position:absolute;left:18px;top:38px;width:44px;height:4px;
+  background:#ef4444;border-radius:2px;
+}
+.swal-pro-error::before{ transform:rotate(45deg); }
+.swal-pro-error::after{  transform:rotate(-45deg); }
+
+----------------------------------------------
+
+/* Icono "info" en círculo (igual tamaño que el check) */
+.swal-pro-info{
+  width:80px;height:80px;margin:4px auto 8px;border-radius:50%;
+  background:#eaf3ff; position:relative;
+}
+.swal-pro-info::before{               /* palo de la “i” */
+  content:""; position:absolute; left:38px; top:22px;
+  width:4px; height:30px; background:#2970ff; border-radius:2px;
+}
+.swal-pro-info::after{                /* punto de la “i” */
+  content:""; position:absolute; left:38px; top:56px;
+  width:6px; height:6px; background:#2970ff; border-radius:50%;
+}
+
+/* Título de sección y lista limpia dentro del modal */
+.swal-pro-section{
+  text-align:left; font-weight:700; color:#111827;
+  margin:12px 0 6px; font-size:16px;
+}
+.swal-pro-list{
+  list-style:none; padding:0; margin:0 0 10px; text-align:left;
+}
+.swal-pro-list li{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 0; border-bottom:1px dashed #eee;
+}
+.swal-pro-list li:last-child{ border-bottom:none; }
+
+/* Botoncito “Ver” a la derecha */
+.swal-pro-see{
+  margin-left:auto; padding:6px 12px; border:0; border-radius:8px;
+  background:#2970ff; color:#fff; font-weight:600; cursor:pointer;
+}
+.swal-pro-see:hover{ filter:brightness(.96); }
+
+.swal-pro-list li span{ flex:1; min-width:0; }
+
+/* Botón "Ver" un poco más pequeño y siempre en una sola línea */
+.swal-pro-see{
+  margin-left:auto;
+  padding:4px 10px;        /* ↓ más compacto */
+  font-size:13px;          /* ↓ más pequeño */
+  line-height:1.2;
+  white-space:nowrap;      /* evita que "Ver" se parta en dos líneas */
+  border:0; border-radius:8px;
+  background:#2970ff; color:#fff; font-weight:600; cursor:pointer;
+}
+.swal-pro-see:hover{ filter:brightness(.96); }
