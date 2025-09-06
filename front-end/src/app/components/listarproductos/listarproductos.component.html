@@ -59,7 +59,7 @@
           <tr *ngFor="let prod of displayedProductos">
             <td>{{ prod.idproducto }}</td>
             <td>{{ prod.nombre }}</td>
-            <td>{{ prod.stock }}</td>
+            <td>{{ formatoStock(prod)}}</td>
             <td>{{ prod.proveedor.nombre }}</td>
             <td>{{ prod.categorias.categoria }}</td>
             <td>{{ prod.fecha_caducidad }}</td>
@@ -131,6 +131,18 @@
                [(ngModel)]="prodSeleccionado.stock"
                name="stock" required>
       </div>
+
+      <div class="form-group">
+  <label>Unidad</label>
+  <mat-form-field class="col-xs-12">
+    <mat-select name="unidad_stock"
+                [(ngModel)]="prodSeleccionado.unidad_stock"
+                placeholder="Unidad"
+                required>
+      <mat-option *ngFor="let u of uStock" [value]="u">{{ u }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
 
       <div class="form-group">
         <mat-form-field class="col-xs-12">

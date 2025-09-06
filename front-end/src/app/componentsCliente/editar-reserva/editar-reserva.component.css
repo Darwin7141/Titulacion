@@ -7,14 +7,15 @@
   padding: 16px;
   background: #fff;
                 /* ← AJUSTA AQUÍ el redondeo visible */
-  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  box-shadow: 0 8px 50px rgba(0,0,0,.06);
+  font-family:"Roboto",sans-serif;
 }
 
 /* Título */
 .sheet-title{
   text-align: center;
   font-size: 22px;
-  font-weight: 500;
+  font-weight: 550;
   color: #111827;
   margin: 0 0 12px;
 }
@@ -66,15 +67,15 @@
 /* Botones */
 .btn{ display:inline-flex; align-items:center; gap:8px; border:none; cursor:pointer; line-height:1; padding:10px 14px; font-size:14px; border-radius:10px; }
 .btn i{ font-size:16px; }
-.primary{ background:#1976d2; color:#fff; }
-.ghost{ background:#f1f5f9; color:#374151; }
-.add-button{ background:#22c55e; color:#fff; }
+.primary{ background:#22c55e !important; color:#fff !important; }
+.ghost{ background:#dc3545 !important; color:#fff !important;}
+.add-button{ background:#22c55e !important; color:#fff !important; }
 .icon{ width:36px; height:36px; padding:0; justify-content:center; }
 .danger{ background:#dc3545; color:#fff; }
 .actions{ display:flex; justify-content:center; gap:12px; margin-top:10px; }
 
 .dialog-reserva .mat-mdc-dialog-container .mdc-dialog__surface{
-  border-radius: 15px !important;   /* súbelo a 48px/56px si lo quieres más redondo */
+  border-radius: 14px !important;   /* súbelo a 48px/56px si lo quieres más redondo */
   overflow: hidden;                  /* recorta contenido en las esquinas */
   box-shadow: 0 12px 32px rgba(0,0,0,.12);
 }

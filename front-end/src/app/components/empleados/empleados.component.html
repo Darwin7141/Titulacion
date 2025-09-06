@@ -6,7 +6,7 @@
 
     <!-- Un único submit → guardar() decide si crea o actualiza -->
     <form #empleadoForm="ngForm"
-          (ngSubmit)="guardar()"
+          (ngSubmit)="esEdicion ? guardar() : agregar()"
           autocomplete="on">
 
       <div class="form-grid">

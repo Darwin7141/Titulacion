@@ -4,7 +4,7 @@
     <h3>{{ esEdicion ? 'Editar Cliente' : 'Agregar Cliente' }}</h3>
 
     <form #cliForm="ngForm"
-          (ngSubmit)="guardar()"
+          (ngSubmit)="esEdicion ? guardar() : agregar()"
           autocomplete="on">
 
       <div class="form-grid">

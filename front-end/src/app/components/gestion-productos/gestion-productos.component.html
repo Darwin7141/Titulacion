@@ -32,7 +32,7 @@
          <div class="dp-name">{{ p.nombre }}</div>
           <div class="dp-stock">
             <ng-container *ngIf="p.stock > 0; else agotado">
-              Stock: {{ p.stock }}
+              Stock: {{ formatoStock(p) }}
             </ng-container>
             <ng-template #agotado>
               <span class="no-stock">Sin stock</span>
@@ -51,7 +51,7 @@
         <header class="panel-head"><div class="head-title">Seleccionado</div></header>
         <div class="sel-head">
         <div class="sel-name">{{ s.nombre }}</div>
-        <span class="badge badge-stock">Stock: {{ s.stock }}</span>
+        <span class="badge badge-stock">Stock: {{ formatoStock(s) }}</span>
         </div>
 
         <div class="sel-meta">
@@ -99,7 +99,7 @@
           <tbody>
             <tr *ngFor="let it of asignados">
               <td>{{ it.producto.nombre }}</td>
-              <td class="num">{{ it.cantidad }}</td>
+              <td class="num">{{ cantFormato(it) }}</td>
               <td *ngIf="showPrecios" class="num">{{ subtotal(it) | currency:'USD' }}</td>
               <td class="acc">
                 <button mat-icon-button (click)="incrementar(it)" [disabled]="it.producto.stock<=0" aria-label="Añadir">

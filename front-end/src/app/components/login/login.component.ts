@@ -251,6 +251,10 @@ abrirRegistro() {
     });
 }
 
+cerrar() {
+  this.showLoginForm = false;
+}
+
 scrollTo(id: string, event: Event) {
     event.preventDefault(); // Para que no recargue
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -351,109 +355,233 @@ scrollTo(id: string, event: Event) {
     });
   }
 
-  private checkAddPage(doc: jsPDF, yPos: number): number {
-      // Altura de la página
-      const pageHeight = doc.internal.pageSize.getHeight();
-      // Si superamos un umbral (p.e. 270), creamos una nueva página y reiniciamos la posición
-      if (yPos >= pageHeight - 20) {
-        doc.addPage();
-        return 20; // reiniciamos yPos a 20
+// ===== Helpers (NO async) =====
+private fitFontSizeToMaxLine(
+  doc: jsPDF,
+  lines: string[],
+  desiredSize: number,
+  maxWidth: number,
+  minSize = 14
+): number {
+  doc.setFontSize(desiredSize);
+  const longest = Math.max(...lines.map(t => doc.getTextWidth(t)));
+  if (longest <= maxWidth) return desiredSize;
+
+  const scaled = Math.floor(desiredSize * (maxWidth / longest));
+  return Math.max(minSize, scaled);
+}
+
+/** Dibuja varias líneas centradas y devuelve el Y (baseline) de la última línea. */
+private drawCenteredLines(
+  doc: jsPDF,
+  lines: string[],
+  centerX: number,
+  startY: number,
+  fontSize: number,
+  lineGap = 6
+): number {
+  doc.setFontSize(fontSize);
+  const lineH = fontSize * 1.2;
+  let y = startY;
+  lines.forEach((t, i) => {
+    doc.text(t, centerX, y, { align: 'center' });
+    if (i < lines.length - 1) y += lineH + lineGap;
+  });
+  return y;
+}
+
+// ===== Tu PDF =====
+async generarPDFServiciosMenus() {
+  const doc   = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+
+  // ====== layout ======
+  const M  = 36;
+  const G  = 26;
+  const W  = pageW - M * 2;
+  const CW = (W - G) / 2;
+  const CX = [M, M + CW + G];
+
+  const TITLE_Y     = M + 30;
+  const BODY_Y_BASE = M + 92;            // base mínima
+  const BODY_B      = pageH - M - 34;
+
+  // se recalcula por página según el alto real del título
+  let BODY_Y = BODY_Y_BASE;
+
+  // Imágenes/filas (mismo estilo que tenías)
+  const IMG   = { w: 80, h: 80, r: 50 };
+  const ROW_H = IMG.h + 20;
+
+  // Encabezado de servicio
+  const RHDR_H        = 30;
+  const HDR_BLOCK_H   = RHDR_H + 12;     // alto real ocupado por el header
+
+  const NAME_COLOR  = '#55311F';
+  const PRICE_COLOR = '#55311F';
+  const MUTED       = '#6B7280';
+
+  // ---------- Página (fondo + título auto-fit + pie) ----------
+  const drawPage = () => {
+    doc.setFillColor('#F7F4EF'); doc.rect(0, 0, pageW, pageH, 'F');
+    doc.setFillColor('#FFFFFF');
+    doc.roundedRect(M - 6, M - 6, pageW - (M - 6) * 2, pageH - (M - 6) * 2, 10, 10, 'F');
+
+    // título en dos líneas auto-ajustado
+    const titleLines = ['Catálogo de', 'Servicios y Menús'];
+    const innerW     = pageW - (M - 6) * 2;
+    const maxTitleW  = innerW - 24;
+
+    doc.setFont('helvetica', 'bold'); doc.setTextColor('#A45B35');
+    const titleSize  = this.fitFontSizeToMaxLine(doc, titleLines, 40, maxTitleW, 18);
+    const lastTitleY = this.drawCenteredLines(doc, titleLines, pageW / 2, TITLE_Y, titleSize, 4);
+
+    doc.setDrawColor(220);
+    doc.line(M, lastTitleY + 10, pageW - M, lastTitleY + 10);
+
+    // el cuerpo empieza debajo del título real
+    BODY_Y = Math.max(BODY_Y_BASE, lastTitleY + 24);
+
+    // pie
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor('#9CA3AF');
+    const pg = doc.getCurrentPageInfo().pageNumber;
+    doc.text(`Pág. ${pg}`, pageW - M, pageH - M, { align: 'right' });
+  };
+
+  // ---------- control de columnas/página ----------
+  let col = 0;            // 0 = izquierda, 1 = derecha
+  let y   = 0;
+
+  const goNextColumn = (): 'same-page' | 'new-page' => {
+  col++;
+  if (col > 1) {
+    doc.addPage();
+    drawPage();
+    col = 0;
+    y = BODY_Y;
+    return 'new-page';
+  }
+  y = BODY_Y;
+  return 'same-page';
+};
+
+  const ensureSpace = (needed: number) => {
+    if (y + needed > BODY_B) goNextColumn();
+  };
+
+  // ---------- header de servicio (auto-fit para no cortar) ----------
+  const drawServiceHeader = (title: string, cont = false) => {
+    const x = CX[col], width = CW;
+
+    doc.setFillColor('#F2E7DA');
+    doc.roundedRect(x, y, width, RHDR_H, 8, 8, 'F');
+
+    const text = (cont ? `${title} (cont.)` : title).toUpperCase();
+    const maxW = width - 32; // padding interior
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(NAME_COLOR);
+    const fz = this.fitFontSizeToMaxLine(doc, [text], 13, maxW, 10);
+    doc.setFontSize(fz);
+    doc.text(text, x + width / 2, y + 20, { align: 'center' });
+
+    y += HDR_BLOCK_H;
+  };
+
+  // ---------- una fila de menú (texto centrado verticalmente) ----------
+  const drawMenuRow = async (menu: any) => {
+    const x = CX[col], width = CW;
+
+    const imgX = x + 6;
+    const imgY = y + (ROW_H - IMG.h) / 2;
+
+    try {
+      if (menu.fotoMenuUrl) {
+        const base64 = await this.getBase64ImageRounded(menu.fotoMenuUrl, IMG.w, IMG.h, IMG.r);
+        doc.addImage(base64, 'PNG', imgX, imgY, IMG.w, IMG.h);
+      } else {
+        doc.setFillColor('#F3F4F6');
+        doc.roundedRect(imgX, imgY, IMG.w, IMG.h, IMG.r, IMG.r, 'F');
       }
-      return yPos;
+    } catch {
+      doc.setFillColor('#F3F4F6');
+      doc.roundedRect(imgX, imgY, IMG.w, IMG.h, IMG.r, IMG.r, 'F');
     }
 
+    const textX   = imgX + IMG.w + 10;
+    const textMax = x + width - textX - 60;
 
-  async generarPDFServiciosMenus() {
-      const doc = new jsPDF({ unit: 'pt', format: 'letter' });
-  
-      // Fondo suave
-      doc.setFillColor('#FFF8F2');
-      doc.rect(0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight(), 'F');
-  
-      let y = 70;
-      const pageWidth = doc.internal.pageSize.getWidth();
-  
-      // Título general centrado
-      doc.setFontSize(36);
-      doc.setTextColor('#c08a68');
-      doc.text('Catálogo de Servicios y Menús', pageWidth / 2, y, { align: 'center' });
-      y += 50;
-  
-      // Para cada servicio (solo nombre centrado)
-      for (const serv of this.servicios) {
-        y = this.checkAddPage(doc, y);
-  
-        doc.setFontSize(20);
-        doc.setTextColor('#6F4E37');
-        doc.text(serv.nombre.toUpperCase(), pageWidth / 2, y, { align: 'center' });
-        y += 40;
-  
-        // Menús de este servicio: imagen a la izquierda y texto a la derecha
-        const menusDeEsteServicio = this.menus.filter(m => m.idservicio === serv.idservicio);
-  
-        for (const menu of menusDeEsteServicio) {
-          y = this.checkAddPage(doc, y);
-  
-          // Imagen más grande: 80×80
-          const imgX = 60;
-          const imgY = y;
-          const imgWidth = 80;
-          const imgHeight = 80;
-  
-          if (menu.fotoMenuUrl) {
-            try {
-              // Convertimos la imagen con esquinas redondeadas
-              const base64Rounded = await this.getBase64ImageRounded(menu.fotoMenuUrl, imgWidth, imgHeight, 10);
-              doc.addImage(base64Rounded, 'PNG', imgX, imgY, imgWidth, imgHeight);
-            } catch (err) {
-              console.error('Error al convertir imagen del menú:', err);
-            }
-          }
-  
-          // Texto a la derecha
-          let textX = imgX + imgWidth + 20;
-          let currentY = imgY + 15;
-  
-          // Nombre del menú
-          doc.setFontSize(14);
-          doc.setTextColor('#6F4E37');
-          doc.text(menu.nombre.toUpperCase(), textX, currentY);
-          currentY += 18;
-  
-          // Descripción
-          doc.setFontSize(12);
-          doc.setTextColor('#333');
-          const descLines = doc.splitTextToSize(menu.descripcion || '', 250); 
-          doc.text(descLines, textX, currentY);
-          currentY += descLines.length * 14 + 8;
-  
-          // Precio
-          doc.setFontSize(14);
-          doc.setTextColor('#6F4E37');
-          doc.text(`$${menu.precio}`, textX, currentY);
-  
-          // Siguiente menú
-          const usedHeight = Math.max(imgHeight, (currentY - imgY + 10));
-          y += usedHeight + 20;
-          y = this.checkAddPage(doc, y);
-        }
-  
-        y += 50;
-        y = this.checkAddPage(doc, y);
-      }
-  
-      // Blob y enlace
-      const pdfBlob = doc.output('blob');
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-  
-      const linkHTML = `
-        <a href="${pdfUrl}" download="catalogo_servicios_menus.pdf" target="_blank">
-          Descargar PDF
-        </a>
-      `;
-      doc.save('catalogo_servicios_menus.pdf');
+    const centerY = y + ROW_H / 2;
+
+    // nombre
+    const FS_NAME = 12, LINE_H = FS_NAME * 1.2;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(FS_NAME); doc.setTextColor(NAME_COLOR);
+    const nameLines = doc.splitTextToSize(String(menu.nombre || '').toUpperCase(), textMax);
+    const nameY = centerY - ((nameLines.length - 1) * LINE_H) / 2 + FS_NAME * 0.35;
+    doc.text(nameLines, textX, nameY);
+
+    // precio
+    const FS_PRICE = 12;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(FS_PRICE); doc.setTextColor(PRICE_COLOR);
+    const priceY = centerY + FS_PRICE * 0.35;
+    doc.text(`$${Number(menu.precio ?? 0).toFixed(2)}`, x + width - 6, priceY, { align: 'right' });
+
+    // separador
+    doc.setDrawColor(235);
+    doc.line(x, y + ROW_H, x + width, y + ROW_H);
+
+    y += ROW_H;
+  };
+
+  // ---------- empezar documento ----------
+  drawPage();
+  col = 0;
+  y   = BODY_Y;
+
+  // Recorremos servicios de forma secuencial (flujo 2 columnas)
+  for (const s of this.servicios) {
+    const title = String(s?.nombre || '').trim();
+
+    // Menús de ese servicio (ordenados)
+    const menus = this.menus
+      .filter((m: any) => m.idservicio === s.idservicio)
+      .sort((a: any, b: any) => String(a.nombre || '').localeCompare(String(b.nombre || '')));
+
+    // aseguro que quepa header + al menos 1 fila
+    ensureSpace(HDR_BLOCK_H + ROW_H);
+    drawServiceHeader(title, false);
+
+    for (let i = 0; i < menus.length; i++) {
+  if (y + ROW_H > BODY_B) {
+    const moved = goNextColumn();
+    // 👇 Solo repite encabezado si pasaste a una *nueva página*
+    if (moved === 'new-page') {
+      drawServiceHeader(title, true); // "(cont.)" en página nueva
     }
-  
+  }
+  await drawMenuRow(menus[i]);
+}
+
+    // pequeño respiro tras terminar un servicio
+    ensureSpace(12);
+    y += 12;
+  }
+
+  doc.save('catalogo_2columnas.pdf');
+}
+
+
+
+async addPageNumbers(doc: jsPDF, pageW: number, pageH: number) {
+  const total = doc.getNumberOfPages();
+  for (let i = 1; i <= total; i++) {
+    doc.setPage(i);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor('#9CA3AF');
+    const txt = `Página ${i} de ${total}`;
+    doc.text(txt, pageW - 42, pageH - 18, { align: 'right' });
+  }
+}
     /**
      * Redondea las esquinas de la imagen dibujándola en un canvas y haciendo "clip()" 
      * con un rectángulo redondeado. 
@@ -692,7 +820,7 @@ scrollTo(id: string, event: Event) {
   this.recuperarService.solicitarRecuperacion({ correo: this.correoRecuperar })
     .pipe(finalize(() => this.isLoadingRecuperar = false))
     .subscribe({
-      next: () => Swal.fire('Éxito', 'Revisa tu correo para restablecer tu contraseña.', 'success')
+      next: () => Swal.fire('Éxito', 'Se ha enviado un link a tu correo para reestablecer tu contraseña', 'success')
                       .then(() => this.closeRecuperar()),
       error: () => Swal.fire('Error', 'No se pudo enviar el enlace. Intenta de nuevo.', 'error')
     });

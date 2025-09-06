@@ -1,159 +1,236 @@
-.clientes-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    text-align: center;
-  }
+/* —————————————————————————————————————————————
+   CONTENEDOR GENERAL
+   ————————————————————————————————————————————— */
+.tabla-wrapper{
+  max-width:1150px;
+  margin:0 auto;
+}
+
+/* —————————————————————————————————————————————
+   TARJETA
+   ————————————————————————————————————————————— */
+:host ::ng-deep .mat-card.tabla-card{
+  padding:0;
+  border-radius:14px;
+  box-shadow:0 4px 14px -3px rgba(0,0,0,.15);
+}
+
+/* —————————————————————————————————————————————
+   CABECERA
+   ————————————————————————————————————————————— */
+:host ::ng-deep .mat-card-header{
+  padding:20px 28px;
+  border-bottom:1px solid #eee;
+}
+
+/* ——— barra principal ——— */
+.toolbar{
+  display:flex;           /* ← alinea horizontalmente */
+  align-items:center;     /* ← centra en vertical */
+  width:100%;
+}
+
+/* grupo izquierda = buscador + icon-buttons */
+.left-group{
+  display:flex;
+  align-items:center;
+  gap:8px;                /* espacio uniforme */
+}
+
+/* ——————————————————————————
+   BUSCADOR  (36 px de alto)
+   —————————————————————————— */
+.buscador.slim{
+  width:260px;
+margin-top:15px;}
+
+:host ::ng-deep .buscador.slim .mdc-text-field{
+  height:36px!important;
+  padding:0 8px;
+  border:1px solid #b0c6e8;
+  border-radius:18px;      /* estilo pill como la imagen 2 */
+  background:#fff;
+  display:flex;
+  align-items:center;
+  box-sizing:border-box;
   
-  h2 {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
+}
+
+:host ::ng-deep .buscador.slim .mat-mdc-form-field-flex,
+:host ::ng-deep .buscador.slim .mat-mdc-form-field-infix{
+  height:36px;
+  padding:0!important;
+  display:flex;
+  align-items:center;
+}
+
+/* quitamos contorno default */
+:host ::ng-deep .buscador.slim .mdc-notched-outline__leading,
+:host ::ng-deep .buscador.slim .mdc-notched-outline__trailing{
+  border:none;
+}
+
+/* icono lupa dentro del input */
+:host ::ng-deep .buscador.slim .mat-mdc-form-field-prefix mat-icon{
+  font-size:20px;color:#607d8b;
+}
+
+/* ——— icon-buttons (🔍  ⟳) ——— */
+.left-group .mat-icon-button{
+  width:36px;height:36px;line-height:36px;
+  margin:0;
+                  /* juntos sin hueco extra */
+}
+
+/* ——————————————————————————
+   BOTÓN “AGREGAR”  (derecha)
+   —————————————————————————— */
+.btn-add{
+  margin-left:auto;        /* empuja hasta el extremo derecho */
+  height:36px;line-height:36px;
+  min-width:110px;
+  display:flex;align-items:center;justify-content:center;
+}
+.btn-add mat-icon{margin-right:4px;}
+
+/* —————————————————————————————————————————————
+   TABLA, ETC.  (sin cambios)
+   ————————————————————————————————————————————— */
+.admin-table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:"Roboto",sans-serif;
+  font-size: 15px;          /* tamaño normal de las celdas   */
+  color: #333; 
+    }
+
+    .admin-table thead th{
+  text-align:left;        /* alinea texto a la izquierda            */
+  padding:4px 14px;       /* 14 px igual que los <td>   (← importante) */
+}
+
+
+ .admin-table tbody td{
+  padding: 2px 12px !important;   /* 6 px arriba/abajo  */
+  line-height: 26px !important;   /* 26 px de texto     */
+  text-align:left;
+  padding: 4px 14px;
+              /* opcional           */
+}
+
+.admin-table td{
+  padding:12px 18px;
+  border-bottom:1px 
+  solid #f0f0f0;
+  white-space:nowrap;
+  font-family: "Roboto",sans-serif;
+  font-size: 14px;
+  color:#535554}
+
+
+.admin-table th{
+  background:#fafafa;
+  font-weight:600;
+  color:#666;
+  padding:12px 18px;
+  border-bottom:1px 
+  solid #f0f0f0;
+  white-space:nowrap;
+font-family: "Roboto",sans-serif;
+  font-size: 15px;
+  font-weight: 600;}
+
+ 
+
+
+.admin-table tr:hover{
+  background:#f9fbff;
   }
-  
-  table {
-    width: 80%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    text-align: left;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  table th,
-  table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-  }
-  
-  table th {
-    background-color: #f4f4f4;
-    color: #555;
-    font-weight: bold;
-  }
-  
-  table tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  table tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .add-icon {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .add-icon button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-  
-  .search-bar {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-  }
-  .spacer {
-    margin: 20px 0;
-  }
-  
-  .edit-form {
-    margin-top: 20px;
-    border: 1px solid #ccc;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
-  }
-  
-  .edit-form .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .edit-form label {
-    display: block;
-    font-weight: bold;
-  }
-  
-  .edit-form input {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .edit-form .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  
-  .edit-form button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .edit-form button[type='button'] {
-    background-color: #f44336;
-    color: #fff;
-  }
-  
-  .edit-form button[type='submit'] {
-    background-color: #4caf50;
-    color: #fff;
-  }
-  .search-bar {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .search-input {
-    width: 70%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  .search-button,
-.reload-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
+.acciones-col{display:flex;gap:4px;}
+.no-data{padding:20px;text-align:center;color:#999;}
+.btn-back{display:block;margin:24px auto 0;}
+
+
+----------------------------
+
+:host ::ng-deep .mat-paginator,
+:host ::ng-deep .mat-mdc-paginator{
+  display: flex;
+  justify-content: center;       /* centra todo el paginador */
+  padding: 16px 0;               /* espacio arriba/abajo     */
+  border-top: 1px solid #eee;    /* línea divisoria opcional */
+  box-sizing: border-box;
+}
+
+/* 2) Ocultar selector “Items per page” (si lo necesitas) */
+:host ::ng-deep .mat-paginator-page-size,
+:host ::ng-deep .mat-mdc-paginator-page-size{
+  display: none !important;
+}
+
+/* 3) Agrupar rango + flechas */
+:host ::ng-deep .mat-paginator-range-actions,
+:host ::ng-deep .mat-mdc-paginator-range-actions{
   display: flex;
   align-items: center;
+  gap: 16px;                     /* separación texto ⇆ botones */
+}
+
+/* 4) Botones flecha: círculo azul con animación */
+:host ::ng-deep .mat-paginator-navigation-previous,
+:host ::ng-deep .mat-paginator-navigation-next,
+:host ::ng-deep .mat-mdc-paginator-navigation-previous,
+:host ::ng-deep .mat-mdc-paginator-navigation-next{
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #3f51b5;           /* color primario */
+  display: inline-flex;
   justify-content: center;
+  align-items: center;
+  transition: background .25s, transform .25s;
+  padding: 0;
 }
-  .search-button mat-icon,
-.reload-button mat-icon {
+
+/* Hover / focus (sólo estado habilitado) */
+:host ::ng-deep .mat-paginator-navigation-previous:not([disabled]):hover,
+:host ::ng-deep .mat-paginator-navigation-next:not([disabled]):hover,
+:host ::ng-deep .mat-mdc-paginator-navigation-previous:not([disabled]):hover,
+:host ::ng-deep .mat-mdc-paginator-navigation-next:not([disabled]):hover{
+  background: #5c6bc0;           /* tono más claro */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px -2px rgba(0,0,0,.25);
+}
+
+/* Estado deshabilitado */
+:host ::ng-deep .mat-paginator-navigation-previous[disabled],
+:host ::ng-deep .mat-paginator-navigation-next[disabled],
+:host ::ng-deep .mat-mdc-paginator-navigation-previous[disabled],
+:host ::ng-deep .mat-mdc-paginator-navigation-next[disabled]{
+  background: #cbd1e1;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* 5) Flechas blancas (icon-font o SVG) */
+:host ::ng-deep
+.mat-paginator-navigation-previous .mat-icon,
+:host ::ng-deep
+.mat-paginator-navigation-next   .mat-icon,
+:host ::ng-deep
+.mat-mdc-paginator-navigation-previous .mat-mdc-paginator-icon,
+:host ::ng-deep
+.mat-mdc-paginator-navigation-next   .mat-mdc-paginator-icon{
+  color: #fff !important;   /* icono blanco */
+  fill:  #fff !important;   /* por si es SVG */
+  opacity: 1 !important;    /* anula 0.54 default */
   font-size: 20px;
-  color: #fff;
+  line-height: 20px;
 }
 
-.not-found {
-  text-align: center;
-  font-size: 16px;
-  color: #d9534f;
-  margin-bottom: 20px;
+/* 6) Ocultar la etiqueta de rango (1 – 10 de 25) */
+:host ::ng-deep .mat-paginator-range-label,
+:host ::ng-deep .mat-mdc-paginator-range-label{
+  display: none !important;
 }
-
-  
-  .spacer {
-    margin: 20px 0;}

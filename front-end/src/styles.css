@@ -32,7 +32,26 @@
   text-align: center;
   font-size: 16px;                    /* como en el mock */
   color: #374151;
+  
 }
+
+.swal-pro-html{
+  margin: 0 auto;
+  max-height: 450px;        /* ajusta si quieres más/menos alto */
+  overflow: auto;           /* ← scroll vertical */
+  padding-right: 6px;       /* espacio para que no tape la barra */
+}
+
+/* Scrollbar sutil (webkit) */
+.swal-pro-html::-webkit-scrollbar{ width: 8px; }
+.swal-pro-html::-webkit-scrollbar-thumb{
+  background: rgba(0,0,0,.18);
+  border-radius: 6px;
+}
+.swal-pro-html::-webkit-scrollbar-track{
+  background: transparent;
+}
+
 
 /* ÚNICO botón “Listo”, centrado */
 .swal-pro-confirm{
@@ -52,19 +71,20 @@
 .swal-pro-confirm:hover{ filter: brightness(.96); }
 .swal-pro-confirm:focus{ outline: none; box-shadow: 0 0 0 4px rgba(91,108,249,.22); }
 
---------------------------------------------------------------------------------
 .swal-pro-warn{
   width:80px;height:80px;margin:4px auto 8px;border-radius:50%;
   background:#fff7ed; /* amarillo muy suave */
   position:relative;
 }
 .swal-pro-warn::after{ /* palo del “!” */
-  content:"";position:absolute;left:38px;top:18px;width:4px;height:28px;
+  content:"";position:absolute;left:50%; top:18px;width:4px;height:28px;
   background:#f59e0b;border-radius:2px;
+   transform:translateX(-50%);
 }
 .swal-pro-warn::before{ /* punto del “!” */
-  content:"";position:absolute;left:38px;top:52px;width:4px;height:4px;
+  content:"";position:absolute;left:50%; top:54px;width:4px;height:4px;
   background:#f59e0b;border-radius:50%;
+  transform:translateX(-50%);
 }
 
 /* Círculo de error (rojo, “X”) */
@@ -81,7 +101,7 @@
 .swal-pro-error::before{ transform:rotate(45deg); }
 .swal-pro-error::after{  transform:rotate(-45deg); }
 
-----------------------------------------------
+/*----------------------------------------------*/
 
 /* Icono "info" en círculo (igual tamaño que el check) */
 .swal-pro-info{
@@ -131,3 +151,46 @@
   background:#2970ff; color:#fff; font-weight:600; cursor:pointer;
 }
 .swal-pro-see:hover{ filter:brightness(.96); }
+
+/*----------------------------------------------------------*/
+
+/* ===== Notificaciones CLIENTE (scope aislado) ===== */
+.swal-pro--cliente .swal-pro-html,
+.swal-pro-html--cliente{
+  max-height: 450px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+/* Scrollbar sutil solo en cliente */
+.swal-pro--cliente .swal-pro-html::-webkit-scrollbar,
+.swal-pro-html--cliente::-webkit-scrollbar{ width: 8px; }
+.swal-pro--cliente .swal-pro-html::-webkit-scrollbar-thumb,
+.swal-pro-html--cliente::-webkit-scrollbar-thumb{
+  background: rgba(0,0,0,.18);
+  border-radius: 6px;
+}
+.swal-pro--cliente .swal-pro-html::-webkit-scrollbar-track,
+.swal-pro-html--cliente::-webkit-scrollbar-track{
+  background: transparent;
+}
+
+/* Lista y botón “Visto” compactos SOLAMENTE en cliente */
+.swal-pro--cliente .swal-pro-list{ list-style:none; padding:0; margin:8px 0 0; text-align:left; }
+.swal-pro--cliente .swal-pro-list li{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 0; border-bottom:1px dashed #eee;
+}
+.swal-pro--cliente .swal-pro-list li:last-child{ border-bottom:none; }
+.swal-pro--cliente .swal-pro-list li span{ flex:1; min-width:0; }
+
+.swal-pro--cliente .swal-pro-see{
+  margin-left:auto;
+  padding:4px 10px;
+  font-size:13px;
+  line-height:1.2;
+  white-space:nowrap;
+  border:0; border-radius:8px;
+  background:#2970ff; color:#fff; font-weight:600; cursor:pointer;
+}
+.swal-pro--cliente .swal-pro-see:hover{ filter:brightness(.96); }

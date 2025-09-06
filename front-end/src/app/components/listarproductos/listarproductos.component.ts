@@ -26,6 +26,7 @@ export class ListarproductosComponent implements OnInit {
   searchTerm        = '';
   isEditMode        = false;
   prodSeleccionado: any = null;
+  uStock = ['unidades','kg','g','l','ml','paquetes','cajas'];
 
   /* id de categoría – puede llegar por @Input O por la URL */
   @Input() idCatParam: number | null = null;
@@ -121,6 +122,25 @@ export class ListarproductosComponent implements OnInit {
     const end   = start + this.pageSize;
     this.displayedProductos = this.prodFiltrados.slice(start, end);
   }
+
+  private unidad(u: string | undefined | null, n: number): string {
+  if (!u) return '';
+  const l = u.toLowerCase().trim();
+  if (l === 'unidades') return n === 1 ? 'unidad' : 'unidades';
+  if (l === 'paquetes') return n === 1 ? 'paquete' : 'paquetes';
+  if (l === 'cajas')    return n === 1 ? 'caja'    : 'cajas';
+  if (l === 'kg') return 'Kg';
+  if (l === 'l')  return 'L';
+  if (l === 'ml') return 'ml';
+  if (l === 'g')  return 'g';
+  return u;
+}
+
+formatoStock(p: any): string {
+  const n = Number(p.stock) ?? 0;
+  if (!p?.unidad_stock) return String(n);
+  return `${n} ${this.unidad(p.unidad_stock, n)}`;
+}
 
  
   guardarEdicion(): void {

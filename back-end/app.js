@@ -1,4 +1,17 @@
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+// 1) .env general (BD, etc.)
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// 2) PayPal: tu archivo se llama "process.env" (SIN punto)
+dotenv.config({ path: path.join(__dirname, 'process.env'), override: true });
+
+// DEBUG opcional (quítalo luego)
+console.log('[ENV check] PAYPAL_ENV=', process.env.PAYPAL_ENV);
+console.log('[ENV check] CID set? ', !!process.env.PAYPAL_CLIENT_ID);
+console.log('[ENV check] SEC set? ', !!process.env.PAYPAL_SECRET);
+
 const express      = require('express');
 const bodyParser   = require('body-parser');
 const http         = require('http');
@@ -77,6 +90,7 @@ require('./server/routes/contacto')(app);
 require('./server/routes/estado_reserva')(app);
 require('./server/routes/notificaciones')(app);
 require('./server/routes/reserva_producto')(app);
+require('./server/routes/paypal')(app);
 
 
 // Ruta catch‐all

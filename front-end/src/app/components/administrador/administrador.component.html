@@ -6,7 +6,7 @@
 
     <!-- Usamos guardar() para ambos casos -->
     <form #adminForm="ngForm"
-          (ngSubmit)="guardar()"
+          (ngSubmit)="esEdicion ? guardar() : agregar()"
           autocomplete="on">
 
       <div class="form-grid">

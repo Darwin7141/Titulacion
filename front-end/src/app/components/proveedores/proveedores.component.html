@@ -6,7 +6,7 @@
 
     <!-- Un único submit → guardar() decide si crea o actualiza -->
     <form #provForm="ngForm"
-          (ngSubmit)="guardar()"
+          (ngSubmit)="esEdicion ? guardar() : agregar()"
           autocomplete="on">
 
       <div class="form-grid">
@@ -21,21 +21,29 @@
 
         <!-- Cédula / RUC -->
         <div class="form-group">
+          <label>Documento</label>
+          <div>
+            <label>
+              <input type="radio" name="tipoDoc" [(ngModel)]="tipoDoc" value="CEDULA"> Cédula
+            </label>
+            <label style="margin-left:12px;">
+              <input type="radio" name="tipoDoc" [(ngModel)]="tipoDoc" value="RUC"> RUC
+            </label>
+          </div>
+        </div>
+
+        <!-- Cédula / RUC (mismo campo) -->
+        <div class="form-group">
           <label for="ci">Cédula / RUC</label>
           <input id="ci" name="ci" type="text"
                  [(ngModel)]="proveedor.ci"
-                 placeholder="Ingrese la cédula o RUC"
+                 [maxlength]="tipoDoc === 'CEDULA' ? 10 : 13"
+                 [placeholder]="tipoDoc === 'CEDULA' ? 'Ingrese la cédula' : 'Ingrese el RUC'"
+                 (input)="soloNumeros($event)"
+                 [attr.inputmode]="'numeric'"
+                 [attr.pattern]="'[0-9]*'"
                  required
                  cdkFocusInitial>
-        </div>
-
-        <!-- Dirección -->
-        <div class="form-group">
-          <label for="direccion">Dirección</label>
-          <input id="direccion" name="direccion" type="text"
-                 [(ngModel)]="proveedor.direccion"
-                 placeholder="Ingrese la dirección"
-                 required>
         </div>
 
         <!-- Nombre / Razón Social -->
@@ -44,6 +52,15 @@
           <input id="nombre" name="nombre" type="text"
                  [(ngModel)]="proveedor.nombre"
                  placeholder="Ingrese el nombre o razón social"
+                 required>
+        </div>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label for="direccion">Dirección</label>
+          <input id="direccion" name="direccion" type="text"
+                 [(ngModel)]="proveedor.direccion"
+                 placeholder="Ingrese la dirección"
                  required>
         </div>
 

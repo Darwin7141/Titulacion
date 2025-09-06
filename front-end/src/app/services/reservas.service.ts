@@ -140,7 +140,9 @@ getServiciosMasReservados(limit = 5)
     `${this.url}dashboard/top-servicios?limit=${limit}`
   );
 }
-
+capturarOrdenPayPal(orderId: string) {
+  return this.http.post<any>(`${this.url}paypal/capture`, { orderId });
+}
 
 }
 

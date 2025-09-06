@@ -268,3 +268,12 @@ button:hover{ filter:brightness(.96); }
 .swal-pro-cancel{ background:#6b7280; color:#fff; }
 .swal-pro-cancel:hover{ filter:brightness(.95); }
 .swal-pro-cancel:focus{ outline:none; box-shadow:0 0 0 4px rgba(107,114,128,.22); }
+
+.my-spinner{
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 3px solid #e5e7eb;
+  border-top-color: #5b6cf9;
+  animation: myspin 0.8s linear infinite;
+}
+@keyframes myspin { to { transform: rotate(360deg); } }

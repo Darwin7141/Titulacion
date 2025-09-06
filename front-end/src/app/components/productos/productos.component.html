@@ -37,6 +37,18 @@
                  required>
         </div>
 
+       <div class="form-group">
+        <label for="unidad_stock">Unidad</label>
+        <select id="unidad_stock"
+                name="unidad_stock"
+                [(ngModel)]="productos.unidad_stock"
+                placeholder="Unidad"
+                required>
+       <option value="" disabled selected>Seleccione una unidad</option>         
+      <option *ngFor="let u of uStock" [value]="u">{{ u }}</option>
+      </select>
+      </div>
+
         <!-- Proveedor -->
         <div class="form-group">
           <label for="proveedor">Proveedor</label>

@@ -267,6 +267,35 @@ export class GestionProductosComponent implements OnInit {
     });
   }
 
+
+  private baseUnit(u?: string | null): string {
+  return (u || 'unidades').toLowerCase().trim();
+}
+private unidad(u: string | null | undefined, n: number): string {
+  const b = this.baseUnit(u);
+
+  // unidades contables con plural
+  if (b === 'unidades') return n === 1 ? 'unidad' : 'unidades';
+  if (b === 'paquetes') return n === 1 ? 'paquete' : 'paquetes';
+  if (b === 'cajas')    return n === 1 ? 'caja'    : 'cajas';
+
+  // físicas (presentación visual)
+  if (b === 'kg') return 'Kg';
+  if (b === 'l')  return 'L';
+  if (b === 'ml') return 'ml';
+  if (b === 'g')  return 'g';
+
+  return u || '';
+}
+formatoStock(p: any): string {
+  const n = Number(p?.stock ?? 0);
+  return `${n} ${this.unidad(p?.unidad_stock, n)}`.trim();
+}
+cantFormato(it: { producto: any; cantidad: number }): string {
+  const n = Number(it?.cantidad ?? 0);
+  return `${n} ${this.unidad(it?.producto?.unidad_stock, n)}`.trim();
+}
+
   cancel() {
     this.dialogRef.close(false);
   }

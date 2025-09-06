@@ -82,6 +82,7 @@ import { AsistenteVirtualComponent } from './componentsCliente/asistente-virtual
 import { GestionProductosComponent } from './components/gestion-productos/gestion-productos.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PagosDialogComponent } from './components/pagos-dialog/pagos-dialog.component';
+import { NotificacionPagoComponent } from './components/notificacion-pago/notificacion-pago.component';
 
 
 
@@ -131,6 +132,7 @@ import { PagosDialogComponent } from './components/pagos-dialog/pagos-dialog.com
     AsistenteVirtualComponent,
     GestionProductosComponent,
     PagosDialogComponent,
+    NotificacionPagoComponent,
     
     
   

@@ -1,97 +1,68 @@
-<div class="clientes-container">
-    <h2>Listado de Categorías</h2>
-  
-    <!-- Campo de búsqueda -->
-    <div class="search-bar">
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Nombre"
-        [(ngModel)]="searchTerm"
-      />
-      <button class="search-button" (click)="buscarCategorias()">
-        <mat-icon>search</mat-icon>
-      </button>
-      <button class="reload-button" (click)="recargarLista()">
-        <mat-icon>refresh</mat-icon>
-      </button>
-    </div>
-  
-    <div *ngIf="catFiltrados.length === 0 && searchTerm" class="not-found">
-      <p>No se encontró ninguna categoría con el nombre proporcionado.</p>
-    </div>
-  
-  
-    <div class="spacer"></div> <!-- Espacio entre búsqueda y tabla -->
-  
-    <!-- Tabla de empleados -->
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Nombre</th>
-          
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let cat of catFiltrados">
-          <td>{{ cat.idcategoria }}</td>
-          <td>{{ cat.categoria }}</td>
-       
-          
-          
-          <td>
-            <button mat-icon-button color="primary" (click)="editarCategorias(cat)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <!-- Ícono de eliminar -->
-            <button mat-icon-button color="warn" (click)="eliminarCategorias(cat.idcategoria)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- Formulario de edición -->
-    <div *ngIf="isEditMode" class="edit-form">
-      <h3>Editar Categoria</h3>
-      <form (ngSubmit)="guardarEdicion()">
-        <div class="form-group">
-          <label>Código</label>
-          <input
-            type="text"
-            [(ngModel)]="catSeleccionado.idcategoria"
-            name="idcategoria"
-            disabled
-          />
-        </div>
-        <div class="form-group">
-          <label>Nombre</label>
-          <input
-            type="text"
-            [(ngModel)]="catSeleccionado.categoria"
-            name="nombre"
-            required
-          />
-        </div>
-        
-        
-  
-        <div class="form-actions">
-          <button type="button" (click)="cancelarEdicion()">Cancelar</button>
-          <button type="submit">Guardar</button>
-        </div>
-      </form>
-    </div>
-  
-    <!-- Botón para agregar empleado -->
-    <div class="add-icon">
-      <button mat-fab color="primary" [routerLink]="['/categoriaProductos']">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
-  </div>
-  
+<div class="tabla-wrapper">
+  <mat-card class="tabla-card">
+    <mat-card-header>
+      <div class="toolbar">
+        <div class="left-group">
+          <mat-form-field appearance="outline" class="buscador slim">
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput placeholder="Nombre"
+                   [(ngModel)]="searchTerm"
+                   (keyup.enter)="buscarCategorias()">
+          </mat-form-field>
 
+          <button mat-icon-button color="primary" matTooltip="Buscar" (click)="buscarCategorias()">
+            <mat-icon>search</mat-icon>
+          </button>
+          <button mat-icon-button color="primary" matTooltip="Recargar" (click)="recargarLista()">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+
+        <button mat-raised-button color="primary" class="btn-add" (click)="abrirDialogoAgregar()">
+          <mat-icon>add</mat-icon><span>Agregar</span>
+        </button>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of displayedCats">
+            <td>{{ c.idcategoria }}</td>
+            <td>{{ c.categoria }}</td>
+            <td class="acciones-col">
+              <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarCategorias(c)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="eliminarCategorias(c.idcategoria)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <mat-paginator
+        [length]="catFiltrados.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10]"
+        (page)="pageChanged($event)">
+      </mat-paginator>
+
+      <p class="no-data" *ngIf="catFiltrados.length === 0 && searchTerm">
+        No se encontró ninguna categoría con el nombre proporcionado.
+      </p>
+    </mat-card-content>
+  </mat-card>
+
+  <button mat-icon-button class="btn-back" matTooltip="Volver" (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+</div>

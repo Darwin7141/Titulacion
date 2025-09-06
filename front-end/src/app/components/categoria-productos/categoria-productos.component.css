@@ -1,12 +1,104 @@
-.content {
-    background: #eee; /* Establece el fondo del elemento con el color gris claro #eee */
-    position: absolute; /* Posiciona el elemento en relación a sus ancestros */
-    left: 50%; /* Ubica el elemento al 50% del ancho de su contenedor padre */
-    top: 50%; /* Ubica el elemento al 50% de la altura de su contenedor padre */
-    transform: translate(-50%, -50%); /* Desplaza el elemento hacia la izquierda y hacia arriba en un 50% de su propio ancho y alto, centrándolo así */
-    padding: 50px; /* Añade un relleno interno de 50 píxeles en todos los lados del elemento */
-  }
-  
-  .btn {
-    margin: 30px 5px; /* Establece los márgenes del elemento: 30 píxeles arriba y abajo, 5 píxeles a la izquierda y a la derecha */
-  }
+
+/* Contenedor centrado dentro del diálogo */
+.registro-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tarjeta */
+.registro-panel-content {
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 640px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  color: #333;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Título */
+.registro-panel-content h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: "Roboto", sans-serif;
+  font-size: 1.75rem;
+  color: var(--verde);
+  font-weight: 550;
+}
+
+/* Grid 2 columnas */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 30px;
+}
+
+/* Inputs */
+.form-group { display: flex; flex-direction: column; }
+.form-group label {
+  font-weight: 550;
+  margin-bottom: 5px;
+  color: #555;
+  font-family: "Roboto", sans-serif;
+
+}
+.form-group input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: border-color .3s;
+  font-family: "Roboto", sans-serif;
+}
+.form-group input:focus {
+  outline: none;
+  border-color: var(--verde);
+}
+
+/* Botonera */
+.registro-buttons {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+.btn-cancel,
+.btn-register {
+  padding: 10px 24px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .3s, transform .2s;
+  font-family: "Roboto", sans-serif;
+
+}
+.btn-cancel {
+  background: #ef4444;
+  color: white;
+}
+.btn-cancel:hover {
+  background: #b62f2f;
+  transform: translateY(-2px);
+}
+.btn-register {
+  background:  #0ccf36;
+  color: white;
+}
+.btn-register:hover {
+  background: #098123;
+  transform: translateY(-2px);
+}
+.form-group select{
+  padding:10px 12px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  font-size:14px;
+  transition:border-color .3s;
+  background:#fff;
+  color: #555;
+  font-family: "Roboto", sans-serif;
+}

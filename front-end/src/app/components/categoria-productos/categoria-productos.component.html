@@ -1,22 +1,30 @@
-<div class="content">
-    <h2>AGREGAR CATEGORÍA</h2>
-    <form #categoriaForm="ngForm" (ngSubmit)="agregar()">
-  
-      
-  
-      <mat-form-field class="col-xs-12">
-        <input matInput type="text" #nombreField="ngModel" name="nombre" [(ngModel)]="cat.categoria" required placeholder="Nombre" autofocus>
-        <mat-error *ngIf="nombreField.invalid">El nombre de la categoría es requerido</mat-error>
-      </mat-form-field>
-  
-      
-  
-      
-  
-  
-      <button [routerLink]="['/listaCategorias']" mat-raised-button class="btn" color="default" type="button">Cancelar</button>
-      <button [disabled]="!categoriaForm.form.valid" mat-raised-button  class="btn" color="primary" type="submit">Agregar</button>
+<div class="registro-panel">
+  <div class="registro-panel-content">
+    <h3>{{ esEdicion ? 'Editar Categoría' : 'Agregar Categoría' }}</h3>
+
+    <form #catForm="ngForm" (ngSubmit)="guardar()" autocomplete="on">
+      <div class="form-grid">
+        <div class="form-group" *ngIf="esEdicion">
+          <label for="idcategoria">Código</label>
+          <input id="idcategoria" name="idcategoria" type="text"
+                 [(ngModel)]="cat.idcategoria" disabled>
+        </div>
+
+        <div class="form-group">
+          <label for="categoria">Nombre</label>
+          <input id="categoria" name="categoria" type="text"
+                 [(ngModel)]="cat.categoria"
+                 placeholder="Ingrese el nombre de la categoría"
+                 required cdkFocusInitial>
+        </div>
+      </div>
+
+      <div class="registro-buttons">
+        <button type="button" class="btn-cancel" (click)="cancelar()">Cancelar</button>
+        <button type="submit" class="btn-register" [disabled]="!catForm.valid">
+          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        </button>
+      </div>
     </form>
   </div>
-  
-
+</div>

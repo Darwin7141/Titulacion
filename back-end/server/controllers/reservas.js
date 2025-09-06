@@ -941,6 +941,4 @@ module.exports = {
     getReservasUltimosSeisMeses,
     getServiciosMasReservados
 
-    
-    
   };

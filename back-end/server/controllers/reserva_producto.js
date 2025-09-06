@@ -11,7 +11,9 @@ async function listarPorReserva(req, res) {
     return res.json(items.map(i => ({
       producto: {
         idproducto: i.producto.idproducto,
-        nombre:     i.producto.nombre
+        nombre:     i.producto.nombre,
+        stock:      i.producto.stock,         
+        unidad_stock:  i.producto.unidad_stock 
       },
       cantidad: i.cantidad
     })));
@@ -48,7 +50,9 @@ async function agregarAReserva(req, res) {
     return res.status(201).json({
       producto: {
         idproducto: creado.producto.idproducto,
-        nombre:     creado.producto.nombre
+        nombre:     creado.producto.nombre,
+        stock:        creado.stock,
+        unidad_stock: creado.unidad_stock
       },
       cantidad: creado.cantidad
     });
@@ -98,7 +102,9 @@ async function restarProductoReserva(req, res) {
     return res.json({
       producto: {
         idproducto: prod.idproducto,
-        nombre:     prod.nombre
+        nombre:     prod.nombre,
+        stock:        prod.stock,        
+        unidad_stock: prod.unidad_stock
       },
       cantidad: nuevaCant
     });

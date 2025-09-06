@@ -1,0 +1,90 @@
+<div class="modal-wrapper">
+
+  <!-- Header / Título centrado -->
+  <header class="modal-header">
+    <!-- Título principal -->
+    <h2 class="reserva-title">Reserva R{{ idSufijo }}</h2>
+
+    <!-- Botón cerrar (se posiciona a la derecha con tu CSS existente) -->
+    <button mat-icon-button aria-label="Cerrar" (click)="cerrar()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <!-- Contenido -->
+  <section class="dialog-body">
+
+    <!-- Datos informativos estilo “Etiqueta: valor” -->
+    <div class="info-block">
+       
+  <!--     <div class="info-line">
+        <span class="label">Fecha del evento:</span>
+        <span class="value">{{ fechaStr }}</span>
+      </div>
+      <div class="info-line">
+        <span class="label">Dirección del evento:</span>
+        <span class="value">{{ data.direccionevento }}</span>
+      </div> -->
+    </div> 
+
+    <!-- Tarjetas resumen -->
+    <div class="summary-cards">
+      <div class="card total">
+        <div class="card-label">Total</div>
+        <div class="card-value">${{ data.total | number:'1.2-2' }}</div>
+      </div>
+      <div class="card pago">
+        <div class="card-label">Primer pago</div>
+        <div class="card-value">${{ data.primer_pago | number:'1.2-2' }}</div>
+      </div>
+      <div class="card pago">
+        <div class="card-label">Segundo pago</div>
+        <div class="card-value">${{ data.segundo_pago | number:'1.2-2' }}</div>
+      </div>
+      <div class="card saldo" [class.ok]="data.saldo_pendiente === 0">
+        <div class="card-label">Saldo pendiente</div>
+        <div class="card-value">${{ data.saldo_pendiente | number:'1.2-2' }}</div>
+      </div>
+    </div>
+
+    <!-- Tabla de menús -->
+    <section class="menus">
+      <h4>Menús contratados</h4>
+
+      <div class="table">
+        <div class="thead">
+          <div>Menú</div>
+          <div class="num">Cantidad</div>
+          <div class="num">Precio Unitario</div>
+          <div class="num">Subtotal</div>
+        </div>
+
+       <div class="tbody" *ngIf="data.detalles?.length; else sinDatos">
+  <div class="row" *ngFor="let item of data.detalles">
+    <div class="name">{{ item.menu?.nombre }}</div>
+    <div class="num">{{ item.cantpersonas }}</div>
+    <div class="num">${{ item.preciounitario | number:'1.2-2' }}</div>
+    <div class="num">${{ item.subtotal | number:'1.2-2' }}</div>
+  </div>
+</div>
+
+
+<div class="tfooter">
+  <div class="spacer">Total</div>
+  <div class="num">${{ totalMenus | number:'1.2-2' }}</div>
+</div>
+
+        <ng-template #sinDatos>
+          <div class="empty">No hay menús registrados.</div>
+        </ng-template>
+      </div>
+    </section>
+
+  </section>
+
+  <!-- Acciones -->
+  <footer class="actions">
+    <button mat-flat-button class="btn-primary" (click)="cerrar()">Cerrar</button>
+  </footer>
+
+</div>

@@ -1,4 +1,4 @@
-const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); // Importar la función de validación
+const { validarIdentificacionEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); // Importar la función de validación
 const modelos = require('../models'); // Importar los modelos
 
 async function create(req, res) {
@@ -8,8 +8,8 @@ async function create(req, res) {
 
   try {
       // Validar datos antes de la inserción
-      if (!validarCedulaEcuador(ci)) {
-          return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
+      if (!validarIdentificacionEcuador(ci)) {
+  return res.status(400).send({ message: 'La identificación (Cédula/RUC) no es válida.' });
       }
 
       if (!validarEmail(e_mail)) {
@@ -57,8 +57,8 @@ async function update(req, res) {
 
   try {
       // Validar los campos antes de la actualización
-      if (ci && !validarCedulaEcuador(ci)) {
-          return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
+      if (ci && !validarIdentificacionEcuador(ci)) {
+          return res.status(400).send({ message: 'La identificación (Cédula/RUC) no es válida.' });
       }
 
       if (e_mail && !validarEmail(e_mail)) {
@@ -138,7 +138,7 @@ function getAll(req, res) {
     });
 }
 
-async function verificarCedula(req, res) {
+/*async function verificarCedula(req, res) {
     const { ci } = req.params;
     try {
         const cliente = await modelos.proveedor.findOne({ where: { ci } });
@@ -150,7 +150,23 @@ async function verificarCedula(req, res) {
         console.error("Error al verificar cédula:", err);
         res.status(500).send({ message: "Error al verificar la cédula.", error: err.message });
     }
+}*/
+
+
+async function verificarIdentificacion(req, res) {
+  const id = req.params.id ?? req.params.ci;  // <-- clave
+  if (!id) {
+    return res.status(400).send({ message: 'Falta parámetro id/ci' });
+  }
+  try {
+    const prov = await modelos.proveedor.findOne({ where: { ci: id } });
+    return res.status(200).send({ existe: !!prov });
+  } catch (err) {
+    console.error("Error al verificar identificación:", err);
+    res.status(500).send({ message: "Error al verificar la identificación.", error: err.message });
+  }
 }
+
 
 async function verificarEmail(req, res) {
     const { email } = req.params;
@@ -225,7 +241,7 @@ async function getProveedorPorCedula(req, res) {
   const codigoproveedor = req.params.codigoproveedor;
   try {
     // Busca cliente por su clave primaria (codigocliente)
-    const cliente = await modelos.empleado.findByPk(codigoproveedor);
+    const cliente = await modelos.proveedor.findByPk(codigoproveedor);
     if (!cliente) {
       return res.status(404).json({ message: 'Proveedor no encontrado.' });
     }
@@ -246,7 +262,8 @@ module.exports = {
     update,
     eliminar,
     getAll,
-    verificarCedula,
+    //verificarCedula,
+    verificarIdentificacion,
     verificarEmail,
     verificarTelefono,
     getProveedorPorCedula,

@@ -27,6 +27,8 @@ export class ProveedoresComponent implements OnInit {
   };
 
   esEdicion = false;
+  tipoDoc: 'CEDULA' | 'RUC' = 'CEDULA';
+
     constructor(
       
       private serviceProv: ProveedoresService,
@@ -39,22 +41,36 @@ export class ProveedoresComponent implements OnInit {
       if (this.data?.prov) {
     this.proveedor = { ...this.data.prov };   // precargar
     this.esEdicion     = true;
+
+    if (this.proveedor.ci?.length === 13) this.tipoDoc = 'RUC';
   }
     }
-    agregar() {
-  if (!this.validaciones.validarCedulaEcuador(this.proveedor.ci)) {
-    Swal.fire({
-      width: 480,
-      html: `
-        <div class="swal-pro-error"></div>
-        <h2 class="swal-pro-title">Cédula no válida</h2>
-        <p class="swal-pro-desc">La cédula ingresada no es válida.</p>
-      `,
-      showConfirmButton: true, confirmButtonText: 'Listo',
-      buttonsStyling: false, focusConfirm: true,
-      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
-    }); return;
+
+    soloNumeros(e: any) {
+    const val = (e.target.value || '').replace(/\D/g, '');
+    e.target.value = val; this.proveedor.ci = val;
   }
+
+     private validarIdentificacionOAlertar(): boolean {
+    if (!this.validaciones.validarIdentificacionEcuador(this.proveedor.ci)) {
+      Swal.fire({ width:480, html:`
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Identificación no válida</h2>
+        <p class="swal-pro-desc">
+          ${this.tipoDoc === 'CEDULA'
+            ? 'La cédula debe tener 10 dígitos válidos.'
+            : 'El RUC debe tener 13 dígitos válidos.'}
+        </p>`,
+        showConfirmButton:true, confirmButtonText:'Listo',
+        buttonsStyling:false, customClass:{ popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      });
+      return false;
+    }
+    return true;
+  }
+
+    agregar() {
+  if (!this.validarIdentificacionOAlertar()) return;
 
   if (!this.proveedor.nombre.trim()) {
     Swal.fire({
@@ -119,8 +135,8 @@ export class ProveedoresComponent implements OnInit {
         width: 480,
         html: `
           <div class="swal-pro-warn"></div>
-          <h2 class="swal-pro-title">Cédula duplicada</h2>
-          <p class="swal-pro-desc">La cédula ingresada ya se encuentra registrada.</p>
+          <h2 class="swal-pro-title">Identificación duplicada</h2>
+          <p class="swal-pro-desc">Ya existe un registro con este número de Cédula o RUC</p>
         `,
         showConfirmButton: true, confirmButtonText: 'Listo',
         buttonsStyling: false, focusConfirm: true,
@@ -198,19 +214,7 @@ export class ProveedoresComponent implements OnInit {
         }
 
       guardar(): void {
-  if (!this.validaciones.validarCedulaEcuador(this.proveedor.ci)) {
-    Swal.fire({
-      width: 480,
-      html: `
-        <div class="swal-pro-error"></div>
-        <h2 class="swal-pro-title">Cédula no válida</h2>
-        <p class="swal-pro-desc">La cédula ingresada no es válida.</p>
-      `,
-      showConfirmButton: true, confirmButtonText: 'Listo',
-      buttonsStyling: false, focusConfirm: true,
-      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
-    }); return;
-  }
+  if (!this.validarIdentificacionOAlertar()) return;
 
   if (!this.proveedor.nombre.trim()) {
     Swal.fire({

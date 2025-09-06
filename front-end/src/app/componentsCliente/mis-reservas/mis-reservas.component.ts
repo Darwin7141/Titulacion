@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { EditarReservaComponent } from '../editar-reserva/editar-reserva.component';
 import Swal from 'sweetalert2';
 import jsPDF from 'jspdf';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-mis-reservas',
@@ -35,6 +36,7 @@ export class MisReservasComponent implements OnInit {
   searchTerm: string = '';
   allReservas: any[] = [];
   currentIndex = 0;
+  loadingPago: boolean = false;
 
   /** guardamos el código del cliente para recargar sin perder posición */
   private codigocliente!: string | null;
@@ -363,7 +365,6 @@ doc.text(dinero(reserva?.total), col4Right - pad, totalY, { align: 'right' });
     });
   }
 
-
   private swalOk(titulo: string, desc = '') {
   Swal.fire({
     width: 480,
@@ -383,6 +384,9 @@ doc.text(dinero(reserva?.total), col4Right - pad, totalY, { align: 'right' });
     }
   });
 }
+
+
+
 
   realizarPrimerPago(reservaId: string, saldopendiente: number): void {
     Swal.fire({
@@ -544,96 +548,10 @@ doc.text(dinero(reserva?.total), col4Right - pad, totalY, { align: 'right' });
       saldopendiente = 0;
     }
 
-    Swal.fire({
-      title: 'Pago con tarjeta',
-      html: `
-        <label for="montoPago">Monto a pagar:</label>
-        <input type="number" id="montoPago" class="swal2-input" value="${saldopendiente.toFixed(2)}" min="0" max="${saldopendiente}" placeholder="Monto a pagar"><br>
-        <label for="numeroTarjeta">Número de tarjeta:</label>
-        <input type="text" id="numeroTarjeta" class="swal2-input" placeholder="1234 1234 1234 1234" maxlength="19"><br>
-        <label for="fechaExpiracion">Fecha de expiración:</label>
-        <input type="text" id="fechaExpiracion" class="swal2-input" placeholder="MM/AA"><br>
-        <label for="cvc">CVC:</label>
-        <input type="text" id="cvc" class="swal2-input" placeholder="CVC"><br>
-        <label for="titular">Titular de la tarjeta:</label>
-        <input type="text" id="titular" class="swal2-input" placeholder="Nombre completo"><br>
-      `,
-      showCancelButton: true,
-      confirmButtonText: 'Pagar',
-      cancelButtonText: 'Cancelar',
-      preConfirm: () => {
-        const montoPago = parseFloat((document.getElementById('montoPago') as HTMLInputElement).value);
-        const numeroTarjeta = (document.getElementById('numeroTarjeta') as HTMLInputElement).value;
-        const fechaExpiracion = (document.getElementById('fechaExpiracion') as HTMLInputElement).value;
-        const cvc = (document.getElementById('cvc') as HTMLInputElement).value;
-        const titular = (document.getElementById('titular') as HTMLInputElement).value;
-
-        this.pagarConTarjeta(idreserva, saldopendiente, montoPago, numeroTarjeta, fechaExpiracion, cvc, titular);
-      }
-    });
   }
 
-  pagarConTarjeta(idreserva: string, saldopendiente: number, montoPago: number, numeroTarjeta: string, fechaExpiracion: string, cvc: string, titular: string): void {
-    this.reservasService.procesarPagoConTarjeta(idreserva, saldopendiente, montoPago, numeroTarjeta, fechaExpiracion, cvc, titular).subscribe({
-      next: (response) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Pago con tarjeta realizado',
-          text: 'El pago con tarjeta fue realizado exitosamente.',
-        });
 
-        this.cargarReservasCliente(response.reserva.codigocliente);
-
-        if (montoPago < saldopendiente) {
-          this.mostrarBotonPagoFinal = true;
-          this.mostrarBotonPagoInicial = false;
-        } else {
-          this.mostrarBotonPagoFinal = false;
-        }
-      },
-      error: (err) => {
-        console.error('Error al procesar el pago con tarjeta:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al procesar el pago',
-          text: 'Hubo un problema al procesar el pago. Intenta nuevamente.',
-        });
-      }
-    });
-  }
-
-  mostrarPayPal(_reserva: any) {
-  }
-
-  private swalError(titulo: string, desc = 'Intenta nuevamente en unos minutos.') {
-  Swal.fire({
-    width: 480,
-    html: `
-      <div class="swal-pro-error"></div>
-      <h2 class="swal-pro-title">${titulo}</h2>
-      ${desc ? `<p class="swal-pro-desc">${desc}</p>` : ''}
-    `,
-    showConfirmButton: true,
-    confirmButtonText: 'Entendido',
-    buttonsStyling: false,
-    customClass: {
-      popup: 'swal-pro',
-      confirmButton: 'swal-pro-confirm',
-      htmlContainer: 'swal-pro-html'
-    }
-  });
-}
-
- private swalLoading(msg = 'Procesando...') {
-  Swal.fire({
-    width: 360,
-    html: `<div class="spinner"></div><div class="msg">${msg}</div>`,
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    showConfirmButton: false,
-    customClass: { popup: 'swal-loading' }
-  });
-}
+ 
 
   abrirPayPal(tipo: 'inicial' | 'final', reserva: any) {
     const montoPago = tipo === 'inicial'
@@ -660,7 +578,7 @@ doc.text(dinero(reserva?.total), col4Right - pad, totalY, { align: 'right' });
               purchase_units: [{ amount: { value: montoPago.toString() } }],
               application_context: { shipping_preference: 'NO_SHIPPING' }
             }),
-          onApprove: async (_data: any, actions: any) => {
+        onApprove: async (_data: any, actions: any) => {
             try {
               
               

@@ -50,11 +50,15 @@
 
     <!-- ───── Barra superior ───── -->
     <mat-toolbar color="primary" class="toolbar">
-      <button mat-icon-button (click)="drawer.toggle()">
-        <mat-icon>menu</mat-icon>
-      </button>
 
       <span class="app-title">DAAYFOOD</span>
+      <button mat-icon-button
+          class="edge-menu"
+          (click)="drawer.toggle()"
+          [style.left.px]="(drawer.opened ? sidenavWidth : sidenavWidth) "
+          aria-label="Menú">
+    <mat-icon>menu</mat-icon>
+    </button>
       <span class="spacer"></span>
 
       <button mat-icon-button (click)="verNotificacionesCliente()">
@@ -69,16 +73,11 @@
         <mat-icon>power_settings_new</mat-icon>
       </button>
 
-      <button mat-button [matMenuTriggerFor]="profileMenu">
+      <button mat-button >
         <mat-icon>person</mat-icon>
         {{ userEmail }}
       </button>
-      <mat-menu #profileMenu="matMenu">
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>exit_to_app</mat-icon>
-          Salir
-        </button>
-      </mat-menu>
+      
     </mat-toolbar>
 
     <!-- ══════════════════  ZONA CENTRAL  ══════════════════ -->

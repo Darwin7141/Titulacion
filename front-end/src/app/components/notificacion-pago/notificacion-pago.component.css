@@ -1,0 +1,257 @@
+
+/* ===== Tu caja es la única con estilo ===== */
+.modal-wrapper{
+  background: #fff;
+               /* bordes circulares */
+  box-shadow: 0 14px 40px rgba(0,0,0,.18);
+  overflow: hidden;                  /* esquinas perfectas */
+  font-family:"Roboto",sans-serif;
+}
+
+/* ===== Header / Título centrado ===== */
+.modal-header{
+  position: relative;
+  padding: 8px 16px 0;
+  background: #ffffff;
+  border-bottom: 0;
+  text-align: center;                 /* centra el contenido del header */
+}
+
+h2.reserva-title{
+  display: block;                     /* asegura ancho completo */
+  margin: 4px auto 6px;               /* lo sube un poco y centra */
+  font-weight: 550;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  letter-spacing: .2px;
+}
+
+/* Botón de cerrar arriba a la derecha, sin afectar el centrado */
+.close-btn{
+  position: absolute !important;
+  right: 12px;
+  top: 10px;
+  z-index: 2;
+}
+
+/* ===== Cuerpo ===== */
+.dialog-body{
+  padding: 4px 20px 0;
+}
+
+/* ===== Datos informativos: “Etiqueta: valor” ===== */
+.info-block{
+  margin: 4px 0 14px;
+  font-family:"Roboto",sans-serif;
+}
+.info-line{
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0;
+  font-size: 15px;
+}
+.info-line .label{
+  font-weight: 700;
+  color: #0f172a; /* casi negro */
+}
+.info-line .value{
+  font-weight: 500;
+  color: #111827;
+}
+
+/* ===== Tarjetas resumen ===== */
+.summary-cards{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 12px 0 6px;
+}
+.card{
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 12px 12px;
+  border: 1px solid #eeeeee;
+}
+.card.total{ background:#fff8e1; border-color:#ffe082; }
+.card.pago{  background:#f5f6ff; border-color:#e7e7ff; }
+.card.saldo{ background:#fff1f2; border-color:#fecdd3; }
+.card.saldo.ok{ background:#ecfdf5; border-color:#bbf7d0; }
+.card-label{
+  font-size: 12px;
+  color: #6b7280;             /* muted */
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.card-value{
+  font-size: 16px;
+  font-weight: 650;
+}
+
+/* ===== Tabla ===== */
+.menus{
+  padding: 8px 20px 0;
+}
+.menus h4{
+  margin: 10px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color:#111827;
+}
+
+.table{
+  border: 1px solid #e6e8ee;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;                  /* respeta las esquinas */
+  box-shadow: 0 1px 0 rgba(15,23,42,.03);
+}
+
+
+.thead, .row{
+  display: grid;
+  grid-template-columns: 1fr 120px 140px 140px;
+  align-items: center;
+}
+.thead{
+  background: #f1f5f9;
+  font-weight: 700;
+  font-size: 15px;
+  color: #0f172a;
+  border-bottom: 1px solid #e6e8ee;
+  padding: 10px 16px;
+}
+.row{
+  padding: 4px 18px;
+  
+}
+.row:nth-child(odd){
+  background: #fcfcfd;
+}
+.name{ font-weight: 500; font-size: 15px; }
+.num{
+  text-align: right;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  
+}
+
+.tbody .row{
+  padding: 1px 16px;                /* ↑ separa más cada fila */
+  background: #ffffff;               /* sin cebra para un look más pro */
+  border-bottom: 1px solid #e6e8ee;  /* separador */
+}
+
+/* Quita la línea en la última fila del cuerpo */
+.tbody .row:last-child{
+  border-bottom: none;
+}
+
+/* Total table footer */
+.tfooter{
+  display: grid;
+  grid-template-columns: 1fr 120px 140px 140px; /* = .thead/.row */
+  padding: 10px 16px;                            /* = .thead */
+  background: #f1f5f9;                           /* = .thead */
+  border-top: 1px solid #e6e8ee;
+  margin: 0;                                     /* evita encogimientos */
+}
+
+/* “Total” debajo de “Precio Unit.” (columna 3) */
+.tfooter .spacer{
+  grid-column: 3 / 4;
+  text-align: right;
+  font-weight: 700;
+}
+
+/* Valor debajo de “Subtotal” (columna 4) */
+.tfooter .num{
+  grid-column: 4 / 5;
+  text-align: right;
+  font-weight: 700;
+  font-size: 15px;
+}
+.empty{
+  padding: 14px;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* ===== Acciones ===== */
+.actions{
+  display: flex;
+  justify-content: center;
+  padding: 16px 20px 20px;
+}
+
+.btn-primary{
+background: #16a34a !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 4px rgba(22,163,74,.22) !important;
+  border-radius: 12px !important;
+  font-weight: 550 !important;
+  height: 40px !important;
+  padding: 0 16px !important;
+  
+}
+.btn-primary:hover{
+  filter: brightness(0.98);
+  box-shadow: 0 6px 14px rgba(34,197,94,.35);
+}
+/* ===== Responsive pequeño ===== */
+@media (max-width: 680px){
+  .summary-cards{ grid-template-columns: 1fr 1fr; }
+  .thead, .row, .tfooter{
+    grid-template-columns: 1fr 84px 96px 96px;
+  }
+}
+
+.modal-wrapper{
+  max-height: 86vh;            /* no más alto que la ventana */
+  display: flex;               /* permite separar header / body / footer */
+  flex-direction: column;
+}
+
+/* --- la parte que scrollea es SOLO el contenido --- */
+.dialog-body{
+  overflow-y: auto;            /* aquí aparece la barra */
+  padding: 4px 20px 0;
+  /* opcional: suaviza el scroll */
+  scroll-behavior: smooth;
+}
+
+/* --- footer fijo visible (no scrollea) --- */
+.actions{
+  flex: 0 0 auto;              /* no crece ni se encoge */
+  display: flex;
+  justify-content: center;
+  padding: 16px 20px 20px;
+  background: #fff;            /* evita transparencia al hacer scroll */
+  box-shadow: 0 -1px 0 rgba(0,0,0,.04); /* línea sutil superior (opcional) */
+  border-bottom-left-radius: 12px;  /* respeta bordes si usas radios grandes */
+  border-bottom-right-radius: 12px;
+}
+
+
+
+
+.reserva-modal-panel .mat-mdc-dialog-container .mdc-dialog__surface{
+  border-radius: 18px !important;   /* súbelo a 48px/56px si lo quieres más redondo */
+  overflow: hidden;                  /* recorta contenido en las esquinas */
+  box-shadow: 0 12px 32px rgba(0,0,0,.12);
+}
+
+/* Evitar doble “tarjeta” dentro del modal (opcional) */
+.reserva-modal-panel .edit-sheet{
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;                  /* ya redondeamos el surface del modal */
+  padding: 16px 20px;
+}
+
+.reserva-modal-panel .mdc-dialog__surface{
+  max-height: 88vh;          /* no excede la pantalla */
+  width: 'auto';
+  display: flex;
+  flex-direction: column;
+}

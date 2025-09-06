@@ -59,31 +59,22 @@
 
 <div class="submenu" [@slideToggle]="showProductos">
   <!-- Lista general -->
+  <a mat-list-item (click)="setView('categorias'); drawer.close()">
+  <mat-icon matListIcon>category</mat-icon>
+  <span>Categorías</span>
+  </a>
+
   <a mat-list-item (click)="setView('prod-general'); drawer.close()">
     <mat-icon matListIcon>store</mat-icon>
     <span>Lista General</span>
   </a>
 
   <!-- categorías -->
-  <a mat-list-item (click)="setView('prod-cat', 7); drawer.close()">
-    <mat-icon matListIcon>local_bar</mat-icon>
-    <span>Bebidas</span>
-  </a>
-  <a mat-list-item (click)="setView('prod-cat', 3); drawer.close()">
-    <mat-icon matListIcon>restaurant_menu</mat-icon>
-    <span>Carnes</span>
-  </a>
-  <a mat-list-item (click)="setView('prod-cat', 8); drawer.close()">
-    <mat-icon matListIcon>layers</mat-icon>
-    <span>Materiales</span>
-  </a>
-  <a mat-list-item (click)="setView('prod-cat', 9); drawer.close()">
-    <mat-icon matListIcon>grain</mat-icon>
-    <span>Granos</span>
-  </a>
-  <a mat-list-item (click)="setView('prod-cat', 5); drawer.close()">
-    <mat-icon matListIcon>cake</mat-icon>
-    <span>Panadería</span>
+  <a mat-list-item
+     *ngFor="let cat of categoriasMenu"
+     (click)="setView('prod-cat', cat.id); drawer.close()">
+    <mat-icon matListIcon>{{ cat.icon }}</mat-icon>
+    <span>{{ cat.nombre }}</span>
   </a>
 </div>
 
@@ -111,10 +102,10 @@
           <mat-icon matListIcon>menu_book</mat-icon>
           <span>Menús</span>
         </a>
-        <a mat-list-item (click)="setView('reservas'); drawer.close()">
-          <mat-icon matListIcon>event</mat-icon>
-          <span>Reservas</span>
-        </a>
+        <a mat-list-item (click)="reservaNotificada=null; setView('reservas'); drawer.close()">
+  <mat-icon matListIcon>event</mat-icon>
+  <span>Reservas</span>
+</a>
       </div>
 
     </mat-nav-list>
@@ -125,11 +116,15 @@
 
     <!-- BARRA SUPERIOR -->
     <mat-toolbar color="primary" class="toolbar">
-      <button mat-icon-button (click)="drawer.toggle()">
-        <mat-icon>menu</mat-icon>
-      </button>
 
       <span class="app-title">DAAYFOOD</span>
+       <button mat-icon-button
+          class="edge-menu"
+          (click)="drawer.toggle()"
+          [style.left.px]="(drawer.opened ? sidenavWidth : sidenavWidth) "
+          aria-label="Menú">
+    <mat-icon>menu</mat-icon>
+  </button>
       <span class="spacer"></span>
 
       <button mat-icon-button (click)="verNotificaciones()">
@@ -144,15 +139,11 @@
         <mat-icon>power_settings_new</mat-icon>
       </button>
 
-      <button mat-button [matMenuTriggerFor]="profileMenu">
+      <button mat-button >
         <mat-icon>person</mat-icon>
         {{ userEmail }}
       </button>
-      <mat-menu #profileMenu="matMenu">
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>exit_to_app</mat-icon> Salir
-        </button>
-      </mat-menu>
+      
     </mat-toolbar>
 
     <!-- ══════════════════  ZONA CENTRAL  ══════════════════ -->
@@ -242,15 +233,19 @@
           <app-listarproveedor (cerrar)="setView('dashboard')"></app-listarproveedor>
         </ng-container>
 
+        <ng-container *ngSwitchCase="'categorias'">
+        <app-listar-categorias (cerrar)="setView('dashboard')"></app-listar-categorias>
+        </ng-container>
+
         <ng-container *ngSwitchCase="'prod-general'">
-  <app-listarproductos (cerrar)="setView('dashboard')"> </app-listarproductos>
-</ng-container>
+        <app-listarproductos (cerrar)="setView('dashboard')"> </app-listarproductos>
+        </ng-container>
 
-<ng-container *ngSwitchCase="'prod-cat'">
-  <app-listarproductos [idCatParam]="selectedCatId"(cerrar)="setView('dashboard')"> </app-listarproductos>
-</ng-container>
+        <ng-container *ngSwitchCase="'prod-cat'">
+        <app-listarproductos [idCatParam]="selectedCatId"(cerrar)="setView('dashboard')"> </app-listarproductos>
+        </ng-container>
 
-<ng-container *ngSwitchCase="'tipos'">
+        <ng-container *ngSwitchCase="'tipos'">
           <!-- el propio componente emite (cerrar) si quieres volver -->
           <app-listacatering (cerrar)="setView('dashboard')"></app-listacatering>
         </ng-container>
@@ -267,7 +262,9 @@
 
         <ng-container *ngSwitchCase="'reservas'">
           <!-- el propio componente emite (cerrar) si quieres volver -->
-          <app-listar-reservas (cerrar)="setView('dashboard')"></app-listar-reservas>
+          <app-listar-reservas
+          [highlight]="reservaNotificada" 
+          (cerrar)="setView('dashboard')"></app-listar-reservas>
         </ng-container>
 
         

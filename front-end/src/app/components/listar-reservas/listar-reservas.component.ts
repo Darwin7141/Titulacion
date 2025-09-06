@@ -1,4 +1,4 @@
-import { Component , OnInit,EventEmitter, Output,  } from '@angular/core';
+import { Component , OnInit,EventEmitter, Output, Input, OnChanges, SimpleChanges  } from '@angular/core';
 import { ReservasService } from '../../services/reservas.service';
 import { ActivatedRoute } from '@angular/router';
 import { EstadoReservaService } from '../../services/estado-reserva.service';
@@ -25,9 +25,10 @@ interface PagoFiltrado {
   standalone: false,
   
   templateUrl: './listar-reservas.component.html',
-  styleUrl: './listar-reservas.component.css'
+  styleUrl: './listar-reservas.component.css',
+//  inputs: ['highlight']  
 })
-export class ListarReservasComponent implements OnInit {
+export class ListarReservasComponent implements OnInit, OnChanges {
   reserva: any[] = [];
   resFiltrados: any[] = [];
   searchTerm: string = '';
@@ -49,6 +50,9 @@ export class ListarReservasComponent implements OnInit {
 
   @Output() cerrar = new EventEmitter<void>();
   volver(){ this.cerrar.emit(); }
+
+   @Input() highlight: string | null = null;     // ← NUEVO
+ 
 
   constructor(
     private resService: ReservasService,
@@ -78,25 +82,43 @@ export class ListarReservasComponent implements OnInit {
     });
   }
 
+   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['highlight']) {
+      this.highlightedReserva = this.highlight ?? null;
+
+      // si ya tengo data cargada, actualizo la vista inmediatamente
+      if (this.reserva.length) {
+        this.resFiltrados = this.highlightedReserva
+          ? this.reserva.filter(r => r.idreserva === this.highlightedReserva)
+          : [...this.reserva];
+
+        this.pageIndex = 0;
+        this.updatePagedData();
+      }
+    }
+  }
+
   cargarReservas(): void {
     this.resService.getAllReservas().subscribe({
       next: data => {
         this.reserva = data;
-        this.resFiltrados = data;        // asignas todos a resFiltrados…
+        this.resFiltrados = data;
 
-        // si venimos con highlight, filtras…
-        if (this.highlightedReserva) {
-          this.resFiltrados = this.resFiltrados
-            .filter(r => r.idreserva === this.highlightedReserva);
+        // aplica highlight si vino por query o por Input
+        const hi = this.highlightedReserva || this.highlight;
+        if (hi) {
+          this.resFiltrados = this.resFiltrados.filter(r => r.idreserva === hi);
+          // si quieres, limpia el query param para no “pegarnos” a un id
           this.router.navigate([], { relativeTo: this.route, queryParams: {} });
         }
 
-        this.pageIndex = 0;                 // resetea a la 1.ª página
-    this.updatePagedData();         // ← y aquí arrancas la paginación
+        this.pageIndex = 0;
+        this.updatePagedData();
       },
       error: err => console.error(err)
     });
   }
+
 
   cargarEstados(): void {
     this.estadoService.getEstadoReserva().subscribe({
@@ -278,12 +300,11 @@ verDetalles(idreserva: string) {
         </tr>
       `).join('');
 
-      const filasProd = agregados.map(it => `
-        <tr>
-          <td>${it.producto.nombre}</td>
-          <td>${it.cantidad}</td>
-        </tr>
-      `).join('');
+      const filasProd = agregados.map(it => 
+  `<tr>
+    <td>${it.producto.nombre}</td>
+    <td>${this.cantFormato(it)}</td> 
+  </tr>`).join('');
 
       const html = `
         <div class="sr-modal">
@@ -577,6 +598,36 @@ async downloadPdf(filtrarIdEstado?: number): Promise<void> {
 
     doc.save('Pagos.pdf');
   }
+
+  private baseUnidad(u?: string | null): string {
+  return (u || 'unidades').toLowerCase().trim();
+}
+
+  private unidad(u: string | null | undefined, n: number): string {
+  const b = this.baseUnidad(u);
+
+  // unidades contables con plural
+  if (b === 'unidades') return n === 1 ? 'unidad' : 'unidades';
+  if (b === 'paquetes') return n === 1 ? 'paquete' : 'paquetes';
+  if (b === 'cajas')    return n === 1 ? 'caja'    : 'cajas';
+
+  // físicas (presentación visual)
+  if (b === 'kg') return 'Kg';
+  if (b === 'l')  return 'L';
+  if (b === 'ml') return 'ml';
+  if (b === 'g')  return 'g';
+
+  return u || '';
+}
+formatoStock(p: any): string {
+  const n = Number(p?.stock ?? 0);
+  return `${n} ${this.unidad(p?.unidad_stock, n)}`.trim();
+}
+cantFormato(it: { producto: any; cantidad: number }): string {
+  const n = Number(it?.cantidad ?? 0);
+  return `${n} ${this.unidad(it?.producto?.unidad_stock, n)}`.trim();
+}
+
 
  
 }

@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         fecha_caducidad: {
             type: DataTypes.DATE
         },
+        unidad_stock: { 
+            type: DataTypes.STRING
+        },
+  
     }, {
         tableName: 'productos',// Especificar el nombre de la tabla como 'cargo'
         timestamps: false

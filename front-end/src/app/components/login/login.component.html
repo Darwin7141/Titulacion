@@ -23,9 +23,25 @@
 <!-- FORMULARIO INLINE -->
 <div *ngIf="showLoginForm" class="login-card">
   <div class="login-card__inner">
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGmF2tVAOMb7f7xMEnizI-Dqvdas2KlFDLeg&s"
-         alt="Logo" class="login-card__logo" />
-    <h2 class="login-card__title">Inicia Sesión</h2>
+    <!-- Botón cerrar -->
+    <button
+      type="button"
+      class="login-card__close"
+      (click)="cerrar()"
+      aria-label="Cerrar">
+      &times;
+    </button>
+
+    <!-- Frase superior -->
+    <p class="login-card__welcome">Bienvenidos</p>
+
+    <!-- Logo -->
+    <img src="assets/LOGOMODIDFICADO.png" alt="Logo" class="login-card__logo" />
+
+    <!-- Frase inferior al logo -->
+    <p class="login-card__subtitle">Inicia sesión en tu cuenta</p>
+
+    
 
     <form #loginForm="ngForm" (ngSubmit)="login()" autocomplete="on" class="login-card__form">
       <div class="form-group">
@@ -60,9 +76,10 @@
     </form>
 
     <div class="login-card__links">
-    <a (click)="abrirRecuperar()" style="cursor:pointer">¿Olvidaste tu contraseña?</a>
-      <span>·</span>
-       <a (click)="abrirRegistro()" style="cursor:pointer">Regístrate</a>
+      <a (click)="abrirRecuperar()" style="cursor:pointer">¿Olvidaste tu contraseña?</a>
+      <br />
+      <span>¿No tienes una cuenta? </span>
+      <a (click)="abrirRegistro()" style="cursor:pointer">Regístrate</a>
     </div>
 
     <div class="lock-info" *ngIf="bloquearCampos">
@@ -360,6 +377,12 @@ Responsabilidad, Ética profesional, Resiliencia.
   </div>
   <div class="recuperar-card">
     <div class="recuperar-card__inner">
+      <button type="button"
+              class="recuperar-close"
+              (click)="closeRecuperar()"
+              aria-label="Cerrar">
+        <span aria-hidden="true">&times;</span>
+      </button>
       <h2 class="recuperar-card__title">Recuperar Contraseña</h2>
       <form #recForm="ngForm"
             (ngSubmit)="solicitarRecuperacion()"
@@ -380,15 +403,11 @@ Responsabilidad, Ética profesional, Resiliencia.
         </div>
 
         <div class="recuperar-buttons">
-          <button type="button"
-                  class="btn-cancel"
-                  (click)="closeRecuperar()">
-            Cancelar
-          </button>
+          
           <button type="submit"
                   class="btn-submit"
                   [disabled]="recForm.invalid">
-            Solicitar
+            Enviar
           </button>
         </div>
       </form>

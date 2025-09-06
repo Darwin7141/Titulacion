@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "aos": "^2.3.4",
+    "axios": "^1.11.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "connect-multiparty": "^2.2.0",

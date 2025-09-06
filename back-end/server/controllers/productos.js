@@ -1,27 +1,24 @@
 
 const modelos = require('../models'); // Importar los modelos
 
+
+const uStock = ['unidades','kg','g','l','ml','paquetes','cajas'];
 async function create(req, res) {
 
-  const { nombre, stock, codigoproveedor, idcategoria, fecha_caducidad} = req.body;
+  const { nombre, stock, codigoproveedor, idcategoria, fecha_caducidad, unidad_stock} = req.body;
 
    const id_admin = req.session.admin.codigoadmin;
   if (stock == null || isNaN(stock)) {
     return res.status(400).send({ message: 'El campo "stock" es requerido y debe ser un número.' });
 
-    
 }
-
   try {
-      
-
-      // Obtener el último valor de codigoempleado
+    
       const lastProducto = await modelos.productos.findOne({
           order: [['idproducto', 'DESC']],
       });
 
-      // Generar el siguiente código
-      let nextCodigo = 'PR001'; // Valor inicial por defecto
+      let nextCodigo = 'PR001'; 
 if (lastProducto && lastProducto.idproducto) {
     const lastNumber = parseInt(lastProducto.idproducto.slice(2), 10); // Extraer el número después de "PR"
     nextCodigo = `PR${(lastNumber + 1).toString().padStart(3, '0')}`; // Asegurarse de que el número tenga tres dígitos
@@ -40,7 +37,8 @@ if (!regex.test(nextCodigo)) {
           codigoproveedor,
           idcategoria,
           id_admin, 
-          fecha_caducidad
+          fecha_caducidad,
+          unidad_stock: uStock.includes((unidad_stock || '').toLowerCase()) ? unidad_stock : 'unidades'
          
       });
 
@@ -52,10 +50,9 @@ if (!regex.test(nextCodigo)) {
 }
 
 
-
 async function update(req, res) {
   const { idproducto } = req.params; // Código del empleado desde los parámetros de la URL
-  const { nombre, stock, codigoproveedor, idcategoria, id_admin, fecha_caducidad} = req.body; // Datos a actualizar
+  const { nombre, stock, codigoproveedor, idcategoria, id_admin, fecha_caducidad, unidad_stock} = req.body; // Datos a actualizar
 
   try {
       
@@ -73,6 +70,7 @@ async function update(req, res) {
           idcategoria : idcategoria || productos. idcategoria,
           id_admin: id_admin || productos. id_admin,
           fecha_caducidad :fecha_caducidad|| productos. fecha_caducidad,
+          unidad_stock: unidad_stock || productos. unidad_stock
           
       });
 

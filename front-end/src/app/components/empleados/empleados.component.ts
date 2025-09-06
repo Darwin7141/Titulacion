@@ -146,7 +146,7 @@ export class EmpleadosComponent implements OnInit {
         html: `
           <div class="swal-pro-warn"></div>
           <h2 class="swal-pro-title">Cédula duplicada</h2>
-          <p class="swal-pro-desc">La cédula ya existe en la base de datos.</p>
+          <p class="swal-pro-desc">La cédula ya ingresada ya se encuentra registrada.</p>
         `,
         showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
         customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
@@ -160,7 +160,7 @@ export class EmpleadosComponent implements OnInit {
           html: `
             <div class="swal-pro-warn"></div>
             <h2 class="swal-pro-title">Correo duplicado</h2>
-            <p class="swal-pro-desc">El correo ya existe en la base de datos.</p>
+            <p class="swal-pro-desc">El correo ingresado ya se encuentra registrado.</p>
           `,
           showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
           customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
@@ -174,7 +174,7 @@ export class EmpleadosComponent implements OnInit {
             html: `
               <div class="swal-pro-warn"></div>
               <h2 class="swal-pro-title">Teléfono duplicado</h2>
-              <p class="swal-pro-desc">El teléfono ya existe en la base de datos.</p>
+              <p class="swal-pro-desc">El teléfono ingresado ya existe en la base de datos</p>
             `,
             showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
             customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }

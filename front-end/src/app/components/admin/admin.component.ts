@@ -12,6 +12,10 @@ import { ChartConfiguration } from 'chart.js';
 import { ProductosService }      from '../../services/productos.service';
 import { ClientesService }       from '../../services/clientes.service';
 import { ProveedoresService }    from '../../services/proveedores.service';
+import { CategoriaProductosService } from '../../services/categoria-productos.service';
+import { ListarReservasComponent } from '../listar-reservas/listar-reservas.component';
+import { MatDialog } from '@angular/material/dialog';
+import { NotificacionPagoComponent } from '../notificacion-pago/notificacion-pago.component';
 
 @Component({
   selector: 'app-admin',
@@ -39,7 +43,6 @@ export class AdminComponent implements OnInit, OnDestroy{
   reservasNuevas: string[] = [];
   pagosPendientes: Array<{ reservaId: string; clienteNombre: string; tipoPago: string; fecha: string }> = [];
   cancelaciones:   string[]   = [];
-
   expiraciones: string[] = [];
 
   private subscripciones: Array<any> = [];
@@ -47,6 +50,7 @@ export class AdminComponent implements OnInit, OnDestroy{
   totalStock       = 0;
   totalClientes    = 0;
   totalProveedores = 0;
+  sidenavWidth = 45;
 
   // ───────── Gráfico reservas 6 meses ─────────
   reservasLabels: string[] = [];         // ej. ['Ene', 'Feb', …]
@@ -55,11 +59,14 @@ export class AdminComponent implements OnInit, OnDestroy{
   // ───────── Servicios más reservados ─────────
   topServicios: { nombre: string, total: number }[] = [];
   activeView: 'dashboard' | 'admin' | 'cliente' | 'cargos' |
-            'empleados' | 'proveedores' |
+            'empleados' | 'proveedores' | 'categorias' |
             'prod-general' | 'prod-cat' | 'tipos' 
             | 'servicios' | 'menus' | 'reservas'= 'dashboard';
 
   selectedCatId: number | null = null;
+  categoriasMenu: Array<{ id: number; nombre: string; icon: string }> = [];
+  reservaNotificada: string | null = null; 
+  
   
 
   constructor(
@@ -72,6 +79,8 @@ export class AdminComponent implements OnInit, OnDestroy{
     private clientesSvc:    ClientesService,
     private proveedoresSvc: ProveedoresService,
     private reservasSvc:    ReservasService,
+    private categoriasSvc: CategoriaProductosService,
+    private dialog: MatDialog 
 
     ){}
 
@@ -108,72 +117,46 @@ export class AdminComponent implements OnInit, OnDestroy{
 
 
     private abrirModalPago(reservaId: string): void {
-    // 1) Consultamos la reserva completa desde el backend
-    this.reservasService.getReservaById(reservaId).subscribe({
-      next: (reserva) => {
-        // reserva es el objeto que incluye { idreserva, fechaevento, direccionevento, total, primer_pago, segundo_pago, saldo_pendiente, detalles: [...] }
-        // 2) Armamos contenido HTML para el modal
-        let htmlPago = `
-           <!-- Títulos centrados -->
-         <div style="text-align:center; margin-bottom:16px;">
-           
-           <h4 style="margin:4px 0 0;">Detalles de la Reserva ${reservaId}</h4>
-         </div>
-         <!-- Campos alineados a la izquierda -->
-         <div style="text-align:left; line-height:1.6; margin-bottom:16px;">
-           <p style="margin:4px 0;"><strong>Fecha del evento:</strong> ${new Date(reserva.fechaevento).toLocaleDateString()}</p>
-           <p style="margin:4px 0;"><strong>Dirección del evento:</strong> ${reserva.direccionevento}</p>
-           <p style="margin:4px 0;"><strong>Total:</strong> $${reserva.total.toFixed(2)}</p>
-           <p style="margin:4px 0;"><strong>Primer pago:</strong> $${(reserva.primer_pago ?? 0).toFixed(2)}</p>
-           <p style="margin:4px 0;"><strong>Segundo pago:</strong> $${(reserva.segundo_pago ?? 0).toFixed(2)}</p>
-           <p style="margin:4px 0;"><strong>Saldo pendiente:</strong> $${(reserva.saldo_pendiente ?? 0).toFixed(2)}</p>
-         </div>
-          <hr/>
-          <p><strong>Menús contratados:</strong></p>
-          <table style="width:100%; text-align:left; border-collapse: collapse;">
-            <thead>
-              <tr>
-                <th style="border-bottom:1px solid #ddd; padding: 4px;">Menú</th>
-                <th style="border-bottom:1px solid #ddd; padding: 4px;">Cantidad</th>
-                <th style="border-bottom:1px solid #ddd; padding: 4px;">Precio Unit.</th>
-                <th style="border-bottom:1px solid #ddd; padding: 4px;">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
+  this.reservasService.getReservaById(reservaId).subscribe({
+    next: (r) => {
+      // Normaliza tipos y nombres de campos que llegan del backend
+      const data = {
+        id: String(r.idreserva ?? reservaId),
+        codigocliente: r.codigocliente,
+        fechaevento: r.fechaevento,
+        direccionevento: r.direccionevento ?? '-',
+        total: Number(r.total ?? 0),
+        primer_pago: Number(r.primer_pago ?? 0),
+        segundo_pago: Number(r.segundo_pago ?? 0),
+        saldo_pendiente: Number(r.saldo_pendiente ?? 0),
+        detalles: (r.detalles ?? []).map((d: any) => ({
+          // soporta tanto d.menu?.nombre como d.menu_nombre
+          menu: d.menu ?? (d.menu_nombre ? { nombre: d.menu_nombre } : null),
+          cantpersonas: Number(d.cantpersonas ?? 0),
+          preciounitario: Number(d.preciounitario ?? 0),
+          subtotal: Number(
+            d.subtotal ?? (Number(d.cantpersonas ?? 0) * Number(d.preciounitario ?? 0))
+          )
+        }))
+      };
 
-        reserva.detalles.forEach((item: any) => {
-          htmlPago += `
-            <tr>
-              <td style="padding:4px;">${item.menu.nombre}</td>
-              <td style="padding:4px;">${item.cantpersonas}</td>
-              <td style="padding:4px;">$${item.preciounitario.toFixed(2)}</td>
-              <td style="padding:4px;">$${item.subtotal.toFixed(2)}</td>
-            </tr>
-          `;
-        });
+      this.dialog.open(NotificacionPagoComponent, {
+        width: '720px',
+        maxWidth: '95vw',
+        panelClass: 'reserva-modal-panel',
+        data
+      });
+    },
+    error: (err) => {
+      console.error('No se pudo obtener datos de la reserva', err);
+      // Si quieres, deja este SweetAlert solo para errores:
+      Swal.fire('Error', 'No pudimos cargar los detalles de la reserva.', 'error');
+    }
+  });
+}
 
-        htmlPago += `
-            </tbody>
-          </table>
-        `;
+  private onCategoriasActualizadas = () => this._ngZone.run(() => this.cargarCategoriasMenu());
 
-        // 3) Mostrar el modal con SweetAlert2
-        Swal.fire({
-          title: `Reserva ${reservaId}`,
-          html: htmlPago,
-          width: '600px',
-          showCloseButton: true,
-          focusConfirm: false,
-          confirmButtonText: 'Cerrar'
-        });
-      },
-      error: (err) => {
-        console.error('No se pudo obtener datos de la reserva', err);
-        Swal.fire('Error', 'No pudimos cargar los detalles de la reserva.', 'error');
-      }
-    });
-  }
 
    ngOnInit() {
   // 1) Leo el usuario (si hay) o dejo ‘Invitado’
@@ -304,6 +287,9 @@ export class AdminComponent implements OnInit, OnDestroy{
      this.cargarTarjetas();
     this.cargarGraficoReservas();
     this.cargarTopServicios();
+
+  window.addEventListener('categoriasActualizadas', this.onCategoriasActualizadas); // ← NUEVO
+  this.cargarCategoriasMenu();
 }
 
   ngOnDestroy() {
@@ -311,6 +297,7 @@ export class AdminComponent implements OnInit, OnDestroy{
   window.removeEventListener('storage', this.onStorageEvent);
   window.removeEventListener('nuevasReservasActualizado', this.onCustomEvent);
   window.removeEventListener('nuevosPagosActualizado', this.onCustomEvent);
+  window.removeEventListener('categoriasActualizadas', this.onCategoriasActualizadas);
 
   // 7) Cancelar la(s) suscripción(es) a notificaciones WebSocket
   this.subscripciones.forEach(sub => {
@@ -445,7 +432,7 @@ export class AdminComponent implements OnInit, OnDestroy{
 
 
 
-// Este método sólo quita la reserva concreta y abre la vista de detalles
+
 irAListaReservas(idreserva: string) {
   // 1) Cierro el modal (dispara Swal.then con result.isDismissed=true)
   Swal.close();
@@ -457,7 +444,10 @@ irAListaReservas(idreserva: string) {
   // 4) Informo al header (u otro componente) del cambio:
   window.dispatchEvent(new Event('nuevasReservasActualizado'));
   // 5) Navego a la lista de reservas:
-  this._router.navigate(['/listaReservas'], { queryParams: { highlight: idreserva } });
+  //this._router.navigate(['/listaReservas'], { queryParams: { highlight: idreserva } });
+
+  this.reservaNotificada = idreserva;
+    this.activeView = 'reservas';
 }
 
 irAPagoPendiente(reservaId: string, tipoPago: string) {
@@ -558,6 +548,33 @@ chartOptions: ChartConfiguration<'line'>['options'] = {
     x: { grid: { display:false } }
   }
 };
+
+private cargarCategoriasMenu(): void {
+  this.categoriasSvc.getCategoria().subscribe({
+    next: (cats:any[]) => {
+      this.categoriasMenu = cats
+        .sort((a,b) => (a.categoria || '').localeCompare(b.categoria || ''))
+        .map(c => ({
+          id: c.idcategoria,
+          nombre: c.categoria,
+          icon: this.iconoCategoria(c.categoria)
+        }));
+    },
+    error: err => console.error('No se pudieron cargar categorías del menú', err)
+  });
+}
+
+private iconoCategoria(nombre = ''): string {
+  const n = nombre.toLowerCase();
+  if (n.includes('bebida')) return 'local_bar';
+  if (n.includes('carne') || n.includes('pollo') || n.includes('prote')) return 'restaurant_menu';
+  if (n.includes('material')) return 'layers';
+  if (n.includes('grano') || n.includes('cereal')) return 'grain';
+  if (n.includes('pan') || n.includes('pastel') || n.includes('panader')) return 'cake';
+  return 'category';
+}
+
+
 
 
 setView(view: typeof this.activeView, catId?: number): void {

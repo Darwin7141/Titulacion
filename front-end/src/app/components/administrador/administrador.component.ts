@@ -164,7 +164,7 @@ export class AdministradorComponent implements OnInit {
         html: `
           <div class="swal-pro-warn"></div>
           <h2 class="swal-pro-title">Cédula duplicada</h2>
-          <p class="swal-pro-desc">La cédula ya existe en la base de datos.</p>
+          <p class="swal-pro-desc">La cédula ingresada ya se encuentra registrada.</p>
         `,
         showConfirmButton: true,
         confirmButtonText: 'Listo',
@@ -182,7 +182,7 @@ export class AdministradorComponent implements OnInit {
           html: `
             <div class="swal-pro-warn"></div>
             <h2 class="swal-pro-title">Correo duplicado</h2>
-            <p class="swal-pro-desc">El correo ya existe en la base de datos.</p>
+            <p class="swal-pro-desc">El correo ingresado ya se encuentra registrado.</p>
           `,
           showConfirmButton: true,
           confirmButtonText: 'Listo',
@@ -200,7 +200,7 @@ export class AdministradorComponent implements OnInit {
             html: `
               <div class="swal-pro-warn"></div>
               <h2 class="swal-pro-title">Teléfono duplicado</h2>
-              <p class="swal-pro-desc">El teléfono ya existe en la base de datos.</p>
+              <p class="swal-pro-desc">El teléfono ingresado ya se encuentra registrado.</p>
             `,
             showConfirmButton: true,
             confirmButtonText: 'Listo',

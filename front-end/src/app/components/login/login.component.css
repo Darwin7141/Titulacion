@@ -2,12 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
 
-:root {
-  --verde: #057A3D;
-  --verde-osc: #03532B;
-  --crema: #EEF4EF;
-  --negro: #1B1B1B;
-}
 
 /* Animación Ken-Burns para el hero */
 @keyframes zoomHero {
@@ -19,7 +13,7 @@
 .login-page-bg {
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', sans-serif;
+  font-family:"Roboto",sans-serif;
   color: #fff;
   background: url('https://images.pexels.com/photos/612790/pexels-photo-612790.jpeg?auto=compress&cs=tinysrgb&w=1200') no-repeat center/cover fixed;
 }
@@ -84,18 +78,18 @@
 }
 
 .inicio-sesion {
-  background: #EEF4EF;
-  color: #000; 
+  background: #868886;
+  color: #fff; 
   font-weight: 500;
   border: none;
   padding: 8px 18px;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background .3s;
 }
 
 .inicio-sesion:hover {
-  background: #9e9e9cea; 
+  background: #585858ea; 
 }
 
 .logo-nav {
@@ -175,17 +169,20 @@ body > header + * {
 /* === 4) LOGIN DIALOG ================================================ */
 .login-card {
   position: absolute;
-  top: 80px;          /* justo bajo la navbar */
+  top: 80px; /* bajo la navbar */
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
   max-width: 360px;
   padding: 1rem;
   z-index: 1000;
+  font-family:"Roboto",sans-serif;
+  
 }
 
 /* panel interno con sombra y fondo */
 .login-card__inner {
+  position: relative; /* para anclar la X */
   background: #fff;
   border-radius: 12px;
   padding: 2rem;
@@ -193,47 +190,68 @@ body > header + * {
   text-align: center;
 }
 
-/* logo circular */
-.login-card__logo {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin: 0 auto 1rem;
+/* botón cerrar (X) */
+.login-card__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #9ca3af;
+}
+.login-card__close:hover,
+.login-card__close:focus {
+  color: #111827;
+  outline: none;
 }
 
-/* título */
-.login-card__title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.75rem;
-  margin-bottom: 1.5rem;
-  color: var(--verde);
+/* frase superior */
+.login-card__welcome {
+  margin: 0 0 .5rem;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #111827;
+  
+}
+
+/* logo circular */
+.login-card__logo{
+  display: block;
+  width: min(220px, 80%); /* se adapta al card */
+  height: auto;           /* mantiene proporción */
+  margin: 0 auto 12px;
+  border-radius: 0;
+}
+
+/* frase inferior al logo */
+.login-card__subtitle {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: #111827;
+  
 }
 
 
 
 /* formulario */
-.login-card__form .form-group {
-  margin-bottom: 1.25rem;
-  position: relative;
-}
-
-/* inputs con sólo borde inferior */
-.login-card__form input {
+.login-card__form .form-group { margin-bottom: 1.25rem; position: relative; border-radius: 10px; }
+.login-card__form input{
   width: 100%;
-  border: none;
-  border-bottom: 2px solid #ccc;
-  padding: 0.5rem 0;
-  font-size: 1rem;
-  transition: border-color .3s;
-}
-
-.login-card__form input:focus {
+  border: 1px solid #d1d5db !important;
+  border-radius: 20px !important; 
+  padding: 0.75rem 1rem;           /* espacio interno */
+  background: #fff;
+  font-size: 1rem;                 /* corrige el rem */
   outline: none;
-  border-bottom-color: var(--verde);
+  transition: border-color .2s, box-shadow .2s;
 }
 
-/* mensajes de error */
+
+
+/* errores */
 .login-card__form .error {
   color: #d9534f;
   font-size: 0.875rem;
@@ -241,54 +259,30 @@ body > header + * {
   text-align: left;
 }
 
-/* botón degradado */
+/* botón */
 .btn-submit {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #fff;
-  background: #dbd819;
+  color: #fff !important; 
+  background: #F7C600 !important; 
   border: none;
-  border-radius: 6px;
+  border-radius: 20px;
   cursor: pointer;
   transition: opacity .3s;
   margin-top: 0.5rem;
 }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-submit:hover:not(:disabled) { opacity: 0.85; }
 
-.btn-submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+/* links */
+.login-card__links { margin-top: 1rem; font-size: 0.875rem; color: #E72422 }
 
-.btn-submit:hover:not(:disabled) {
-  opacity: 0.85;
-}
-
-/* enlaces secundarios */
-.login-card__links {
-  margin-top: 1rem;
-  font-size: 0.875rem;
-  color: #555;
-}
-
-.login-card__links a {
-  color: var(--verde);
-  text-decoration: none;
-  margin: 0 .25rem;
-}
-
-.login-card__links span {
-  color: #999;
-}
+.login-card__links span { color: #111827; }
 
 /* info bloqueo */
-.lock-info {
-  margin-top: 1rem;
-  font-size: 0.875rem;
-  color: #d9534f;
-}
-
+.lock-info { margin-top: 1rem; font-size: 0.875rem; color: #E72422 }
 /* === 5) SOBRE NOSOTROS + OVERLAY + LAYOUT ============================ */
 .sobre-nosotros-container {
   position: relative;
@@ -688,6 +682,8 @@ body > header + * {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: "Roboto", sans-serif;
+  border-radius: 18px;
 }
 
 /* Card */
@@ -707,9 +703,10 @@ body > header + * {
 .registro-panel-content h3 {
   text-align: center;
   margin-bottom: 20px;
-  font-family: 'Playfair Display', serif;
+  font-family: "Roboto", sans-serif;
   font-size: 1.75rem;
-  color: var(--verde);
+  
+  font-weight: 550;
 }
 
 /* Grid de 2 columnas */
@@ -753,26 +750,27 @@ body > header + * {
   padding: 10px 24px;
   font-weight: 600;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background .3s, transform .2s;
 }
 .btn-cancel {
-  background: #eee;
-  color: #333;
+  background: #ef4444 !important;
+  color: white !important;
 }
 .btn-cancel:hover {
-  background: #ddd;
+  background: #b62f2f !important;
   transform: translateY(-2px);
 }
 .btn-register {
-  background:  #0ccf36;
-  color: white;
+  background:  #0ccf36 !important;
+  color: white !important;
 }
 .btn-register:hover {
-  background: #098123;
+  background: #098123 !important;
   transform: translateY(-2px);
 }
+
 
 .recuperar-dialog-container.mat-dialog-container {
   background: transparent !important;
@@ -790,6 +788,7 @@ body > header + * {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: "Roboto", sans-serif;
 }
 
 /* Panel interior */
@@ -805,9 +804,9 @@ body > header + * {
 
 /* Título */
 .recuperar-card__title {
-  font-family: 'Playfair Display', serif;
+  font-family: "Roboto", sans-serif;
   margin-bottom: 16px;
-  color: var(--verde);
+  font-weight: 550;
   font-size: 20px;
 }
 
@@ -819,8 +818,8 @@ body > header + * {
 .recuperar-card__form label {
   display: block;
   margin-bottom: 4px;
-  font-weight: 600;
-  color: #555;
+  font-weight: 550;
+  color: #303030;
 }
 .recuperar-card__form input {
   width: 100%;
@@ -846,32 +845,22 @@ body > header + * {
 .recuperar-buttons {
   display: flex;
   gap: 12px;
+  justify-content: center;
 }
 
 /* Ambos botones idénticos en tamaño */
 .recuperar-buttons button {
-  flex: 1;                /* reparto igual del espacio */
-  height: 48px;           /* misma altura fija */
-  display: flex;
-  align-items: center;    /* centra vertical */
-  justify-content: center;/* centra horizontal */
+  padding: 10px 24px;
   font-weight: 600;
   font-size: 1rem;
-  border-radius: 6px;
+  border-radius: 18px;
   border: none;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
   box-sizing: border-box; /* incluye bordes/padding */
-}
-
-/* Cancelar */
-.btn-cancel {
-  background: #eee;
-  color: #333;
-}
-.btn-cancel:hover {
-  background: #ddd;
-  transform: translateY(-2px);
+  align-items:center ;
+  justify-content: center;
+  
 }
 
 /* Solicitar */
@@ -893,3 +882,30 @@ body > header + * {
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:12px;z-index:10
 }
+
+.recuperar-card__inner{
+  position: relative; /* nuevo */
+}
+
+/* Botón X (cerrar) arriba a la derecha */
+.recuperar-close{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #6b7280;         /* gris */
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.recuperar-close:hover{ background: #f3f4f6; color:#111827; }
+.recuperar-close:focus{ outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,.15); }
+
+/* Solo un botón, alineado a la derecha */

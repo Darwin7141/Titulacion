@@ -48,6 +48,7 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
   slides: SlideServicio[] = [];
   currentSlide = 0;
   auto$?: any; 
+  sidenavWidth = 40;
 
   private codigocliente: string | null = null;
   private subscripciones: any[] = [];
@@ -131,75 +132,80 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
 
   /** Botón “campanita” */
   verNotificacionesCliente(): void {
-    if (!this.notificaciones.length) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Sin notificaciones',
-        text: 'No hay notificaciones nuevas.',
-        confirmButtonText: 'Cerrar'
-      });
-      return;
-    }
-
-    let html = `<div style="text-align:left;">`;
-    this.notificaciones.forEach(n => {
-      html += `
-        <div style="
-           display: flex;
-           align-items: flex-start;
-           margin-bottom: 16px;
-           padding-bottom: 16px;
-           border-bottom: 1px solid #eee;
-        ">
-          <div style="flex: 1;">
-            <div style="font-size:0.875rem; color:#555; margin-bottom:4px;">
-              ${new Date(n.fecha).toLocaleString()}
-            </div>
-            <div style="color:#222;">
-              ${n.texto}
-            </div>
-          </div>
-          <button
-            onclick="window.marcarVistoCliente(${n.id}); return false;"
-            style="
-              margin-left: auto;
-              background-color: #007bff;
-              color: #fff;
-              border: none;
-              border-radius: 4px;
-              padding: 6px 12px;
-              cursor: pointer;
-            "
-          >
-            Visto
-          </button>
-        </div>
-      `;
-    });
-    html += `</div>`;
-
-    (window as any).marcarVistoCliente = (notifId: number) => {
-      this._ngZone.run(() => this.marcarVisto(notifId));
-    };
-
+  // Mismo patrón que el admin: modal “Sin novedades”
+  if (!this.notificaciones.length) {
     Swal.fire({
-      icon: 'info',
-      title: 'Notificaciones',
-      html,
-      showCloseButton: true,
-      focusConfirm: false,
-      confirmButtonText: 'Marcar todas como leídas'
-    }).then(result => {
-      if (result.isConfirmed && this.codigocliente) {
-        this.notiSvc.marcarTodasComoLeidas(this.codigocliente)
-          .subscribe(() => {
-            this.notificaciones = [];
-            this.hayNuevasNotificaciones = false;
-            this.cantidadNotificacionesCliente = 0;
-          });
+      width: 480,
+      html: `
+        <h2 class="swal-pro-title">Sin novedades</h2>
+        <p class="swal-pro-desc">No hay notificaciones nuevas.</p>
+      `,
+      showConfirmButton: true,
+      confirmButtonText: 'Listo',
+      buttonsStyling: false,
+      customClass: {
+        popup: 'swal-pro',
+        confirmButton: 'swal-pro-confirm',
+        htmlContainer: 'swal-pro-html'
       }
     });
+    return;
   }
+
+  const ordenadas = [...this.notificaciones].sort((a, b) => {
+    const ta = new Date(a.fecha).getTime();
+    const tb = new Date(b.fecha).getTime();
+    return tb - ta; // desc
+  });
+
+  
+  let html = `
+    <h2 class="swal-pro-title">Notificaciones</h2>
+    <ul class="swal-pro-list">
+  `;
+
+  ordenadas.forEach(n => {
+    const fecha = new Date(n.fecha).toLocaleString();
+    html += `
+      <li>
+        <span>
+          <small style="display:block;color:#6b7280;margin-bottom:2px">${fecha}</small>
+          ${n.texto}
+        </span>
+        <button class="swal-pro-see" onclick="window.marcarVistoCliente(${n.id})">Visto</button>
+      </li>
+    `;
+  });
+
+  html += `</ul>`;
+
+  // función global para el botón "Visto"
+  (window as any).marcarVistoCliente = (notifId: number) => {
+    this._ngZone.run(() => this.marcarVisto(notifId));
+  };
+
+  Swal.fire({
+    width: 520,
+    html,
+    showCloseButton: true,
+    focusConfirm: false,
+    confirmButtonText: 'Marcar todas como leídas',
+    buttonsStyling: false,
+    customClass: {
+      popup: 'swal-pro swal-pro--cliente',
+      confirmButton: 'swal-pro-confirm',
+      htmlContainer: 'swal-pro-html swal-pro-html--cliente' // <- aquí metemos el scroll
+    }
+  }).then(result => {
+    if (result.isConfirmed && this.codigocliente) {
+      this.notiSvc.marcarTodasComoLeidas(this.codigocliente).subscribe(() => {
+        this.notificaciones = [];
+        this.hayNuevasNotificaciones = false;
+        this.cantidadNotificacionesCliente = 0;
+      });
+    }
+  });
+}
 
   /** Marcar individual como leída */
   private marcarVisto(id: number) {

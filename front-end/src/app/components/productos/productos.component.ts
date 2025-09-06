@@ -23,8 +23,9 @@ export class ProductosComponent implements OnInit {
     idcategoria: '',
     id_admin:  '',
     fecha_caducidad: '',
-   
+    unidad_stock: ''
   };
+  uStock = ['unidades','kg','g','l','ml','paquetes','cajas'];
   categoriaFijaId: string | null = null;
   prov: any[] = [];
   cat: any[] = [];
@@ -107,6 +108,21 @@ export class ProductosComponent implements OnInit {
       customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
     }); return;
   }
+
+  if (!this.productos.unidad_stock) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Unidad obligatoria</h2>
+        <p class="swal-pro-desc">Selecciona la unidad del stock.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    });
+    return;
+  }
+
 
   if (!this.productos.codigoproveedor) {
     Swal.fire({

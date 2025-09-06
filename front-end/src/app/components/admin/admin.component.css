@@ -31,9 +31,10 @@
 
 /* 3) Título dentro de la toolbar */
 .app-title{
-  margin-left:8px;
+  margin-left:40px;
   font-size:1.25rem;
   font-weight:500;
+  text-align: center; 
 }
 
 /* 4) Sidebar fija bajo toolbar */
@@ -211,7 +212,7 @@
    9) Layout dashboard (sin cambios)
    ────────────────────────────────────────────────────────────────*/
 .stats-row{
-  display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;
+  display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap ; font-family:"Roboto",sans-serif;
 }
 .stat-card{
   position:relative;overflow:hidden;
@@ -226,6 +227,7 @@
 .stat-card .label{
   font-size:14px;font-weight:500;opacity:.9;
   letter-spacing:.4px;
+  
 }
 .stat-card .value{
   display:flex;align-items:center;gap:6px;
@@ -261,10 +263,21 @@
 .orange.trend{color:#fff;}
 /* ───────── Paneles grid ───────── */
 .dashboard-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:16px;
+  display:grid;grid-template-columns:1fr 1fr;gap:16px; font-family:"Roboto",sans-serif;
 }
 .panel{padding:16px;border-radius:8px;}
-.panel canvas{width:100% !important;max-height:280px;}
+.panel canvas{width:100% !important;max-height:280px; }
+:host ::ng-deep .panel .mat-mdc-card-title,
+:host ::ng-deep .panel .mat-card-title{
+  font-family:"Roboto",sans-serif;
+  font-weight: 550;
+  font-size: 1.3rem;
+  letter-spacing: .2px;
+  color:#535353;
+  font-family:"Roboto",sans-serif;
+  text-align: center;
+  
+}
 
 .top-list{margin:0;padding:0 0 0 16px;}
 .top-list li{display:flex;justify-content:space-between;margin:4px 0;}
@@ -279,6 +292,7 @@
 .top-list li{
   display:flex;align-items:center;justify-content:space-between;
   padding:6px 4px; font-size:15px; font-weight:500;
+  
 }
 
 /* puntito de color */
@@ -290,6 +304,7 @@
 .top-list .name{
   flex:1;           /* ocupa todo el espacio intermedio */
   padding-left:4px;
+  
 }
 
 /* badge numérico */

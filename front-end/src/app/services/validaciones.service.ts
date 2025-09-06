@@ -34,6 +34,53 @@ export class ValidacionesService {
     return digito_validador === ultimo_digito || (digito_validador === 10 && ultimo_digito === 0);
   }
 
+  validarRucEcuador(ruc: string): boolean {
+  if (!/^\d{13}$/.test(ruc)) return false;
+
+  const region = parseInt(ruc.slice(0, 2), 10);
+  if (region < 1 || region > 24) return false;
+
+  const tercero = parseInt(ruc[2], 10);
+
+  // Naturales 0–5: cédula válida + final "001"
+  if (tercero >= 0 && tercero <= 5) {
+    if (!this.validarCedulaEcuador(ruc.slice(0, 10))) return false;
+    return ruc.slice(10) === '001';
+  }
+
+  // Público 6: DV en pos 9 + final "0001"
+  if (tercero === 6) {
+    const coef = [3,2,7,6,5,4,3,2];
+    let suma = 0;
+    for (let i = 0; i < 8; i++) suma += parseInt(ruc[i], 10) * coef[i];
+    const mod = suma % 11;
+    const dv = (mod === 0) ? 0 : 11 - mod;
+    if (dv !== parseInt(ruc[8], 10)) return false;
+    return ruc.slice(9) === '0001';
+  }
+
+  // Privadas/Extranjeras 9: DV en pos 10 + final "001"
+  if (tercero === 9) {
+    const coef = [4,3,2,7,6,5,4,3,2];
+    let suma = 0;
+    for (let i = 0; i < 9; i++) suma += parseInt(ruc[i], 10) * coef[i];
+    const mod = suma % 11;
+    const dv = (mod === 0) ? 0 : 11 - mod;
+    if (dv !== parseInt(ruc[9], 10)) return false;
+    return ruc.slice(10) === '001';
+  }
+
+  return false;
+}
+
+  // ➕ NUEVO
+  validarIdentificacionEcuador(valor: string): boolean {
+    if (!/^\d+$/.test(valor)) return false;
+    if (valor.length === 10) return this.validarCedulaEcuador(valor);
+    if (valor.length === 13) return this.validarRucEcuador(valor);
+    return false;
+  }
+
   validarEmail(email: string): boolean {
     const re = /^[^\s@]+@gmail\.com$/;
     return re.test(email);
