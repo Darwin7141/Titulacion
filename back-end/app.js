@@ -28,9 +28,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // — Nuevos: CORS y sesiones — 
+const FRONTEND = process.env.FRONTEND_URL || 'http://localhost:4200';
 app.use(cors({
-  origin: 'http://localhost:4200',    // tu front de Angular
-  credentials: true,                  // habilita cookies
+  origin: FRONTEND,
+  credentials: true,
   methods: ['GET','POST','PUT','DELETE','OPTIONS']
 }));
 

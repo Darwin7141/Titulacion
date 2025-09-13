@@ -39,7 +39,7 @@ export class ServiciosClienteComponent implements OnInit {
         tap((data) => {
           // Mapear cada servicio para incluir la URL de la imagen
           this.servicio = data.map((s: any) => {
-            const fotografiaUrl = `http://localhost:8010/api/getfotografia/${s.imagen}/true`;
+            const fotografiaUrl = `http://localhost:3000/api/getfotografia/${s.imagen}/true`;
             return { ...s, fotografiaUrl };
           });
         })

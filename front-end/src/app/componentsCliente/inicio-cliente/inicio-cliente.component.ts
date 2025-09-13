@@ -225,7 +225,7 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
     .pipe(
       tap(lista => {
         this.slides = lista.map((s: any) => ({
-          url : `http://localhost:8010/api/getfotografia/${s.imagen}/false`,
+          url : `http://localhost:3000/api/getfotografia/${s.imagen}/false`,
           nombre: s.nombre,                       // o el campo que uses
           descripcion: s.descripcion ?? ''        // idem
         }));

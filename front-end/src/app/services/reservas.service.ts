@@ -11,7 +11,7 @@ export class ReservasService {
   private url: string;
 
   constructor(private http: HttpClient) {
-    this.url = GLOBAL.url; // La base URL, por ejemplo: http://localhost:8010/api/
+    this.url = GLOBAL.url; // La base URL, por ejemplo:
   }
 
   // Crear reserva

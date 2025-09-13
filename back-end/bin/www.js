@@ -2,7 +2,7 @@ const http = require('http');
 // Importamos tanto `app` como `server` desde el app.js modificado:
 const { app, server } = require('../app');
 
-const port = parseInt(process.env.PORT, 10) || 8010;
+const port = parseInt(process.env.PORT, 10) || 3000;
 app.set('port', port);
 
 // Ya no creamos otro server aquí, porque `server` viene de app.js:

@@ -77,7 +77,7 @@ volver(): void {
       next: (data) => {
         // Transformamos cada servicio para que tenga 'fotografiaUrl'
         this.servicio = data.map(serv => {
-          const fotografiaUrl = `http://localhost:8010/api/getfotografia/${serv.imagen}/true`;
+          const fotografiaUrl = `http://localhost:3000/api/getfotografia/${serv.imagen}/true`;
           return { ...serv, fotografiaUrl };
         });
         this.servFiltrados = this.servicio;
@@ -191,7 +191,7 @@ volver(): void {
     this.cateringService.getServicio().subscribe({
       next: (data) => {
         this.servicio = data.map(serv => {
-          const fotografiaUrl = `http://localhost:8010/api/getfotografia/${serv.imagen}/true`;
+          const fotografiaUrl = `http://localhost:3000/api/getfotografia/${serv.imagen}/true`;
           return { ...serv, fotografiaUrl };
         });
         this.servFiltrados = this.servicio;

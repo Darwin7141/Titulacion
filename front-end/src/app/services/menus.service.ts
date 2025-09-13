@@ -50,7 +50,7 @@ export class MenusService {
     // El nombre 'foto' es fundamental para que el backend lo reciba en req.files.foto
     formData.append('foto', file);
   
-    const url = `http://localhost:8010/api/uploadMenu/${idmenu}`;
+    const url = `http://localhost:3000/api/uploadMenu/${idmenu}`;
     return this.http.post<any>(url, formData);
   }
 

@@ -69,7 +69,7 @@ obtenerMenus(): void {
       /* 1. map → añades fotografía */
       this.menu = data.map(menu => ({
         ...menu,
-        fotografiaUrl: `http://localhost:8010/api/getMenu/${menu.imagen}/true`
+        fotografiaUrl: `http://localhost:3000/api/getMenu/${menu.imagen}/true`
       }));
 
       /* 2. filtras por servicio (si corresponde) */
@@ -206,7 +206,7 @@ obtenerMenus(): void {
     this.menuService.getMenu().subscribe({
       next: (data) => {
         this.menu = data.map(menu => {
-          const fotografiaUrl = `http://localhost:8010/api/getMenu/${menu.imagen}/true`;
+          const fotografiaUrl = `http://localhost:3000/api/getMenu/${menu.imagen}/true`;
           return { ...menu, fotografiaUrl };
         });
         this.menuFiltrados = this.menu;

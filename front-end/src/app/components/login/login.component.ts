@@ -83,7 +83,7 @@ export class LoginComponent implements OnInit {
         next: (data) => {
           // Transformamos cada servicio para que tenga 'fotografiaUrl'
           this.servicio = data.map(serv => {
-            const fotografiaUrl = `http://localhost:8010/api/getfotografia/${serv.imagen}/true`;
+            const fotografiaUrl = `http://localhost:3000/api/getfotografia/${serv.imagen}/true`;
             return { ...serv, fotografiaUrl };
           });
           this.servFiltrados = this.servicio;
@@ -336,7 +336,7 @@ scrollTo(id: string, event: Event) {
       next: (data) => {
         // Ajustar si necesitas la URL de la imagen, como en tu LoginComponent
         this.servicios = data.map(serv => {
-          const fotografiaUrl = `http://localhost:8010/api/getfotografia/${serv.imagen}/true`;
+          const fotografiaUrl = `http://localhost:3000/api/getfotografia/${serv.imagen}/true`;
           return { ...serv, fotografiaUrl };
         });
         // 2) Obtener menús
@@ -344,7 +344,7 @@ scrollTo(id: string, event: Event) {
           next: (dataMenus) => {
             // Ajustar igual que en listarmenus.component
             this.menus = dataMenus.map(m => {
-              const fotoMenuUrl = `http://localhost:8010/api/getMenu/${m.imagen}/true`;
+              const fotoMenuUrl = `http://localhost:3000/api/getMenu/${m.imagen}/true`;
               return { ...m, fotoMenuUrl };
             });
           },

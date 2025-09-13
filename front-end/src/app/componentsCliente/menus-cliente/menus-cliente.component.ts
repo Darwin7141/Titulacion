@@ -76,7 +76,7 @@ export class MenusClienteComponent implements OnInit, OnChanges {
       next: (dataMenus) => {
         const todos = dataMenus.map((m: any) => ({
           ...m,
-          fotografiaUrl: `http://localhost:8010/api/getMenu/${m.imagen}/true`,
+          fotografiaUrl: `http://localhost:3000/api/getMenu/${m.imagen}/true`,
           // posibles formas en las que llega el servicio desde la API
           _idservicio: this.normalizar(m.idservicio ?? m.servicio?.idservicio),
           _nombreServ: this.normalizar(m.servicio?.nombre ?? m.servicio ?? m.nombreServicio)

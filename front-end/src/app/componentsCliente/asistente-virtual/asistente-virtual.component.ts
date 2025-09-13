@@ -286,7 +286,7 @@ export class AsistenteVirtualComponent {
       next: (data) => {
         // Ajustar si necesitas la URL de la imagen, como en tu LoginComponent
         this.servicios = data.map(serv => {
-          const fotografiaUrl = `http://localhost:8010/api/getfotografia/${serv.imagen}/true`;
+          const fotografiaUrl = `http://localhost:3000/api/getfotografia/${serv.imagen}/true`;
           return { ...serv, fotografiaUrl };
         });
         // 2) Obtener menús
@@ -294,7 +294,7 @@ export class AsistenteVirtualComponent {
           next: (dataMenus) => {
             // Ajustar igual que en listarmenus.component
             this.menus = dataMenus.map(m => {
-              const fotoMenuUrl = `http://localhost:8010/api/getMenu/${m.imagen}/true`;
+              const fotoMenuUrl = `http://localhost:3000/api/getMenu/${m.imagen}/true`;
               return { ...m, fotoMenuUrl };
             });
           },
