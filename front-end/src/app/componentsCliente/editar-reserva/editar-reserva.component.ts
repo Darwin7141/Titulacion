@@ -84,7 +84,18 @@ export class EditarReservaComponent implements OnInit {
   onCantidadChange(index: number, nuevaCantidadStr: string) {
     const nuevaCant = parseInt(nuevaCantidadStr, 10) || 0;
     if (nuevaCant <= 0) {
-      Swal.fire({ icon: 'warning', title: 'Cantidad inválida', text: 'Debe ser mayor a 0' });
+      Swal.fire({
+                           width: 480,
+                          html: `
+                            <div class="swal-pro-error"></div>
+                            <h2 class="swal-pro-title">Cantidad no admitida</h2>
+                            <p class="swal-pro-desc">La cantidad del menú debe ser al menos 1</p>
+                          `,
+                          showConfirmButton: true,
+                          confirmButtonText: 'Entendido',
+                          buttonsStyling: false,
+                          customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+                          });
       return;
     }
     this.reserva.detalles[index].cantpersonas = nuevaCant;
@@ -99,7 +110,18 @@ export class EditarReservaComponent implements OnInit {
   onMenuSelectChange(index: number, idmenuSeleccionado: string) {
     const menuEncontrado = this.menusDisponibles.find(m => m.idmenu === idmenuSeleccionado);
     if (!menuEncontrado) {
-      Swal.fire({ icon: 'error', title: 'Menú inválido' });
+      Swal.fire({
+            width: 480,
+            html: `
+                            <div class="swal-pro-error"></div>
+                            <h2 class="swal-pro-title">Menú no válido</h2>
+                            <p class="swal-pro-desc">Seleccione un menú de la lista</p>
+                          `,
+            showConfirmButton: true,
+            confirmButtonText: 'Entendido',
+            buttonsStyling: false,
+           customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+            });
       return;
     }
     // actualiza
@@ -189,7 +211,18 @@ export class EditarReservaComponent implements OnInit {
   },
   error: (err) => {
     console.error('Error al actualizar la reserva:', err);
-    Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al actualizar la reserva.' });
+    Swal.fire({
+                         width: 480,
+                        html: `
+                          <div class="swal-pro-error"></div>
+                          <h2 class="swal-pro-title">Error</h2>
+                          <p class="swal-pro-desc">Ocurrió un error al actualizar la reserva</p>
+                        `,
+                        showConfirmButton: true,
+                        confirmButtonText: 'Entendido',
+                        buttonsStyling: false,
+                        customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+                        });
   }
 });
   }

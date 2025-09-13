@@ -86,15 +86,15 @@
             <tbody>
               <tr *ngFor="let det of reserva.detalles">
                 <td>{{ det.menu?.nombre }}</td>
-                <td>{{ det.preciounitario }}</td>
+                <td>${{ det.preciounitario }}</td>
                 <td>{{ det.cantpersonas }}</td>
-                <td>{{ det.subtotal }}</td>
+                <td>${{ det.subtotal }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="3" class="total-label">Total:</td>
-                <td class="total-value">{{ reserva.total }}</td>
+                <td class="total-value">${{ reserva.total }}</td>
               </tr>
             </tfoot>
           </table>

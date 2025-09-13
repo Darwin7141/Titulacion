@@ -98,20 +98,34 @@ export class AgendarReservaComponent implements OnInit{
     const menuEncontrado = this.menus.find(m => m.idmenu === selectedIdMenu);
     if (!menuEncontrado) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Menú no válido',
-        text: 'Seleccione un menú de la lista.'
-      });
+                  width: 480,
+                  html: `
+                                  <div class="swal-pro-error"></div>
+                                  <h2 class="swal-pro-title">Menú no válido</h2>
+                                  <p class="swal-pro-desc">Seleccione un menú de la lista</p>
+                                `,
+                  showConfirmButton: true,
+                  confirmButtonText: 'Entendido',
+                  buttonsStyling: false,
+                 customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+                  });
       return;
     }
 
     const cant = parseInt(cantStr, 10);
     if (isNaN(cant) || cant <= 0) {
       Swal.fire({
-        icon: 'error',
-        title: 'Cantidad inválida',
-        text: 'La cantidad debe ser un número entero mayor a 0.'
-      });
+                     width: 480,
+                    html: `
+                      <div class="swal-pro-error"></div>
+                      <h2 class="swal-pro-title">Cantidad no admitida</h2>
+                      <p class="swal-pro-desc">La cantidad del menú debe ser al menos 1</p>
+                    `,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Entendido',
+                    buttonsStyling: false,
+                    customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+                    });
       return;
     }
 
@@ -154,26 +168,47 @@ export class AgendarReservaComponent implements OnInit{
 
     if (!this.formReserva.fechaevento || isNaN(fechaEvento.getTime())) {
       Swal.fire({
-        icon: 'error',
-        title: 'Fecha inválida',
-        text: 'Seleccione una fecha de evento válida.'
-      });
+                  width: 480,
+                  html: `
+                            <div class="swal-pro-error"></div>
+                            <h2 class="swal-pro-title">Fecha no permitida</h2>
+                            <p class="swal-pro-desc">Seleccione una fecha válida para el evento</p>
+                                `,
+                  showConfirmButton: true,
+                  confirmButtonText: 'Entendido',
+                  buttonsStyling: false,
+                 customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+                  });
       return false;
     }
     if (fechaEvento <= hoy) {
       Swal.fire({
-        icon: 'error',
-        title: 'Fecha no permitida',
-        text: 'La fecha del evento debe ser mayor a la fecha actual.'
-      });
+                  width: 480,
+                  html: `
+                            <div class="swal-pro-error"></div>
+                            <h2 class="swal-pro-title">Fecha no permitida</h2>
+                            <p class="swal-pro-desc">La fecha del evento debe ser posterior a la fecha actual</p>
+                                `,
+                  showConfirmButton: true,
+                  confirmButtonText: 'Entendido',
+                  buttonsStyling: false,
+                 customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+                  });
       return false;
     }
     if (this.menusSeleccionados.length === 0) {
       Swal.fire({
-        icon: 'error',
-        title: 'No hay menús',
-        text: 'Agregue al menos un menú para la reserva.'
-      });
+                     width: 480,
+                    html: `
+                      <div class="swal-pro-error"></div>
+                      <h2 class="swal-pro-title">No hay menús seleccionados</h2>
+                      <p class="swal-pro-desc">Agregue al menos un menú para la reserva</p>
+                    `,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Entendido',
+                    buttonsStyling: false,
+                    customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+                    });
       return false;
     }
     return true;
@@ -195,11 +230,18 @@ export class AgendarReservaComponent implements OnInit{
       }).length;
 
       if (mismas >= 3) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Fecha no disponible',
-          text: 'La fecha seleccionada para su reserva no está disponible. Por favor elija otra fecha para su reserva.'
-        });
+                    Swal.fire({
+                     width: 480,
+                    html: `
+                      <div class="swal-pro-error"></div>
+                      <h2 class="swal-pro-title">Fecha no disponible</h2>
+                      <p class="swal-pro-desc">La fecha seleccionada para su reserva no está disponible. Por favor elija otra fecha para su reserva.</p>
+                    `,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Entendido',
+                    buttonsStyling: false,
+                    customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+                    });
         return;
       }
       // 2) Si hay menos de 3, sigo con mi lógica habitual

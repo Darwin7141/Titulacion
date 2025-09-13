@@ -887,11 +887,7 @@ async function getReservasUltimosSeisMeses(req, res) {
   }
 }
 
-/**
- * GET /api/dashboard/top-servicios
- * Devuelve TOP-N servicios más reservados: [{ nombre:'Buffet', total:89 }, … ]
- * Cambia N con el query ?limit=5 (por defecto 5)
- */
+
 async function getServiciosMasReservados(req, res) {
   try {
     const limite = parseInt(req.query.limit || '5', 10);

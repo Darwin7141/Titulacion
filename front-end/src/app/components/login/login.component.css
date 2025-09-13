@@ -771,6 +771,11 @@ body > header + * {
   transform: translateY(-2px);
 }
 
+.registro-panel-content .form-group .error{
+  color:#d9534f;
+  font-size:.875rem;
+  margin-top:.25rem;
+}
 
 .recuperar-dialog-container.mat-dialog-container {
   background: transparent !important;
@@ -880,8 +885,17 @@ body > header + * {
 .loading-overlay{
   position:absolute;inset:0;background:#ffffff;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;z-index:10
+  gap:12px;z-index:10;
+  border-radius: 18px;
+  font-family:"Roboto",sans-serif;
+  font-weight: 600;
 }
+
+.spinner-daayfood{
+  --mdc-circular-progress-active-indicator-color: #3c6bc2;
+}
+
+
 
 .recuperar-card__inner{
   position: relative; /* nuevo */

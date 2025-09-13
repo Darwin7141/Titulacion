@@ -83,6 +83,7 @@ import { GestionProductosComponent } from './components/gestion-productos/gestio
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PagosDialogComponent } from './components/pagos-dialog/pagos-dialog.component';
 import { NotificacionPagoComponent } from './components/notificacion-pago/notificacion-pago.component';
+import { ReestablecerDialogoComponent } from './components/reestablecer-dialogo/reestablecer-dialogo.component';
 
 
 
@@ -133,6 +134,7 @@ import { NotificacionPagoComponent } from './components/notificacion-pago/notifi
     GestionProductosComponent,
     PagosDialogComponent,
     NotificacionPagoComponent,
+    ReestablecerDialogoComponent,
     
     
   

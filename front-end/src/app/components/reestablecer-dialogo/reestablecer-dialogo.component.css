@@ -1,0 +1,20 @@
+/* mismos estilos que tu modal Recuperar */
+.recuperar-card{ display:flex; align-items:center; justify-content:center; font-family:"Roboto",sans-serif; }
+.recuperar-card__inner{ position:relative; background:#fff; border-radius:10px; padding:24px; width:100%; max-width:360px; box-shadow:0 8px 24px rgba(0,0,0,.1); text-align:center; }
+.recuperar-card__title{ margin-bottom:16px; font-weight:550; font-size:20px; }
+.recuperar-card__form .form-group{ margin-bottom:1rem; text-align:left; }
+.recuperar-card__form label{ display:block; margin-bottom:4px; font-weight:550; color:#303030; }
+.recuperar-card__form input{ width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; transition:border-color .3s; }
+.recuperar-card__form input:focus{ outline:none; border-color:var(--verde); }
+.recuperar-card__form .error{ color:#d9534f; font-size:.875rem; margin-top:4px; }
+.recuperar-buttons{ display:flex; gap:12px; justify-content:center; }
+.recuperar-buttons button{ padding:10px 24px; font-weight:600; font-size:1rem; border-radius:18px; border:none; cursor:pointer; transition:background .3s, transform .2s; }
+.btn-submit{ background:#dbd819; color:#fff; }
+.btn-submit:hover:not(:disabled){ background:#c7b715; transform:translateY(-2px); }
+.btn-submit:disabled{ opacity:.6; cursor:not-allowed; }
+.btn-cancel{ background:#ef4444; color:#fff; }
+.btn-cancel:hover{ background:#b62f2f; transform:translateY(-2px); }
+.loading-overlay{ position:absolute; inset:0; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; z-index:10; border-radius:18px; font-family:"Roboto",sans-serif; font-weight:600; }
+.spinner-daayfood{ --mdc-circular-progress-active-indicator-color: #3c6bc2}
+.recuperar-close{ position:absolute; top:10px; right:10px; width:36px; height:36px; border:none; border-radius:50%; background:transparent; color:#6b7280; font-size:22px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.recuperar-close:hover{ background:#f3f4f6; color:#111827; }

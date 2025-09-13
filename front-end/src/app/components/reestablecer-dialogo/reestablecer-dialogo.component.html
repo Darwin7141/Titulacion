@@ -1,0 +1,52 @@
+<div *ngIf="isLoading" class="loading-overlay">
+  <mat-progress-spinner mode="indeterminate" diameter="50" class="spinner-daayfood"></mat-progress-spinner>
+  <p>Procesando…</p>
+</div>
+
+<div class="recuperar-card">
+  <div class="recuperar-card__inner">
+    <button type="button" class="recuperar-close" (click)="close()" aria-label="Cerrar">
+      <span aria-hidden="true">&times;</span>
+    </button>
+
+    <h2 class="recuperar-card__title">Restablecer Contraseña</h2>
+
+    <form #f="ngForm" (ngSubmit)="submit(f)" class="recuperar-card__form" autocomplete="off">
+      <div class="form-group">
+        <label for="newPass">Nueva Contraseña</label>
+        <input id="newPass" name="newPass" type="password"
+               [(ngModel)]="pass" #newPassModel="ngModel"
+               required minlength="6" placeholder="********" />
+        <div class="error" *ngIf="newPassModel.invalid && (newPassModel.touched || f.submitted)">
+  <ng-container *ngIf="newPassModel.errors?.['required']">La contraseña es obligatoria</ng-container>
+  <ng-container *ngIf="newPassModel.errors?.['minlength']">Mínimo 6 caracteres</ng-container>
+</div>
+
+<!-- y donde uses confirmModel -->
+
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPass">Confirmar Contraseña</label>
+        <input id="confirmPass" name="confirmPass" type="password"
+               [(ngModel)]="confirm" #confirmModel="ngModel"
+               required placeholder="********" />
+        <div class="error" *ngIf="confirmModel.invalid && (confirmModel.touched || f.submitted)">
+          Debes confirmar la contraseña
+        </div>
+        <div class="error" *ngIf="(f.submitted || confirmModel.touched) && pass && confirm && pass !== confirm">
+          Las contraseñas no coinciden
+        </div>
+      </div>
+
+      <div class="recuperar-buttons">
+      <!--  <button type="button" class="btn-cancel" (click)="close()">Cancelar</button> -->
+        <button type="submit" class="btn-submit"
+                [disabled]="f.invalid || !pass || pass !== confirm">
+          Restablecer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
