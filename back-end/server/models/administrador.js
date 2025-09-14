@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
         codigoadmin: {
             type: DataTypes.STRING,
             primaryKey: true,
-            autoIncrement: true
+            //autoIncrement: true
         },
         ci: {
             type: DataTypes.CHAR

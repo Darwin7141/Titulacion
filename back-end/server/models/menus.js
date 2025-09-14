@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
         idmenu: {
             type: DataTypes.STRING,
             primaryKey: true,
-            autoIncrement: true
+          //  autoIncrement: true
         },
         idservicio: {
             type: DataTypes.STRING

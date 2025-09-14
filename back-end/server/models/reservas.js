@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
         idreserva: {
             type: DataTypes.STRING,
             primaryKey: true,
-            autoIncrement: true
+          //  autoIncrement: true
         },
         fechaevento: {
             type: DataTypes.DATE
