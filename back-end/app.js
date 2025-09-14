@@ -1,19 +1,22 @@
 // app.js (arriba)
+// app.js (arriba)
 const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
 
 const isProd = process.env.NODE_ENV === 'production' || process.env.RENDER;
 
-// Siempre intenta leer .env si existe (útil localmente, inocuo si no existe)
-if (fs.existsSync(path.join(__dirname, '.env'))) {
+// Carga .env solo en local
+if (!isProd && fs.existsSync(path.join(__dirname, '.env'))) {
   dotenv.config({ path: path.join(__dirname, '.env') });
 }
 
-// Solo en local (no en Render) carga tu archivo "process.env" y permite override
+// Carga process.env (PayPal local) solo en local
 if (!isProd && fs.existsSync(path.join(__dirname, 'process.env'))) {
   dotenv.config({ path: path.join(__dirname, 'process.env'), override: true });
 }
+
+
 
 
 // DEBUG opcional (quítalo luego)

@@ -1,14 +1,20 @@
 require('dotenv').config(); // Cargar las variables de entorno desde .env
 
+const base = {
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  host:     process.env.DB_HOST,
+  port:     process.env.DB_PORT || 5432,
+  dialect:  'postgres'
+};
+
 module.exports = {
   development: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT
+    ...base
   },
   test: {
+    // si lo usas, cámbialo a PG también o déjalo así para pruebas locales
     username: "root",
     password: null,
     database: "database_test",
@@ -16,10 +22,9 @@ module.exports = {
     dialect: "mysql"
   },
   production: {
-    username: "root",
-    password: null,
-    database: "database_production",
-    host: "127.0.0.1",
-    dialect: "mysql"
+    ...base,
+    dialectOptions: {
+      ssl: { require: true, rejectUnauthorized: false }  // necesario en Render PG
+    }
   }
 };
