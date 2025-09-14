@@ -143,11 +143,10 @@ const { checkExpiracionesYNotificar } = require('./server/controllers/notificaci
     await db.sequelize.authenticate();
     console.log('[DB] Conectado a Postgres');
 
-    // SOLO para inicializar tablas en la nueva DB de Render:
-    if (process.env.RUN_SYNC === 'true') {
-      await db.sequelize.sync({ alter: true });
-      console.log('[DB] Tablas sincronizadas');
-    }
+    // FORZAR sincronización AHORA (una sola vez)
+    console.log('[DB] Sincronizando tablas…');
+    await db.sequelize.sync({ alter: true });   // crea las que faltan / ajusta columnas
+    console.log('[DB] Tablas sincronizadas');
 
     setImmediate(() => checkExpiracionesYNotificar(io));
     setInterval(() => checkExpiracionesYNotificar(io), 24 * 60 * 60 * 1000);
