@@ -1,0 +1,21 @@
+# Todos los node_modules del repo (back y front)
+**/node_modules/
+
+# Archivos de entorno locales
+**/.env
+**/process.env
+
+# Logs y cache
+**/*.log
+npm-debug.log*
+yarn-error.log*
+
+# Builds y temporales
+**/dist/
+**/build/
+**/.cache/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
