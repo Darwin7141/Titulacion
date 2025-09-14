@@ -1,4 +1,4 @@
-export const validarCedulaEcuador = (cedula) => {
+const validarCedulaEcuador = (cedula) => {
     if (cedula.length !== 10) {
       return false;
     }
@@ -25,7 +25,7 @@ export const validarCedulaEcuador = (cedula) => {
   };
 
 // ➕ NUEVO: valida RUC Ecuador
-export const validarRucEcuador = (ruc) => {
+const validarRucEcuador = (ruc) => {
   if (!/^\d{13}$/.test(ruc)) return false;
 
   const region = parseInt(ruc.slice(0, 2), 10);
@@ -65,18 +65,27 @@ export const validarRucEcuador = (ruc) => {
 };
 
 
-export const validarIdentificacionEcuador = (valor) => {
+const validarIdentificacionEcuador = (valor) => {
   if (!/^\d+$/.test(valor)) return false;
   if (valor.length === 10) return validarCedulaEcuador(valor);
   if (valor.length === 13) return validarRucEcuador(valor);
   return false;
 };
 
-  export const validarEmail = (email) => {
+  const validarEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
   
-  export const validarTelefono = (telefono) => {
+  const validarTelefono = (telefono) => {
     return /^0\d{9}$/.test(telefono); // Asegura que el teléfono tenga 10 dígitos y comience con 0
   };
+
+
+  module.exports = {
+  validarCedulaEcuador,
+  validarRucEcuador,
+  validarIdentificacionEcuador,
+  validarEmail,
+  validarTelefono,
+};
