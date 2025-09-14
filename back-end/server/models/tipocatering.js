@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
         },
        
     }, {
-        tableName: 'tipocatering',  // Especificar el nombre de la tabla como 'cargo'
+        tableName: 'tipocatering',
+        freezeTableName: true,  // Especificar el nombre de la tabla como 'cargo'
         timestamps: false
     });
 

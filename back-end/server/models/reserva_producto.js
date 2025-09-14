@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     tableName: 'reserva_producto',
+    freezeTableName: true,
     timestamps: false
   });
 

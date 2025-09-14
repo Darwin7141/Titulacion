@@ -1,5 +1,4 @@
-// app.js (arriba)
-// app.js (arriba)
+// app.js
 const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
@@ -16,20 +15,17 @@ if (!isProd && fs.existsSync(path.join(__dirname, 'process.env'))) {
   dotenv.config({ path: path.join(__dirname, 'process.env'), override: true });
 }
 
-
-
-
 // DEBUG opcional (quítalo luego)
 console.log('[ENV check] PAYPAL_ENV=', process.env.PAYPAL_ENV);
 console.log('[ENV check] CID set? ', !!process.env.PAYPAL_CLIENT_ID);
 console.log('[ENV check] SEC set? ', !!process.env.PAYPAL_SECRET);
 
-const express      = require('express');
-const bodyParser   = require('body-parser');
-const http         = require('http');
-const socketIO     = require('socket.io');
-const session      = require('express-session');
-const cors         = require('cors');
+const express  = require('express');
+const bodyParser = require('body-parser');
+const http     = require('http');
+const socketIO = require('socket.io');
+const session  = require('express-session');
+const cors     = require('cors');
 
 const app = express();
 
@@ -39,7 +35,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// — Nuevos: CORS y sesiones — 
+// — Nuevos: CORS y sesiones —
 const FRONTEND = process.env.FRONTEND_URL || 'http://localhost:4200';
 app.use(cors({
   origin: FRONTEND,
@@ -61,9 +57,7 @@ app.use(session({
 // 1.1) Middleware de autenticación
 // ——————————————————————————————
 function ensureAuth(req, res, next) {
-  if (req.session && req.session.admin) {
-    return next();
-  }
+  if (req.session && req.session.admin) return next();
   return res.status(401).send({ message: 'No autorizado' });
 }
 
@@ -77,18 +71,14 @@ require('./server/routes/cargoempleados')(app);
 app.use('/api/gestionempleados', ensureAuth);
 require('./server/routes/empleados')(app);
 
-
 require('./server/routes/administrador')(app);
 
-// ——————————————————
 // Protegemos proveedor
-// ——————————————————
 app.use('/api/proveedor', ensureAuth);
 require('./server/routes/proveedor')(app);
 
 app.use('/api/productos', ensureAuth);
 require('./server/routes/productos')(app);
-
 
 require('./server/routes/tipocatering')(app);
 require('./server/routes/serviciocatering')(app);
@@ -105,28 +95,22 @@ require('./server/routes/notificaciones')(app);
 require('./server/routes/reserva_producto')(app);
 require('./server/routes/paypal')(app);
 
-
 // Ruta catch‐all
-app.get('*', (req, res) => {
+app.get('*', (_req, res) => {
   res.status(200).send({ message: 'Bienvenido al servidor NodeJS' });
 });
 
 // ——————————————————————————————
-// 3) Creamos el servidor HTTP aquí, pero NO lo `listen`
-//    Lo exportamos para que sea www.js quien ejecute `listen`.
+// 3) Servidor HTTP (listen lo hace www.js)
 // ——————————————————————————————
 const server = http.createServer(app);
 const io = new socketIO.Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
-  }
+  cors: { origin: '*', methods: ['GET', 'POST'] }
 });
-
 app.set('io', io);
 
 // ——————————————————————————————
-// 4) Manejo de conexiones Socket.IO
+// 4) Socket.IO
 // ——————————————————————————————
 io.on('connection', (socket) => {
   console.log(`🔌 [Socket.IO] Cliente conectado: ${socket.id}`);
@@ -147,14 +131,30 @@ io.on('connection', (socket) => {
   });
 });
 
+// ——————————————————————————————
+// 5) DB ready → tareas periódicas (y sync opcional)
+// ——————————————————————————————
+const db = require('./server/models'); // models/index.js
 const { checkExpiracionesYNotificar } = require('./server/controllers/notificaciones');
 
+// Movemos las llamadas para que se ejecuten SOLO cuando la DB esté lista
+(async () => {
+  try {
+    await db.sequelize.authenticate();
+    console.log('[DB] Conectado a Postgres');
 
-setImmediate(() => checkExpiracionesYNotificar(io));
+    // SOLO para inicializar tablas en la nueva DB de Render:
+    if (process.env.RUN_SYNC === 'true') {
+      await db.sequelize.sync({ alter: true });
+      console.log('[DB] Tablas sincronizadas');
+    }
 
-
-setInterval(() => checkExpiracionesYNotificar(io), 24 * 60 * 60 * 1000);
-
+    setImmediate(() => checkExpiracionesYNotificar(io));
+    setInterval(() => checkExpiracionesYNotificar(io), 24 * 60 * 60 * 1000);
+  } catch (err) {
+    console.error('[DB] Error de conexión:', err);
+  }
+})();
 
 // www.js se encargará de llamar a `server.listen(...)`.
 module.exports = { app, server };

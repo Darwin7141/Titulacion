@@ -28,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
         },
     
     }, {
-        tableName: 'proveedor',  // Especificar el nombre de la tabla como 'cargo'
+        tableName: 'proveedor',
+        freezeTableName: true,  // Especificar el nombre de la tabla como 'cargo'
         timestamps: false
     });
 

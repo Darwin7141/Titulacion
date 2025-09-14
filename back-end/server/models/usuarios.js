@@ -17,6 +17,8 @@ module.exports = (sequelize, DataTypes) => {
         rol: {
             type: DataTypes.INTEGER
         },
+
+       
     
         createdAt: {
             type: DataTypes.DATE
@@ -24,7 +26,12 @@ module.exports = (sequelize, DataTypes) => {
         updatedAt: {
             type: DataTypes.DATE
         }
-    });
+
+      }, {
+    tableName: 'cuentasusuarios',
+    freezeTableName: true,
+    timestamps: false,
+  });
 
     return usuarios;
 };

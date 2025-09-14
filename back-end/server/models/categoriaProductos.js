@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         
     }, {
-        tableName: 'categoria_productos',// Especificar el nombre de la tabla como 'cargo'
+        tableName: 'categoria_productos',
+        freezeTableName: true,// Especificar el nombre de la tabla como 'cargo'
         timestamps: false
     });
     categorias.associate = (models) => {

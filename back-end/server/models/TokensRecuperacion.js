@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         },
   }, {
     tableName: 'tokens_recuperacion',
+    freezeTableName: true,
     timestamps: false,
   });
 

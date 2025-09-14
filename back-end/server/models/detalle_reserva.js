@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     tableName: "detalle_reserva",
+    freezeTableName: true,
     timestamps: false // si tu tabla no maneja createdAt/updatedAt
   });
 

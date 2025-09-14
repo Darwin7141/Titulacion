@@ -42,6 +42,11 @@ module.exports = (sequelize, DataTypes) => {
         contrasenia: {
             type: DataTypes.STRING
         },
+
+    }, {
+        tableName: 'clientes',
+        freezeTableName: true,  // Especificar el nombre de la tabla como 'cargo'
+        timestamps: false
     });
 
     cliente.associate = (models) => {
