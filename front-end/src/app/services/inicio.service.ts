@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { GLOBAL } from './global';
-import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +20,7 @@ export class InicioService {
       })
     };
 
-    return this.http.post<any>(environment.apiUrl+"login", usuario, httpOptions);
+    return this.http.post<any>(this.url +"login", usuario, httpOptions);
   }
 
  

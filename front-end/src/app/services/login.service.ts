@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { GLOBAL } from './global';
 import { tap } from 'rxjs/operators';  
-import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +20,7 @@ export class LoginService {
     withCredentials: true
   };
 
-  return this.http.post<any>(environment.apiUrl + 'login', credentials, httpOptions).pipe(
+  return this.http.post<any>(this.url + 'login', credentials, httpOptions).pipe(
     tap((resp) => {
       /* 1. Vaciar lo anterior */
       localStorage.removeItem('identity_user');
