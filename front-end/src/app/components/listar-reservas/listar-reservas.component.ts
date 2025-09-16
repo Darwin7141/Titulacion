@@ -187,26 +187,15 @@ export class ListarReservasComponent implements OnInit, OnChanges {
       // 2) Determinar el texto según el estado seleccionado (itemReserva.idestado corresponde a un ID numérico,
       //    así que tal vez necesites traducirlo a texto legible; aquí asumimos que en estadosReserva ya tienes
       //    una lista de objetos { idestado, estado_reserva }):
-      const estadoObj = this.estadosReserva.find(e => e.idestado === itemReserva.idestado);
-      const textoEstado = estadoObj ? estadoObj.estado_reserva : 'Desconocido';
-
-      let mensajeNotificacion = '';
-      switch (textoEstado) {
-        case 'Aceptada':
-          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} ha sido Aceptada. Por favor realice el abono inicial.`;
-          break;
-        case 'En proceso':
-          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} se encuentra En proceso.`;
-          break;
-        case 'Pagada':
-          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} ha sido Pagada. ¡Gracias por preferirnos!`;
-          break;
-        case 'Cancelada':
-          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} ha sido Cancelada.`;
-          break;
-        default:
-          mensajeNotificacion = `Su reserva ${itemReserva.idreserva} cambió a estado "${textoEstado}".`;
-      }
+      const mapMsg: Record<number,string> = {
+        2: `Su reserva ${itemReserva.idreserva} ha sido Aceptada. Por favor realice el abono inicial.`,
+        3: `Su reserva ${itemReserva.idreserva} se encuentra En proceso.`,
+        4: `Su reserva ${itemReserva.idreserva} ha sido Cancelada.`,
+        5: `Su reserva ${itemReserva.idreserva} ha sido Pagada. ¡Gracias por preferirnos!`
+      };
+      const mensajeNotificacion =
+        mapMsg[itemReserva.idestado] ??
+        `Su reserva ${itemReserva.idreserva} cambió de estado.`;
 
       // 3) Leer (o inicializar) el array de notificaciones que guardamos en localStorage para este cliente
       //    Lo almacenaremos en la clave 'notificacionesCliente_<codigocliente>'

@@ -75,31 +75,37 @@ export class MisReservasComponent implements OnInit {
         this.allReservas = resp;
 
         this.reservas.forEach(r => {
-          const pagado = Number(r.primer_pago)    || 0;
-          const saldo  = Number(r.saldo_pendiente)|| 0;
-          const estado = r.nombre?.estado_reserva;
+          const saldo  = Number(r.saldo_pendiente) || 0;
+
+          const idEstado: number =
+          Number(r.idestado ??
+                 r.estado?.idestado ??
+                 r.nombre?.idestado ??          // por si venía así antes
+                 NaN);
 
           r.mostrarBotonPagoInicial = false;
           r.mostrarBotonPagoFinal   = false;
           r.mostrarComprobante      = false;
 
-          switch (estado) {
-            case 'Aceptada':
-              r.mostrarBotonPagoInicial = true;
-              break;
-            case 'En proceso':
-              r.mostrarBotonPagoFinal = true;
-              break;
-            case 'Pagada':
-              r.mostrarComprobante = true;
-              break;
-            case 'Cancelada':
-              break;
-            default:
-              if (saldo > 0) r.mostrarBotonPagoFinal = true;
-              break;
-          }
-        });
+          switch (idEstado) {
+          case 2: // Aceptada
+            r.mostrarBotonPagoInicial = true;
+            break;
+          case 3: // En proceso
+            r.mostrarBotonPagoFinal = true;
+            break;
+          case 4: // Cancelada
+            break;
+          case 5: // Pagada
+            r.mostrarComprobante = true;
+            break;
+          default:
+            // fallback si no se obtuvo el id, o por cualquier incoherencia
+            if (saldo > 0) r.mostrarBotonPagoFinal = true;
+            break;
+        }
+      });
+
 
         // Mantenerse en la misma tarjeta si viene stayOnId
         if (stayOnId) {

@@ -394,52 +394,35 @@ async function update(req, res) {
     });
 
     // 3) Si cambió el estado, creamos la notificación
-    if (idestado !== undefined) {
-      // 3.1) Obtener el texto legible del nuevo estado
-      const estadoRegistro = await modelos.estado_reserva.findOne({
-        where: { idestado }
-      });
-      const textoEstado = estadoRegistro
-        ? estadoRegistro.estado_reserva
-        : 'Desconocido';
+   if (idestado !== undefined) {
+  const id = Number(idestado);
 
-      // 3.2) Construir el mensaje según el estado
-      let mensajeNotificacion
-      switch (textoEstado) {
-        case 'Aceptada':
-          mensajeNotificacion = `Su reserva ${idreserva} ha sido aceptada. Por favor realice el abono inicial.`;
-          break;
-        case 'En proceso':
-          mensajeNotificacion = `Su reserva ${idreserva} se encuentra en proceso.`;
-          break;
-        case 'Pagada':
-          mensajeNotificacion = `Su reserva ${idreserva} ha sido pagada. ¡Gracias por preferirnos!`;
-          break;
-        case 'Cancelada':
-          mensajeNotificacion = `Su reserva ${idreserva} ha sido cancelada.`;
-          break;
-        default:
-          mensajeNotificacion = `Su reserva ${idreserva} cambió a estado "${textoEstado}".`;
-      }
+  const mapMsg = {
+    2: `Su reserva ${idreserva} ha sido aceptada. Por favor realice el abono inicial.`,
+    3: `Su reserva ${idreserva} se encuentra en proceso.`,
+    4: `Su reserva ${idreserva} ha sido cancelada.`,
+    5: `Su reserva ${idreserva} ha sido pagada. ¡Gracias por preferirnos!`
+  };
 
-      // 3.3) Guardar la notificación y capturar el resultado
-      const nuevaNoti = await modelos.notificaciones.create({
-        codigocliente: reserva.codigocliente,
-        tipo:          'ESTADO',
-        mensaje:       mensajeNotificacion,
-        idreserva,
-        leida:         false
-      });
+  const mensajeNotificacion =
+    mapMsg[id] ?? `Su reserva ${idreserva} cambió de estado.`; // fallback
 
-      // 3.4) Emitir por Socket.IO usando el id y fecha real de la noti
-      io.to(`cliente_${reserva.codigocliente}`).emit('cambio-estado', {
-        id:            nuevaNoti.id,
-        idreserva:     idreserva,
-        codigocliente: reserva.codigocliente,
-        mensaje:       mensajeNotificacion,
-        timestamp:     nuevaNoti.creado_en
-      });
-    }
+  const nuevaNoti = await modelos.notificaciones.create({
+    codigocliente: reserva.codigocliente,
+    tipo: 'ESTADO',
+    mensaje: mensajeNotificacion,
+    idreserva,
+    leida: false
+  });
+
+  io.to(`cliente_${reserva.codigocliente}`).emit('cambio-estado', {
+    id:        nuevaNoti.id,
+    idreserva,
+    codigocliente: reserva.codigocliente,
+    mensaje:   mensajeNotificacion,
+    timestamp: nuevaNoti.creado_en
+  });
+}
 
     // 4) (Opcional) Reemplazar detalles si vienen en el body
     if (Array.isArray(detalle)) {

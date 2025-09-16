@@ -134,24 +134,32 @@ io.on('connection', (socket) => {
 // ——————————————————————————————
 // 5) DB ready → tareas periódicas (y sync opcional)
 // ——————————————————————————————
-const db = require('./server/models'); // models/index.js
+const db = require('./server/models');
 const { checkExpiracionesYNotificar } = require('./server/controllers/notificaciones');
 
-// Movemos las llamadas para que se ejecuten SOLO cuando la DB esté lista
 (async () => {
   try {
     await db.sequelize.authenticate();
     console.log('[DB] Conectado a Postgres');
 
-    // FORZAR sincronización AHORA (una sola vez)
-    console.log('[DB] Sincronizando tablas…');
-    await db.sequelize.sync({ alter: true });   // crea las que faltan / ajusta columnas
-    console.log('[DB] Tablas sincronizadas');
+    // Sincroniza SOLO si lo pides con RUN_SYNC=true
+    if (process.env.RUN_SYNC === 'true') {
+      try {
+        console.log('[DB] Sincronizando tablas…');
+        await db.sequelize.sync({ alter: true });
+        console.log('[DB] Tablas sincronizadas');
+      } catch (e) {
+        console.error('[DB] Sync falló:', e.message);
+        // seguimos igual; no bloqueamos el servidor ni las tareas
+      }
+    }
 
-    setImmediate(() => checkExpiracionesYNotificar(io));
-    setInterval(() => checkExpiracionesYNotificar(io), 24 * 60 * 60 * 1000);
   } catch (err) {
     console.error('[DB] Error de conexión:', err);
+  } finally {
+    // SIEMPRE corre las tareas aunque sync haya fallado
+    setImmediate(() => checkExpiracionesYNotificar(io));
+    setInterval(() => checkExpiracionesYNotificar(io), 24 * 60 * 60 * 1000);
   }
 })();
 
