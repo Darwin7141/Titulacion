@@ -12,7 +12,7 @@ import { ValidacionesService } from '../../services/validaciones.service';
 import { PreclientesService } from '../../services/preclientes.service';
 import { RecuperarContrasenaService } from '../../services/recuperar-contrasena.service';
 import { finalize } from 'rxjs';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
