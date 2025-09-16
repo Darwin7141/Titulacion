@@ -4,7 +4,7 @@ const fs = require('fs');
 const dotenv = require('dotenv');
 
 const isProd = process.env.NODE_ENV === 'production' || process.env.RENDER;
-
+app.set('trust proxy', 1);
 // Carga .env solo en local
 if (!isProd && fs.existsSync(path.join(__dirname, '.env'))) {
   dotenv.config({ path: path.join(__dirname, '.env') });
@@ -48,8 +48,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    sameSite: 'lax',   // o 'none' si sirves en HTTPS y necesitas cross-site
-    secure: false      // true si usas HTTPS
+    sameSite: isProd ? 'none' : 'lax',
+    secure:   isProd ? true   : false    
   }
 }));
 
