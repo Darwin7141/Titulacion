@@ -4,7 +4,7 @@ const fs = require('fs');
 const dotenv = require('dotenv');
 
 const isProd = process.env.NODE_ENV === 'production' || process.env.RENDER;
-app.set('trust proxy', 1);
+
 // Carga .env solo en local
 if (!isProd && fs.existsSync(path.join(__dirname, '.env'))) {
   dotenv.config({ path: path.join(__dirname, '.env') });
@@ -28,7 +28,7 @@ const session  = require('express-session');
 const cors     = require('cors');
 
 const app = express();
-
+app.set('trust proxy', 1);
 // ——————————————————————————————
 // 1) Middlewares de Express
 // ——————————————————————————————
