@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { GLOBAL } from './global';
 import { environment } from '../../environments/environment';
+import { catchError } from 'rxjs/operators';
+import { of, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -29,9 +31,13 @@ export class ReservasService {
   }
 
   // (Opcional) Listar todas las reservas
-  getAllReservas(): Observable<any> {
-    return this.http.get<any>(`${this.url}reservas`);
-  }
+  getAllReservas() {
+  return this.http
+    .get<any[]>(this.url + 'reservas')
+    .pipe(
+      catchError(err => (err.status === 404 ? of([]) : throwError(() => err)))
+    );
+}
 
   crearClienteYReserva(data: any): Observable<any> {
     // data incluirá info de “cliente” + “reserva” + “detalle[]”
@@ -144,10 +150,15 @@ capturarOrdenPayPal(orderId: string) {
   return this.http.post<any>(`${this.url}paypal/capture`, { orderId });
 }
 
-getFechas(): Observable<Array<{ idreserva: string; fechaevento: string }>> {
-  return this.http.get<Array<{ idreserva: string; fechaevento: string }>>(
-    this.url + 'reservas/fechas'
-  );
+getFechas() {
+  return this.http
+    .get<Array<{ idreserva: string; fechaevento: string }>>(
+      this.url + 'reservas/fechas'
+    )
+    .pipe(
+      // si la tabla está vacía y el back responde 404, devolvemos []
+      catchError(err => (err.status === 404 ? of([]) : throwError(() => err)))
+    );
 }
 
 }
