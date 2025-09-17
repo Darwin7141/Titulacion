@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { GLOBAL } from './global';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({
@@ -50,7 +51,7 @@ export class MenusService {
     // El nombre 'foto' es fundamental para que el backend lo reciba en req.files.foto
     formData.append('foto', file);
   
-    const url = `http://localhost:3000/api/uploadMenu/${idmenu}`;
+    const url = `${environment.apiUrl}/uploadMenu/${idmenu}`;
     return this.http.post<any>(url, formData);
   }
 

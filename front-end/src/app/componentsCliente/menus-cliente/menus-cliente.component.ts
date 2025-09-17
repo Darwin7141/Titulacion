@@ -3,6 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MenusService } from '../../services/menus.service';
 import { SeleccionMenusService } from '../../services/seleccion-menus.service';
 import Swal from 'sweetalert2';
+import { environment } from '../../../environments/environment';
+environment
+
 
 @Component({
   selector: 'app-menus-cliente',
@@ -76,7 +79,7 @@ export class MenusClienteComponent implements OnInit, OnChanges {
       next: (dataMenus) => {
         const todos = dataMenus.map((m: any) => ({
           ...m,
-          fotografiaUrl: `http://localhost:3000/api/getMenu/${m.imagen}/true`,
+          fotografiaUrl: `${environment.apiUrl}/getMenu/${m.imagen}/true`,
           // posibles formas en las que llega el servicio desde la API
           _idservicio: this.normalizar(m.idservicio ?? m.servicio?.idservicio),
           _nombreServ: this.normalizar(m.servicio?.nombre ?? m.servicio ?? m.nombreServicio)

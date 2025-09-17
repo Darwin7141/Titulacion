@@ -3,6 +3,8 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { ServiciocateringService } from '../../services/serviciocatering.service';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+environment
 
 @Component({
   selector: 'app-servicios-cliente',
@@ -39,7 +41,7 @@ export class ServiciosClienteComponent implements OnInit {
         tap((data) => {
           // Mapear cada servicio para incluir la URL de la imagen
           this.servicio = data.map((s: any) => {
-            const fotografiaUrl = `http://localhost:3000/api/getfotografia/${s.imagen}/true`;
+            const fotografiaUrl = `${environment.apiUrl}/getfotografia/${s.imagen}/true`;
             return { ...s, fotografiaUrl };
           });
         })

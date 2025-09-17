@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator'; 
 import { MatDialog } from '@angular/material/dialog';
 import { MenusComponent } from '../menus/menus.component';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -69,7 +70,7 @@ obtenerMenus(): void {
       /* 1. map → añades fotografía */
       this.menu = data.map(menu => ({
         ...menu,
-        fotografiaUrl: `http://localhost:3000/api/getMenu/${menu.imagen}/true`
+        fotografiaUrl: `${environment.apiUrl}/getMenu/${menu.imagen}/true`
       }));
 
       /* 2. filtras por servicio (si corresponde) */
@@ -206,7 +207,7 @@ obtenerMenus(): void {
     this.menuService.getMenu().subscribe({
       next: (data) => {
         this.menu = data.map(menu => {
-          const fotografiaUrl = `http://localhost:3000/api/getMenu/${menu.imagen}/true`;
+          const fotografiaUrl = `${environment.apiUrl}/getMenu/${menu.imagen}/true`;
           return { ...menu, fotografiaUrl };
         });
         this.menuFiltrados = this.menu;

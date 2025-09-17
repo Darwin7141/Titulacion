@@ -7,6 +7,7 @@ import { ServiciocateringService } from '../../services/serviciocatering.service
 import { MenusClienteComponent } from '../menus-cliente/menus-cliente.component';
 import { tap } from 'rxjs/operators';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { environment } from '../../../environments/environment';
 
 
 interface ClienteNoti {
@@ -225,7 +226,7 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
     .pipe(
       tap(lista => {
         this.slides = lista.map((s: any) => ({
-          url : `http://localhost:3000/api/getfotografia/${s.imagen}/false`,
+          url : `${environment.apiUrl}/getfotografia/${s.imagen}/false`,
           nombre: s.nombre,                       // o el campo que uses
           descripcion: s.descripcion ?? ''        // idem
         }));

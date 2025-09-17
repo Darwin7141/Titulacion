@@ -6,6 +6,7 @@ import { jsPDF } from 'jspdf';
 import autoTable, { CellHookData }  from 'jspdf-autotable';
 import { MatDialog } from '@angular/material/dialog';
 import { ServiciocateringComponent } from '../serviciocatering/serviciocatering.component';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-listarservicio',
@@ -77,7 +78,7 @@ volver(): void {
       next: (data) => {
         // Transformamos cada servicio para que tenga 'fotografiaUrl'
         this.servicio = data.map(serv => {
-          const fotografiaUrl = `http://localhost:3000/api/getfotografia/${serv.imagen}/true`;
+          const fotografiaUrl = `${environment.apiUrl}/getfotografia/${serv.imagen}/true`;
           return { ...serv, fotografiaUrl };
         });
         this.servFiltrados = this.servicio;
@@ -191,7 +192,7 @@ volver(): void {
     this.cateringService.getServicio().subscribe({
       next: (data) => {
         this.servicio = data.map(serv => {
-          const fotografiaUrl = `http://localhost:3000/api/getfotografia/${serv.imagen}/true`;
+          const fotografiaUrl = `${environment.apiUrl}/getfotografia/${serv.imagen}/true`;
           return { ...serv, fotografiaUrl };
         });
         this.servFiltrados = this.servicio;
