@@ -218,15 +218,13 @@ export class AgendarReservaComponent implements OnInit{
   if (!this.validarCampos()) return;
 
   // 1) Consulto todas las reservas
-  this.reservasService.getAllReservas().subscribe({
-    next: (all: any[]) => {
-      
-      const selectedDate = this.formReserva.fechaevento;
-      const mismas = all.filter(r => {
+  this.reservasService.getFechas().subscribe({
+    next: (rows) => {
+      const selectedDate = this.formReserva.fechaevento; // 'YYYY-MM-DD'
+      const mismas = rows.filter(r => {
         if (!r.fechaevento) return false;
-        
-        const fechaDbYmd = String(r.fechaevento).slice(0, 10);
-        return fechaDbYmd === selectedDate;
+        const ymd = String(r.fechaevento).slice(0, 10); // por si viene con hora
+        return ymd === selectedDate;
       }).length;
 
       if (mismas >= 3) {

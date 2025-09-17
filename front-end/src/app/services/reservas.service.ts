@@ -144,6 +144,12 @@ capturarOrdenPayPal(orderId: string) {
   return this.http.post<any>(`${this.url}paypal/capture`, { orderId });
 }
 
+getFechas(): Observable<Array<{ idreserva: string; fechaevento: string }>> {
+  return this.http.get<Array<{ idreserva: string; fechaevento: string }>>(
+    this.url + 'reservas/fechas'
+  );
+}
+
 }
 
 

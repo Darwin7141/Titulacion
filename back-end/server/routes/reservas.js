@@ -16,6 +16,7 @@ module.exports = (app) => {
     app.get('/api/reservas/cancelaciones/admin', resController.getCancelacionesAdmin);
     app.get('/api/dashboard/reservas-6m',   resController.getReservasUltimosSeisMeses);
     app.get('/api/dashboard/top-servicios', resController.getServiciosMasReservados);
+    app.get('/api/reservas/fechas', resController.listFechas);
     
 
    

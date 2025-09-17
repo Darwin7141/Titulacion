@@ -902,6 +902,20 @@ async function getServiciosMasReservados(req, res) {
   }
 }
 
+async function listFechas(req, res) {
+  try {
+    const filas = await modelos.reservas.findAll({
+      attributes: ['idreserva', 'fechaevento'],
+      order: [['fechaevento', 'ASC']]
+    });
+    // devolvemos tal cual; el front hace el slice(0,10)
+    return res.json(filas);
+  } catch (e) {
+    console.error('GET /api/reservas/fechas >', e);
+    return res.status(500).json({ message: 'Error al listar fechas de reservas' });
+  }
+}
+
 
 module.exports = {
     create,
@@ -918,6 +932,7 @@ module.exports = {
     solicitarCancelacion,
     getCancelacionesAdmin,
     getReservasUltimosSeisMeses,
-    getServiciosMasReservados
+    getServiciosMasReservados,
+    listFechas
 
   };
