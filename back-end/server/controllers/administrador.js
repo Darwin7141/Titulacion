@@ -85,7 +85,16 @@ async function create(req, res) {
 
   } catch (err) {
     await t.rollback();
-    console.error('Error al crear administrador:', err);
+    console.error(
+    '[CREATE ADMIN ERROR]',
+    '\nname:', err?.name,
+    '\nmodel:', err?.errors?.[0]?.instance?.constructor?.name,
+    '\nfield:', err?.errors?.[0]?.path,
+    '\nmessage:', err?.errors?.[0]?.message,
+    '\ndetail:', err?.parent?.detail,
+    '\nconstraint:', err?.parent?.constraint
+  );
+
     res.status(500).send({
       message: 'Ocurrió un error al ingresar el administrador.',
       error: err.message
