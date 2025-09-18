@@ -276,35 +276,56 @@ export class ProveedoresComponent implements OnInit {
     ? this.serviceProv.editarProveedor(this.proveedor)
     : this.serviceProv.agregar(this.proveedor);
 
-  peticion$.subscribe({
-    next: () => {
+ peticion$.subscribe({
+  next: () => {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-check"></div>
+        <h2 class="swal-pro-title">${this.esEdicion ? 'Proveedor actualizado' : 'Proveedor agregado'}</h2>
+        <p class="swal-pro-desc">Los cambios se guardaron correctamente.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    }).then(() => this.dialogRef.close('saved'));
+  },
+  error: (err) => {
+    if (err?.status === 409) {
+      const code = err.error?.code;
+      const map: any = {
+        'DUP_ID'   : { title: 'Identificación duplicada', text: 'La cédula/RUC ya se encuentra registrada.' },
+        'DUP_EMAIL': { title: 'Correo duplicado',         text: 'El correo ingresado ya se encuentra registrado.' },
+        'DUP_TEL'  : { title: 'Teléfono duplicado',       text: 'El teléfono ingresado ya se encuentra registrado.' }
+      };
+      const msg = map[code] ?? { title: 'Dato duplicado', text: 'Ya existe un registro con esos datos.' };
+
       Swal.fire({
         width: 480,
         html: `
-          <div class="swal-pro-check"></div>
-          <h2 class="swal-pro-title">${this.esEdicion ? 'Proveedor actualizado' : 'Proveedor agregado'}</h2>
-          <p class="swal-pro-desc">Los cambios se guardaron correctamente.</p>
-        `,
-        showConfirmButton: true, confirmButtonText: 'Listo',
-        buttonsStyling: false, focusConfirm: true,
-        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
-      }).then(() => this.dialogRef.close('saved'));
-    },
-    error: err => {
-      console.error('Error al guardar proveedor:', err);
-      Swal.fire({
-        width: 480,
-        html: `
-          <div class="swal-pro-error"></div>
-          <h2 class="swal-pro-title">Error</h2>
-          <p class="swal-pro-desc">Ocurrió un error al guardar.</p>
+          <div class="swal-pro-warn"></div>
+          <h2 class="swal-pro-title">${msg.title}</h2>
+          <p class="swal-pro-desc">${msg.text}</p>
         `,
         showConfirmButton: true, confirmButtonText: 'Listo',
         buttonsStyling: false, focusConfirm: true,
         customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
       });
+      return;
     }
-  });
-}
+
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Error</h2>
+        <p class="swal-pro-desc">Ocurrió un error al guardar.</p>
+      `,
+      showConfirmButton: true, confirmButtonText: 'Listo',
+      buttonsStyling: false, focusConfirm: true,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    });
+  }
+});}
 
   }

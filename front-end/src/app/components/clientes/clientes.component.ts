@@ -282,12 +282,39 @@ export class ClientesComponent implements OnInit {
           <h2 class="swal-pro-title">${this.esEdicion ? 'Cliente actualizado' : 'Cliente agregado'}</h2>
           <p class="swal-pro-desc">Los cambios se guardaron correctamente.</p>
         `,
-        showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+        showConfirmButton: true,
+        confirmButtonText: 'Listo',
+        buttonsStyling: false,
+        focusConfirm: true,
         customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
       }).then(() => this.dialogRef.close('saved'));
     },
-    error: err => {
-      console.error('Error al guardar cliente:', err);
+    error: (err) => {
+      if (err?.status === 409) {
+        const code = err.error?.code;
+        const map: any = {
+          'DUP_CI':    { title: 'Cédula duplicada',   text: 'La cédula ingresada ya se encuentra registrada.' },
+          'DUP_EMAIL': { title: 'Correo duplicado',   text: 'El correo ingresado ya se encuentra registrado.' },
+          'DUP_TEL':   { title: 'Teléfono duplicado', text: 'El teléfono ingresado ya se encuentra registrado.' }
+        };
+        const msg = map[code] ?? { title: 'Dato duplicado', text: 'Ya existe un registro con esos datos.' };
+
+        Swal.fire({
+          width: 480,
+          html: `
+            <div class="swal-pro-warn"></div>
+            <h2 class="swal-pro-title">${msg.title}</h2>
+            <p class="swal-pro-desc">${msg.text}</p>
+          `,
+          showConfirmButton: true,
+          confirmButtonText: 'Listo',
+          buttonsStyling: false,
+          focusConfirm: true,
+          customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+        });
+        return;
+      }
+
       Swal.fire({
         width: 480,
         html: `
@@ -295,13 +322,15 @@ export class ClientesComponent implements OnInit {
           <h2 class="swal-pro-title">Error</h2>
           <p class="swal-pro-desc">Ocurrió un error al guardar.</p>
         `,
-        showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+        showConfirmButton: true,
+        confirmButtonText: 'Listo',
+        buttonsStyling: false,
+        focusConfirm: true,
         customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
       });
     }
   });
 }
-
 
 
    }

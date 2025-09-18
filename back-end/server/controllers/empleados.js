@@ -1,6 +1,7 @@
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); // Importar la función de validación
 const modelos = require('../models'); // Importar los modelos
 const bcrypt = require('bcrypt');
+const { Op, fn, col, where } = require('sequelize');
 
 async function create(req, res) {
   const { ci, nombre, direccion, e_mail, telefono, idcargo } = req.body;
@@ -59,47 +60,69 @@ async function create(req, res) {
 
 
 async function update(req, res) {
-  const { codigoempleado } = req.params; // Código del empleado desde los parámetros de la URL
-  const { ci, nombre, direccion, e_mail, telefono, idcargo } = req.body; // Datos a actualizar
+  const { codigoempleado } = req.params;
+  const { ci, nombre, direccion, e_mail, telefono, idcargo } = req.body ?? {};
 
   try {
-      // Validar los campos antes de la actualización
-      if (ci && !validarCedulaEcuador(ci)) {
-          return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
+    // 1) Buscar empleado
+    const empleado = await modelos.empleado.findOne({ where: { codigoempleado } });
+    if (!empleado) return res.status(404).send({ message: 'Empleado no encontrado.' });
+
+    // 2) CÉDULA (solo si cambia)
+    if (typeof ci !== 'undefined' && ci !== empleado.ci) {
+      if (!validarCedulaEcuador(ci)) {
+        return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
       }
-
-      if (e_mail && !validarEmail(e_mail)) {
-          return res.status(400).send({ message: 'El correo ingresado no es válido.' });
-      }
-
-      if (telefono && !validarTelefono(telefono)) {
-          return res.status(400).send({ message: 'El teléfono ingresado no es válido.' });
-      }
-
-      // Buscar al empleado en la base de datos
-      const empleado = await modelos.empleado.findOne({ where: { codigoempleado } });
-
-      if (!empleado) {
-          return res.status(404).send({ message: 'Empleado no encontrado.' });
-      }
-
-      // Actualizar los datos del empleado
-      await empleado.update({
-          ci: ci || empleado.ci,
-          nombre: nombre || empleado.nombre,
-          direccion: direccion || empleado.direccion,
-          e_mail: e_mail || empleado.e_mail,
-          telefono: telefono || empleado.telefono,
-          idcargo: idcargo || empleado.idcargo,
+      const dupCi = await modelos.empleado.count({
+        where: { ci, codigoempleado: { [Op.ne]: codigoempleado } }
       });
+      if (dupCi) return res.status(409).send({ code: 'DUP_CI', message: 'La cédula ya está registrada.' });
+    }
 
-      res.status(200).send({ message: 'Empleado actualizado exitosamente.', empleado });
+    // 3) EMAIL (solo si cambia; case-insensitive)
+    const nuevoEmailNorm  = typeof e_mail !== 'undefined' ? e_mail.trim().toLowerCase() : undefined;
+    const actualEmailNorm = (empleado.e_mail || '').toLowerCase();
+
+    if (typeof e_mail !== 'undefined' && nuevoEmailNorm !== actualEmailNorm) {
+      if (!validarEmail(e_mail)) {
+        return res.status(400).send({ message: 'El correo ingresado no es válido.' });
+      }
+      const dupMail = await modelos.empleado.count({
+        where: {
+          codigoempleado: { [Op.ne]: codigoempleado },
+          [Op.and]: [ where(fn('lower', col('e_mail')), nuevoEmailNorm) ]
+        }
+      });
+      if (dupMail) return res.status(409).send({ code: 'DUP_EMAIL', message: 'El correo ya está registrado.' });
+    }
+
+    // 4) TELÉFONO (solo si cambia)
+    if (typeof telefono !== 'undefined' && telefono !== empleado.telefono) {
+      if (!validarTelefono(telefono)) {
+        return res.status(400).send({ message: 'El teléfono ingresado no es válido.' });
+      }
+      const dupTel = await modelos.empleado.count({
+        where: { telefono, codigoempleado: { [Op.ne]: codigoempleado } }
+      });
+      if (dupTel) return res.status(409).send({ code: 'DUP_TEL', message: 'El teléfono ya está registrado.' });
+    }
+
+  
+    await empleado.update({
+      ci:         typeof ci         !== 'undefined' ? String(ci)              : empleado.ci,
+      nombre:     typeof nombre     !== 'undefined' ? String(nombre).trim()   : empleado.nombre,
+      direccion:  typeof direccion  !== 'undefined' ? String(direccion).trim(): empleado.direccion,
+      e_mail:     typeof e_mail     !== 'undefined' ? nuevoEmailNorm          : empleado.e_mail,
+      telefono:   typeof telefono   !== 'undefined' ? String(telefono)        : empleado.telefono,
+      idcargo:    typeof idcargo    !== 'undefined' ? idcargo                 : empleado.idcargo
+    });
+
+    return res.status(200).send({ message: 'Empleado actualizado exitosamente.', empleado });
   } catch (err) {
-      console.error('Error al actualizar el empleado:', err);
-      res.status(500).send({ message: 'Ocurrió un error al actualizar el empleado.', error: err.message });
+    console.error('Error al actualizar el empleado:', err);
+    return res.status(500).send({ message: 'Ocurrió un error al actualizar el empleado.', error: err.message });
   }
 }
-
 function eliminar(req, res) {
   const { codigoempleado } = req.params;
 

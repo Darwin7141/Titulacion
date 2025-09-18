@@ -1,6 +1,8 @@
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); // Importar la función de validación
 const modelos = require('../models'); // Importar los modelos
 const bcrypt = require('bcrypt');
+const { Op, fn, col, where } = require('sequelize');
+
 async function create(req, res) {
   const { ci, nombre, direccion, e_mail, telefono, idprecliente } = req.body;
     const { sequelize } = modelos;
@@ -98,44 +100,67 @@ async function create(req, res) {
 }
 
 async function update(req, res) {
-  const { codigocliente } = req.params; // Código del empleado desde los parámetros de la URL
-  const { ci, nombre, direccion, e_mail, telefono, idprecliente} = req.body; // Datos a actualizar
+  const { codigocliente } = req.params;
+  const { ci, nombre, direccion, e_mail, telefono, idprecliente } = req.body ?? {};
 
   try {
-      // Validar los campos antes de la actualización
-      if (ci && !validarCedulaEcuador(ci)) {
-          return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
+    // 1) Buscar cliente
+    const cliente = await modelos.clientes.findOne({ where: { codigocliente } });
+    if (!cliente) return res.status(404).send({ message: 'Cliente no encontrado.' });
+
+    // 2) CÉDULA (solo si cambia)
+    if (typeof ci !== 'undefined' && ci !== cliente.ci) {
+      if (!validarCedulaEcuador(ci)) {
+        return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
       }
-
-      if (e_mail && !validarEmail(e_mail)) {
-          return res.status(400).send({ message: 'El correo ingresado no es válido.' });
-      }
-
-      if (telefono && !validarTelefono(telefono)) {
-          return res.status(400).send({ message: 'El teléfono ingresado no es válido.' });
-      }
-
-      // Buscar al empleado en la base de datos
-      const proveedor = await modelos.clientes.findOne({ where: { codigocliente } });
-
-      if (!proveedor) {
-          return res.status(404).send({ message: 'Cliente no encontrado.' });
-      }
-
-      // Actualizar los datos del empleado
-      await proveedor.update({
-          ci: ci || proveedor.ci,
-          nombre: nombre || proveedor.nombre,
-          direccion: direccion || proveedor.direccion,
-          e_mail: e_mail || proveedor.e_mail,
-          telefono: telefono || proveedor.telefono,
-          idprecliente: idprecliente || proveedor.idprecliente
+      const dupCi = await modelos.clientes.count({
+        where: { ci, codigocliente: { [Op.ne]: codigocliente } }
       });
+      if (dupCi) return res.status(409).send({ code: 'DUP_CI', message: 'La cédula ya está registrada.' });
+    }
 
-      res.status(200).send({ message: 'Cliente actualizado exitosamente.', proveedor });
+    // 3) EMAIL (solo si cambia; case-insensitive)
+    const nuevoEmailNorm  = typeof e_mail !== 'undefined' ? e_mail.trim().toLowerCase() : undefined;
+    const actualEmailNorm = (cliente.e_mail || '').toLowerCase();
+
+    if (typeof e_mail !== 'undefined' && nuevoEmailNorm !== actualEmailNorm) {
+      if (!validarEmail(e_mail)) {
+        return res.status(400).send({ message: 'El correo ingresado no es válido.' });
+      }
+      const dupMail = await modelos.clientes.count({
+        where: {
+          codigocliente: { [Op.ne]: codigocliente },
+          [Op.and]: [ where(fn('lower', col('e_mail')), nuevoEmailNorm) ]
+        }
+      });
+      if (dupMail) return res.status(409).send({ code: 'DUP_EMAIL', message: 'El correo ya está registrado.' });
+    }
+
+    // 4) TELÉFONO (solo si cambia)
+    if (typeof telefono !== 'undefined' && telefono !== cliente.telefono) {
+      if (!validarTelefono(telefono)) {
+        return res.status(400).send({ message: 'El teléfono ingresado no es válido.' });
+      }
+      const dupTel = await modelos.clientes.count({
+        where: { telefono, codigocliente: { [Op.ne]: codigocliente } }
+      });
+      if (dupTel) return res.status(409).send({ code: 'DUP_TEL', message: 'El teléfono ya está registrado.' });
+    }
+
+    // 5) UPDATE (normalizando donde conviene)
+    await cliente.update({
+      ci:           typeof ci           !== 'undefined' ? String(ci)                         : cliente.ci,
+      nombre:       typeof nombre       !== 'undefined' ? String(nombre).trim()              : cliente.nombre,
+      direccion:    typeof direccion    !== 'undefined' ? String(direccion).trim()           : cliente.direccion,
+      e_mail:       typeof e_mail       !== 'undefined' ? nuevoEmailNorm                     : cliente.e_mail,
+      telefono:     typeof telefono     !== 'undefined' ? String(telefono)                   : cliente.telefono,
+      idprecliente: typeof idprecliente !== 'undefined' ? idprecliente                       : cliente.idprecliente
+    });
+
+    return res.status(200).send({ message: 'Cliente actualizado exitosamente.', cliente });
   } catch (err) {
-      console.error('Error al actualizar el cliente:', err);
-      res.status(500).send({ message: 'Ocurrió un error al actualizar el cliente.', error: err.message });
+    console.error('Error al actualizar el cliente:', err);
+    return res.status(500).send({ message: 'Ocurrió un error al actualizar el cliente.', error: err.message });
   }
 }
 

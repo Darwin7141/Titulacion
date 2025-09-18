@@ -1,5 +1,6 @@
 const { validarIdentificacionEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); // Importar la función de validación
 const modelos = require('../models'); // Importar los modelos
+const { Op, fn, col, where } = require('sequelize');
 
 async function create(req, res) {
   const { ci, nombre, direccion, e_mail, telefono} = req.body;
@@ -52,47 +53,69 @@ async function create(req, res) {
 }
 
 async function update(req, res) {
-  const { codigoproveedor } = req.params; // Código del empleado desde los parámetros de la URL
-  const { ci, nombre, direccion, e_mail, telefono, id_admin } = req.body; // Datos a actualizar
+  const { codigoproveedor } = req.params;
+  const { ci, nombre, direccion, e_mail, telefono, id_admin } = req.body ?? {};
 
   try {
-      // Validar los campos antes de la actualización
-      if (ci && !validarIdentificacionEcuador(ci)) {
-          return res.status(400).send({ message: 'La identificación (Cédula/RUC) no es válida.' });
+    // 1) Buscar proveedor
+    const proveedor = await modelos.proveedor.findOne({ where: { codigoproveedor } });
+    if (!proveedor) return res.status(404).send({ message: 'Proveedor no encontrado.' });
+
+    // 2) IDENTIFICACIÓN (CI/RUC) — solo si cambia
+    if (typeof ci !== 'undefined' && ci !== proveedor.ci) {
+      if (!validarIdentificacionEcuador(ci)) {
+        return res.status(400).send({ message: 'La identificación (Cédula/RUC) no es válida.' });
       }
-
-      if (e_mail && !validarEmail(e_mail)) {
-          return res.status(400).send({ message: 'El correo ingresado no es válido.' });
-      }
-
-      if (telefono && !validarTelefono(telefono)) {
-          return res.status(400).send({ message: 'El teléfono ingresado no es válido.' });
-      }
-
-      // Buscar al empleado en la base de datos
-      const proveedor = await modelos.proveedor.findOne({ where: { codigoproveedor } });
-
-      if (!proveedor) {
-          return res.status(404).send({ message: 'Administrador no encontrado.' });
-      }
-
-      // Actualizar los datos del empleado
-      await proveedor.update({
-          ci: ci || proveedor.ci,
-          nombre: nombre || proveedor.nombre,
-          direccion: direccion || proveedor.direccion,
-          e_mail: e_mail || proveedor.e_mail,
-          telefono: telefono || proveedor.telefono,
-          id_admin: id_admin || proveedor.id_admin
+      const dupId = await modelos.proveedor.count({
+        where: { ci, codigoproveedor: { [Op.ne]: codigoproveedor } }
       });
+      if (dupId) return res.status(409).send({ code: 'DUP_ID', message: 'La identificación ya está registrada.' });
+    }
 
-      res.status(200).send({ message: 'Proveedor actualizado exitosamente.', proveedor });
+    // 3) EMAIL (case-insensitive) — solo si cambia
+    const nuevoEmailNorm  = typeof e_mail !== 'undefined' ? e_mail.trim().toLowerCase() : undefined;
+    const actualEmailNorm = (proveedor.e_mail || '').toLowerCase();
+
+    if (typeof e_mail !== 'undefined' && nuevoEmailNorm !== actualEmailNorm) {
+      if (!validarEmail(e_mail)) {
+        return res.status(400).send({ message: 'El correo ingresado no es válido.' });
+      }
+      const dupMail = await modelos.proveedor.count({
+        where: {
+          codigoproveedor: { [Op.ne]: codigoproveedor },
+          [Op.and]: [ where(fn('lower', col('e_mail')), nuevoEmailNorm) ]
+        }
+      });
+      if (dupMail) return res.status(409).send({ code: 'DUP_EMAIL', message: 'El correo ya está registrado.' });
+    }
+
+    // 4) TELÉFONO — solo si cambia
+    if (typeof telefono !== 'undefined' && telefono !== proveedor.telefono) {
+      if (!validarTelefono(telefono)) {
+        return res.status(400).send({ message: 'El teléfono ingresado no es válido.' });
+      }
+      const dupTel = await modelos.proveedor.count({
+        where: { telefono, codigoproveedor: { [Op.ne]: codigoproveedor } }
+      });
+      if (dupTel) return res.status(409).send({ code: 'DUP_TEL', message: 'El teléfono ya está registrado.' });
+    }
+
+    // 5) UPDATE (normalizando lo necesario)
+    await proveedor.update({
+      ci:         typeof ci        !== 'undefined' ? String(ci)               : proveedor.ci,
+      nombre:     typeof nombre    !== 'undefined' ? String(nombre).trim()    : proveedor.nombre,
+      direccion:  typeof direccion !== 'undefined' ? String(direccion).trim() : proveedor.direccion,
+      e_mail:     typeof e_mail    !== 'undefined' ? nuevoEmailNorm           : proveedor.e_mail,
+      telefono:   typeof telefono  !== 'undefined' ? String(telefono)         : proveedor.telefono,
+      id_admin:   typeof id_admin  !== 'undefined' ? id_admin                 : proveedor.id_admin
+    });
+
+    return res.status(200).send({ message: 'Proveedor actualizado exitosamente.', proveedor });
   } catch (err) {
-      console.error('Error al actualizar el proveedor:', err);
-      res.status(500).send({ message: 'Ocurrió un error al actualizar el proveedor.', error: err.message });
+    console.error('Error al actualizar el proveedor:', err);
+    return res.status(500).send({ message: 'Ocurrió un error al actualizar el proveedor.', error: err.message });
   }
 }
-
 function eliminar(req, res) {
   const { codigoproveedor } = req.params;
 
