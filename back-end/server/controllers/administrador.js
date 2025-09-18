@@ -1,6 +1,7 @@
 const { validarCedulaEcuador, validarEmail, validarTelefono } = require('../utils/validaciones'); // Importar la función de validación
 const modelos = require('../models'); // Importar los modelos
 const bcrypt = require('bcrypt');
+const { Op, fn, col, where } = require('sequelize');
 
 async function create(req, res) {
   const { ci, nombre, direccion, e_mail, telefono, contrasenia } = req.body;
@@ -93,43 +94,65 @@ async function create(req, res) {
 }
 
 async function update(req, res) {
-  const { codigoadmin } = req.params; // Código del empleado desde los parámetros de la URL
-  const { ci, nombre, direccion, e_mail, telefono } = req.body; // Datos a actualizar
+  const { codigoadmin } = req.params;
+  const { ci, nombre, direccion, e_mail, telefono } = req.body ?? {};
 
   try {
-      // Validar los campos antes de la actualización
-      if (ci && !validarCedulaEcuador(ci)) {
-          return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
+    const administrador = await modelos.administrador.findOne({ where: { codigoadmin } });
+    if (!administrador) return res.status(404).send({ message: 'Administrador no encontrado.' });
+
+    // ------- CÉDULA (solo si cambia) -------
+    if (typeof ci !== 'undefined' && ci !== administrador.ci) {
+      if (!validarCedulaEcuador(ci)) {
+        return res.status(400).send({ message: 'La cédula ingresada no es válida.' });
       }
-
-      if (e_mail && !validarEmail(e_mail)) {
-          return res.status(400).send({ message: 'El correo ingresado no es válido.' });
-      }
-
-      if (telefono && !validarTelefono(telefono)) {
-          return res.status(400).send({ message: 'El teléfono ingresado no es válido.' });
-      }
-
-      // Buscar al empleado en la base de datos
-      const administrador = await modelos.administrador.findOne({ where: { codigoadmin } });
-
-      if (!administrador) {
-          return res.status(404).send({ message: 'Administrador no encontrado.' });
-      }
-
-      // Actualizar los datos del empleado
-      await administrador.update({
-          ci: ci || administrador.ci,
-          nombre: nombre || administrador.nombre,
-          direccion: direccion || administrador.direccion,
-          e_mail: e_mail || administrador.e_mail,
-          telefono: telefono || administrador.telefono
+      const dupCi = await modelos.administrador.count({
+        where: { ci, codigoadmin: { [Op.ne]: codigoadmin } }
       });
+      if (dupCi) return res.status(409).send({ code: 'DUP_CI', message: 'La cédula ya está registrada.' });
+    }
 
-      res.status(200).send({ message: 'Empleado actualizado exitosamente.', administrador });
+    // ------- EMAIL (solo si cambia; case-insensitive) -------
+    const nuevoEmailNorm   = typeof e_mail !== 'undefined' ? e_mail.trim().toLowerCase() : undefined;
+    const actualEmailNorm  = (administrador.e_mail || '').toLowerCase();
+
+    if (typeof e_mail !== 'undefined' && nuevoEmailNorm !== actualEmailNorm) {
+      if (!validarEmail(e_mail)) {
+        return res.status(400).send({ message: 'El correo ingresado no es válido.' });
+      }
+      const dupMail = await modelos.administrador.count({
+        where: {
+          codigoadmin: { [Op.ne]: codigoadmin },
+          [Op.and]: [ where(fn('lower', col('e_mail')), nuevoEmailNorm) ]
+        }
+      });
+      if (dupMail) return res.status(409).send({ code: 'DUP_EMAIL', message: 'El correo ya está registrado.' });
+    }
+
+    // ------- TELÉFONO (solo si cambia) -------
+    if (typeof telefono !== 'undefined' && telefono !== administrador.telefono) {
+      if (!validarTelefono(telefono)) {
+        return res.status(400).send({ message: 'El teléfono ingresado no es válido.' });
+      }
+      const dupTel = await modelos.administrador.count({
+        where: { telefono, codigoadmin: { [Op.ne]: codigoadmin } }
+      });
+      if (dupTel) return res.status(409).send({ code: 'DUP_TEL', message: 'El teléfono ya está registrado.' });
+    }
+
+    // ------- UPDATE (sin helper; trims básicos donde conviene) -------
+    await administrador.update({
+      ci:        typeof ci        !== 'undefined' ? String(ci) : administrador.ci,
+      nombre:    typeof nombre    !== 'undefined' ? String(nombre).trim() : administrador.nombre,
+      direccion: typeof direccion !== 'undefined' ? String(direccion).trim() : administrador.direccion,
+      e_mail:    typeof e_mail    !== 'undefined' ? nuevoEmailNorm : administrador.e_mail,
+      telefono:  typeof telefono  !== 'undefined' ? String(telefono) : administrador.telefono
+    });
+
+    return res.status(200).send({ message: 'Administrador actualizado exitosamente.', administrador });
   } catch (err) {
-      console.error('Error al actualizar el adminsitrador:', err);
-      res.status(500).send({ message: 'Ocurrió un error al actualizar el administrador.', error: err.message });
+    console.error('Error al actualizar el administrador:', err);
+    return res.status(500).send({ message: 'Ocurrió un error al actualizar el administrador.', error: err.message });
   }
 }
 
