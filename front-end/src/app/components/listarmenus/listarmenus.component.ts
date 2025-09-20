@@ -64,13 +64,15 @@ export class ListarmenusComponent implements OnInit {
 
   /* === SOLO este método cambia === */
 obtenerMenus(): void {
-  this.menuService.getMenu().subscribe({
+   this.menuService.getMenu().subscribe({
     next: (data) => {
 
       /* 1. map → añades fotografía */
       this.menu = data.map(menu => ({
         ...menu,
-        fotografiaUrl: `${environment.apiUrl}/getMenu/${menu.imagen}/true`
+        fotografiaUrl: menu?.imagen
+          ? this.menuService.getMenuFotoUrl(menu.imagen, true)
+          : null
       }));
 
       /* 2. filtras por servicio (si corresponde) */

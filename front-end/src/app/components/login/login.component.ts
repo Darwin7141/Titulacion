@@ -335,26 +335,28 @@ scrollTo(id: string, event: Event) {
   cargarServiciosYMenus() {
     // 1) Obtener servicios
     this.cateringService.getServicio().subscribe({
-      next: (data) => {
-        // Ajustar si necesitas la URL de la imagen, como en tu LoginComponent
-        this.servicios = data.map(serv => {
-          const fotografiaUrl = `${environment.apiUrl}/getfotografia/${serv.imagen}/true`;
-          return { ...serv, fotografiaUrl };
-        });
-        // 2) Obtener menús
-        this.menusService.getMenu().subscribe({
-          next: (dataMenus) => {
-            // Ajustar igual que en listarmenus.component
-            this.menus = dataMenus.map(m => {
-              const fotoMenuUrl = `${environment.apiUrl}/getMenu/${m.imagen}/true`;
-              return { ...m, fotoMenuUrl };
-            });
-          },
-          error: (err2) => console.error('Error al obtener menús:', err2)
-        });
-      },
-      error: (err1) => console.error('Error al obtener servicios:', err1)
-    });
+    next: (data) => {
+      this.servicios = (data || []).map(serv => ({
+        ...serv,
+        fotografiaUrl: serv?.imagen
+          ? this.cateringService.getFotoUrl(serv.imagen, true)
+          : null
+      }));
+      // 2) Obtener menús
+      this.menusService.getMenu().subscribe({
+        next: (dataMenus) => {
+          this.menus = (dataMenus || []).map(m => ({
+            ...m,
+            fotoMenuUrl: m?.imagen
+              ? this.menusService.getMenuFotoUrl(m.imagen, true)
+              : null
+          }));
+        },
+        error: (err2) => console.error('Error al obtener menús:', err2)
+      });
+    },
+    error: (err1) => console.error('Error al obtener servicios:', err1)
+  });
   }
 
 // ===== Helpers (NO async) =====
