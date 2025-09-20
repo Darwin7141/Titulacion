@@ -1,15 +1,7 @@
 <!-- menus.component.html -->
 <div class="registro-panel">
   <!-- overlay opcional de carga -->
-  <div *ngIf="isLoading" class="loading-overlay">
-    <mat-progress-spinner
-      mode="indeterminate"
-      color="accent"
-      diameter="50">
-    </mat-progress-spinner>
-    <p>Procesando…</p>
-  </div>
-
+  
   <!-- tarjeta -->
   <div class="registro-panel-content">
     <!-- Título dinámico -->
@@ -92,7 +84,7 @@
                  [alt]="menu.nombre" style="max-width:260px; border-radius:8px;">
           </div>
         </div>
-
+        </div>
       <!-- botones -->
       <div class="registro-buttons">
         <button type="button"
