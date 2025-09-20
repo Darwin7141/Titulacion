@@ -221,20 +221,25 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
     });
   }
 
-  private cargarImagenesServicios(): void {
+ private cargarImagenesServicios(): void {
   this.servCat.getServicio()
-    .pipe(
-      tap(lista => {
-        this.slides = lista.map((s: any) => ({
-          url : `${environment.apiUrl}/getfotografia/${s.imagen}/false`,
-          nombre: s.nombre,                       // o el campo que uses
-          descripcion: s.descripcion ?? ''        // idem
-        }));
-      })
-    )
     .subscribe({
-      next : () => this.iniciarAutoSlide(),
-      error: err => console.error('No se pudieron cargar imágenes', err)
+      next: (lista: any[]) => {
+        // Solo items con imagen; si quieres incluir los que no tienen, quita el filter
+        this.slides = (lista || [])
+          .filter(s => !!s?.imagen)
+          .map((s: any) => ({
+            url: this.servCat.getFotoUrl(s.imagen, true),  // prueba con true (thumb). Si 404, usa false.
+            nombre: s.nombre ?? '',
+            descripcion: s.descripcion ?? ''
+          }));
+
+        // (opcional) log para depurar rutas
+        this.slides.forEach(sl => console.log('[IMG]', sl.url));
+
+        this.iniciarAutoSlide();
+      },
+      error: err => console.error('No se pudieron cargar imágenes:', err)
     });
 }
 
