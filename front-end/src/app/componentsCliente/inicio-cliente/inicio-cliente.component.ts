@@ -229,7 +229,7 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
         this.slides = (lista || [])
           .filter(s => !!s?.imagen)
           .map((s: any) => ({
-            url: this.servCat.getFotoUrl(s.imagen, true),  // prueba con true (thumb). Si 404, usa false.
+            url: this.servCat.getFotoUrl(s.imagen, false),  // prueba con true (thumb). Si 404, usa false.
             nombre: s.nombre ?? '',
             descripcion: s.descripcion ?? ''
           }));
