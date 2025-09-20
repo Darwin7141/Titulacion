@@ -1,8 +1,18 @@
 
 const modelos = require('../models'); // Importar los modelos
 const fs= require ('fs');
-const thumb= require ('node-thumbnail').thumb;
+const makeThumb = require('node-thumbnail').thumb;
 const path=require('path');
+
+const isProd = process.env.NODE_ENV === 'production' || process.env.RENDER;
+const UPLOAD_BASE = process.env.UPLOAD_BASE_DIR || (isProd
+  ? '/var/data'
+  : path.join(__dirname, '..', 'uploads')
+);
+
+const FOTOS_DIR  = path.join(UPLOAD_BASE, 'fotografiasMenus');
+const THUMBS_DIR = path.join(FOTOS_DIR, 'thumbs');
+fs.mkdirSync(THUMBS_DIR, { recursive: true });
 
 async function create(req, res) {
   const { idservicio, nombre, descripcion, precio } = req.body;
@@ -142,101 +152,64 @@ function getAll(req, res) {
     });
 }
 
-function uploadFotografia(req, res) {
-    const id = req.params.idmenu;
-  
-    if (req.files) {
-      const file_path = req.files.foto.path;
-      const file_split = file_path.split('\\');
-      const file_name = file_split[3];
-      
-      const ext_split = file_name.split('.');
-      let file_ext = ext_split[ext_split.length - 1]; // toma la última parte como extensión
-      file_ext = file_ext.toLowerCase();             // para normalizar mayúsculas/minúsculas
-  
-      // Lista de extensiones permitidas
-      const validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-  
-      // Verificamos si la extensión está permitida
-      if (validExtensions.includes(file_ext)) {
-        const foto = { imagen: file_name };
-  
-        modelos.menu
-          .findByPk(id)
-          .then((fotografia) => {
-            if (!fotografia) {
-              // Si no se encuentra el servicio, eliminamos el archivo subido y retornamos error
-              fs.unlink(file_path, () => {});
-              return res.status(404).send({ message: 'Menú no encontrado.' });
-            }
-  
-            // Actualizamos en la BD el campo 'imagen' con el nombre del archivo
-            fotografia
-              .update(foto)
-              .then(() => {
-                const newPath = './server/uploads/fotografiasMenus/' + file_name;
-                const thumbPath = './server/uploads/fotografiasMenus/thumbs';
-  
-                thumb({
-                  source: path.resolve(newPath),
-                  destination: path.resolve(thumbPath),
-                  width: 200,
-                  suffix: '',
-                })
-                  .then(() => {
-                    return res.status(200).send({ fotografia });
-                  })
-                  .catch((err) => {
-                    return res
-                      .status(500)
-                      .send({ message: 'Ocurrió un error al crear el thumbnail. ' + err });
-                  });
-              })
-              .catch((err) => {
-                // Si algo falla en la actualización de la BD, eliminamos el archivo subido
-                fs.unlink(file_path, () => {});
-                return res
-                  .status(500)
-                  .send({ message: 'Ocurrió un error al actualizar la fotografía.' });
-              });
-          })
-          .catch((err) => {
-            fs.unlink(file_path, () => {});
-            return res
-              .status(500)
-              .send({ message: 'Error al buscar el servicio.', error: err });
-          });
-      } else {
-        // Extensión no válida, eliminamos el archivo subido
-        fs.unlink(file_path, (err) => {});
-        return res
-          .status(400)
-          .send({ message: 'La extensión no es válida. Solo se permiten jpg, jpeg, png, gif.' });
-      }
-    } else {
-      return res.status(400).send({ message: 'Debe seleccionar una fotografía.' });
-    }
+async function uploadFotografia(req, res) {
+  const id = req.params.idmenu;
+
+  if (!req.files || !req.files.foto) {
+    return res.status(400).send({ message: 'Debe seleccionar una fotografía.' });
   }
 
-  function getFotografia(req, res) {
-      var fotografia = req.params.fotografia;
-      var thumb = req.params.thumb;
-    
-      if (thumb=="false") 
-        var path_foto = "./server/uploads/fotografiasMenus/" + fotografia;
-       else if (thumb=="true")
-        var path_foto = "./server/uploads/fotografiasMenus/thumbs/" + fotografia;
-      
-    
-      fs.access(path_foto, fs.constants.F_OK, (err) => {
-          if (!err) {
-              res.sendFile(path.resolve(path_foto));
-          } else {
-              res.status(404).send({ message: "No se encuentra la fotografía." });
-          }
-      });
+  try {
+    const menu = await modelos.menu.findByPk(id);
+    if (!menu) {
+      safeUnlink(req.files.foto.path);
+      return res.status(404).send({ message: 'Menú no encontrado.' });
     }
 
+    const filePath = req.files.foto.path;   // ruta completa ya en FOTOS_DIR
+    const fileName = path.basename(filePath);
+    const ext = (path.extname(fileName) || '').toLowerCase().replace('.', '');
+    const valid = ['jpg', 'jpeg', 'png', 'gif'];
+    if (!valid.includes(ext)) {
+      safeUnlink(filePath);
+      return res.status(400).send({ message: 'La extensión no es válida. Solo se permiten jpg, jpeg, png, gif.' });
+    }
+
+    await menu.update({ imagen: fileName });
+
+    await makeThumb({
+      source: path.resolve(filePath),
+      destination: path.resolve(THUMBS_DIR),
+      width: 200,
+      suffix: ''
+    });
+
+    return res.status(200).send({ fotografia: menu });
+  } catch (err) {
+    if (req?.files?.foto?.path) safeUnlink(req.files.foto.path);
+    console.error('Error en uploadFotografia (menú):', err);
+    return res.status(500).send({ message: 'Ocurrió un error al subir la fotografía.' });
+  }
+}
+
+  function getFotografia(req, res) {
+  const fotografia = (req.params.fotografia || '').trim();
+  const useThumb = String(req.params.thumb || '').toLowerCase() === 'true';
+
+  if (!fotografia || fotografia.includes('..') || fotografia.includes('/') || fotografia.includes('\\')) {
+    return res.status(400).send({ message: 'Nombre de archivo inválido.' });
+  }
+
+  const baseDir = useThumb ? THUMBS_DIR : FOTOS_DIR;
+  const absPath = path.join(baseDir, fotografia);
+
+  fs.access(absPath, fs.constants.F_OK, (err) => {
+    if (!err) return res.sendFile(path.resolve(absPath));
+    return res.status(404).send({ message: 'No se encuentra la fotografía.' });
+  });
+}
+
+function safeUnlink(p) { fs.unlink(p, () => {}); }
 
 module.exports = {
     create,

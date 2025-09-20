@@ -46,13 +46,15 @@ export class MenusService {
     return this.http.delete<any>(`${this.url}menu/${idmenu}`);
   }
   
-  subirImagenServicio(file: File, idmenu: string) {
+  subirImagenServicio(file: File, idmenu: string): Observable<any> {
     const formData = new FormData();
-    // El nombre 'foto' es fundamental para que el backend lo reciba en req.files.foto
-    formData.append('foto', file);
-  
-    const url = `${environment.apiUrl}/uploadMenu/${idmenu}`;
-    return this.http.post<any>(url, formData);
+    formData.append('foto', file); // el backend espera 'foto'
+    return this.http.post<any>(`${this.url}uploadMenu/${idmenu}`, formData);
+  }
+
+  // Helper para imágenes de menú
+  getMenuFotoUrl(nombre: string, thumb = false): string {
+    return `${this.url}getMenu/${encodeURIComponent(nombre)}/${thumb}`;
   }
 
 }

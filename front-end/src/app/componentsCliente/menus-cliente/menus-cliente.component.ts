@@ -65,47 +65,54 @@ export class MenusClienteComponent implements OnInit, OnChanges {
   }
 
   private obtenerMenusDelServicio(): void {
-    const idNorm = this.normalizar(this.servicioId);
-    const nombreNorm = this.normalizar(this.nombreServicio);
+  const idNorm = this.normalizar(this.servicioId);
+  const nombreNorm = this.normalizar(this.nombreServicio);
 
-    if (!idNorm && !nombreNorm) {
-      this.mensajeSinMenus = 'No se recibió id de servicio.';
-      this.menusFiltrados = [];
-      return;
-    }
-
-    this.mensajeSinMenus = '';
-    this.menusService.getMenu().subscribe({
-      next: (dataMenus) => {
-        const todos = dataMenus.map((m: any) => ({
-          ...m,
-          fotografiaUrl: `${environment.apiUrl}/getMenu/${m.imagen}/true`,
-          // posibles formas en las que llega el servicio desde la API
-          _idservicio: this.normalizar(m.idservicio ?? m.servicio?.idservicio),
-          _nombreServ: this.normalizar(m.servicio?.nombre ?? m.servicio ?? m.nombreServicio)
-        }));
-
-        // 1) intentamos por id
-        let filtrados = todos.filter(mn => mn._idservicio && mn._idservicio === idNorm);
-
-        // 2) si no hubo match por id y tenemos nombre, probamos por nombre
-        if (!filtrados.length && nombreNorm) {
-          filtrados = todos.filter(mn => mn._nombreServ && mn._nombreServ === nombreNorm);
-        }
-
-        this.menusFiltrados = filtrados;
-
-        this.mensajeSinMenus = this.menusFiltrados.length
-          ? ''
-          : 'Por el momento no existen menús en este servicio.';
-      },
-      error: (err) => {
-        console.error('Error al obtener menús:', err);
-        this.mensajeSinMenus = 'Ocurrió un error al obtener los menús.';
-        this.menusFiltrados = [];
-      },
-    });
+  if (!idNorm && !nombreNorm) {
+    this.mensajeSinMenus = 'No se recibió id de servicio.';
+    this.menusFiltrados = [];
+    return;
   }
+
+  this.mensajeSinMenus = '';
+  this.menusService.getMenu().subscribe({
+    next: (dataMenus: any[]) => {
+      const todos = (dataMenus || []).map((m: any) => {
+        const idServ = m.idservicio ?? m.servicio?.idservicio;
+        const nomServ = m.servicio?.nombre ?? m.servicio ?? m.nombreServicio;
+
+        return {
+          ...m,
+          // usa helper del service (evita environment.apiUrl desalineado)
+          fotografiaUrl: m?.imagen
+            ? this.menusService.getMenuFotoUrl(m.imagen, true)   // thumb
+            : null,
+          
+          _idservicio: this.normalizar(idServ),
+          _nombreServ: this.normalizar(nomServ)
+        };
+      });
+
+      // 1) filtra por id de servicio
+      let filtrados = todos.filter(mn => mn._idservicio && mn._idservicio === idNorm);
+
+      // 2) si no hay match por id y tenemos nombre, intenta por nombre
+      if (!filtrados.length && nombreNorm) {
+        filtrados = todos.filter(mn => mn._nombreServ && mn._nombreServ === nombreNorm);
+      }
+
+      this.menusFiltrados = filtrados;
+      this.mensajeSinMenus = this.menusFiltrados.length
+        ? ''
+        : 'Por el momento no existen menús en este servicio.';
+    },
+    error: (err) => {
+      console.error('Error al obtener menús:', err);
+      this.mensajeSinMenus = 'Ocurrió un error al obtener los menús.';
+      this.menusFiltrados = [];
+    },
+  });
+}
 
   volver(): void {
     this.cerrar.emit();

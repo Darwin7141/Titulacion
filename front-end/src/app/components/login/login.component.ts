@@ -81,18 +81,19 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() : void {
     this.cateringService.getServicio().subscribe({
-        next: (data) => {
-          // Transformamos cada servicio para que tenga 'fotografiaUrl'
-          this.servicio = data.map(serv => {
-            const fotografiaUrl = `${environment.apiUrl}/getfotografia/${serv.imagen}/true`;
-            return { ...serv, fotografiaUrl };
-          });
-          this.servFiltrados = this.servicio;
-        },
-        error: (err) => {
-          console.error('Error al obtener los servicios:', err);
-        },
-      });
+  next: (data) => {
+    this.servicio = (data || []).map((serv: any) => ({
+      ...serv,
+      // usa la miniatura; si no hay imagen, deja null
+      fotografiaUrl: serv?.imagen
+        ? this.cateringService.getFotoUrl(serv.imagen, true)
+        : null,
+    }));
+    this.servFiltrados = this.servicio;
+    
+  },
+  error: (err) => console.error('Error al obtener los servicios:', err),
+});
 
       this.cargarServiciosYMenus();
   }

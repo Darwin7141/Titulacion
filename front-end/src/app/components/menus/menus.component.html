@@ -76,9 +76,22 @@
         <div class="form-group file-group" style="grid-column:1 / span 2;">
           <label for="imagen">Imagen:</label>
           <input id="imagen" type="file"
+                 accept="image/png,image/jpeg,image/jpg,image/gif"
                  (change)="onNewImageSelected($event)">
+
+          <!-- Preview nueva -->
+          <div *ngIf="previewUrl" style="margin-top:8px;">
+            <p style="margin:.25rem 0 .5rem; color:#666;">Vista previa (no guardada aún):</p>
+            <img [src]="previewUrl" alt="Preview" style="max-width:260px; border-radius:8px;">
+          </div>
+
+          <!-- Imagen actual (edición) -->
+          <div *ngIf="!previewUrl && esEdicion && menu?.imagen" style="margin-top:8px;">
+            <p style="margin:.25rem 0 .5rem; color:#666;">Imagen actual:</p>
+            <img [src]="menuCatering.getMenuFotoUrl(menu.imagen, false)"
+                 [alt]="menu.nombre" style="max-width:260px; border-radius:8px;">
+          </div>
         </div>
-      </div><!-- /form-grid -->
 
       <!-- botones -->
       <div class="registro-buttons">

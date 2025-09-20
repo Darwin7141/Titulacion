@@ -22,16 +22,19 @@ export class MenusComponent implements OnInit {
     descripcion: '',
     precio: '',
     idservicio: '',
+    imagen: ''
   };
 
   tipo: any[] = [];
   nuevaImagen: File | null = null;
   isLoading: boolean = false;
   esEdicion = false;
+  previewUrl: string | ArrayBuffer | null = null;
+
     constructor(
       
       private servCatering: ServiciocateringService,
-      private menuCatering: MenusService,
+      public menuCatering: MenusService,
       @Optional() private dialogRef: MatDialogRef<MenusComponent>,
       @Optional() @Inject(MAT_DIALOG_DATA) private data: any,
       private _router:Router) {}
@@ -56,12 +59,51 @@ export class MenusComponent implements OnInit {
       
         }
 
-        onNewImageSelected(event: any): void {
-          if (event.target.files && event.target.files.length > 0) {
-            this.nuevaImagen = event.target.files[0];
-            console.log('Imagen seleccionada:', this.nuevaImagen);
-          }
-        }
+        onNewImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      this.nuevaImagen = null;
+      this.previewUrl = null;
+      return;
+    }
+
+    const file = input.files[0];
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const maxSizeMB = 4;
+
+    if (!validTypes.includes(file.type)) {
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-warn"></div>
+          <h2 class="swal-pro-title">Formato no permitido</h2>
+          <p class="swal-pro-desc">Usa JPG, PNG o GIF.</p>`,
+        showConfirmButton: true, confirmButtonText: 'Entendido', buttonsStyling: false,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      });
+      input.value = '';
+      return;
+    }
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      Swal.fire({
+        width: 480,
+        html: `
+          <div class="swal-pro-warn"></div>
+          <h2 class="swal-pro-title">Archivo muy grande</h2>
+          <p class="swal-pro-desc">La imagen supera ${maxSizeMB} MB.</p>`,
+        showConfirmButton: true, confirmButtonText: 'Ok', buttonsStyling: false,
+        customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+      });
+      input.value = '';
+      return;
+    }
+
+    this.nuevaImagen = file;
+
+    const reader = new FileReader();
+    reader.onload = () => this.previewUrl = reader.result;
+    reader.readAsDataURL(file);
+  }
         
 
          agregar(): void {
@@ -120,18 +162,21 @@ export class MenusComponent implements OnInit {
   this.isLoading = true;
 
   this.menuCatering.agregar(this.menu).subscribe({
-    next : ({ idmenu }) => {
-      const subir$ = this.nuevaImagen
-        ? this.menuCatering.subirImagenServicio(this.nuevaImagen, idmenu)
-        : of(null);
+      next: ({ idmenu }) => {
+        const subir$ = this.nuevaImagen
+          ? this.menuCatering.subirImagenServicio(this.nuevaImagen, idmenu)
+          : of(null);
 
-      subir$.subscribe({
-        next : ()  => this.finalizaExito(),
-        error: err => this.finalizaError('al subir la imagen', err)
-      });
-    },
-    error: err => this.finalizaError('al crear el menú', err)
-  });
+        subir$.subscribe({
+          next: (up) => {
+            if (up?.fotografia?.imagen) this.menu.imagen = up.fotografia.imagen;
+            this.finalizaExito();
+          },
+          error: err => this.finalizaError('al subir la imagen', err),
+        });
+      },
+      error: err => this.finalizaError('al crear el menú', err),
+    });
 }
 
 
@@ -227,13 +272,16 @@ export class MenusComponent implements OnInit {
         : of(null);
 
       upload$.subscribe({
-        next: () => this.finalizaExito(),
-        error: err => this.finalizaError('al subir la imagen', err)
-      });
-    },
-    error: err => this.finalizaError('al guardar el menú', err)
-  });
-}
+          next: (up) => {
+            if (up?.fotografia?.imagen) this.menu.imagen = up.fotografia.imagen;
+            this.finalizaExito();
+          },
+          error: err => this.finalizaError('al subir la imagen', err),
+        });
+      },
+      error: err => this.finalizaError('al guardar el menú', err),
+    });
+  }
 
 
 private finalizaExito(): void {
