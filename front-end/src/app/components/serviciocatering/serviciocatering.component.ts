@@ -24,6 +24,7 @@ export class ServiciocateringComponent implements OnInit {
     descripcion: '',
     idtipo: '',
     idestado: '',
+    imagen: '',
   };
 
   tipo: any[] = [];
@@ -32,6 +33,8 @@ export class ServiciocateringComponent implements OnInit {
   nuevaImagen: File | null = null;
   isLoading: boolean = false;
   esEdicion = false;
+
+  previewUrl: string | ArrayBuffer | null = null;
 
     constructor(
       
@@ -70,12 +73,53 @@ export class ServiciocateringComponent implements OnInit {
       
         }
 
-        onNewImageSelected(event: any): void {
-          if (event.target.files && event.target.files.length > 0) {
-            this.nuevaImagen = event.target.files[0];
-            console.log('Imagen seleccionada:', this.nuevaImagen);
-          }
-        }
+        onNewImageSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) {
+    this.nuevaImagen = null;
+    this.previewUrl = null;
+    return;
+  }
+
+  const file = input.files[0];
+
+  // valida tipo y tamaño (4MB ejemplo)
+  const validTypes = ['image/jpeg','image/png','image/gif'];
+  const maxSizeMB = 4;
+  if (!validTypes.includes(file.type)) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Formato no permitido</h2>
+        <p class="swal-pro-desc">Usa JPG, PNG o GIF.</p>`,
+      showConfirmButton: true, confirmButtonText: 'Entendido', buttonsStyling: false,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    });
+    input.value = '';
+    return;
+  }
+  if (file.size > maxSizeMB * 1024 * 1024) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-warn"></div>
+        <h2 class="swal-pro-title">Archivo muy grande</h2>
+        <p class="swal-pro-desc">La imagen supera ${maxSizeMB} MB.</p>`,
+      showConfirmButton: true, confirmButtonText: 'Ok', buttonsStyling: false,
+      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+    });
+    input.value = '';
+    return;
+  }
+
+  this.nuevaImagen = file;
+
+  // preview
+  const reader = new FileReader();
+  reader.onload = () => this.previewUrl = reader.result;
+  reader.readAsDataURL(file);
+}
 
         private get esDialogo(): boolean { return !!this.dialogRef; }
 
@@ -261,7 +305,11 @@ guardar(): void {
         : of(null);
 
       upload$.subscribe({
-        next: () => this.finalizaExito(),
+        next: (up) => {
+  
+  this.servicio.imagen= up?.fotografia?.imagen ?? this.servicio.imagen;
+  this.finalizaExito();
+},
         error: err => this.finalizaError('al subir la imagen', err)
       });
     },

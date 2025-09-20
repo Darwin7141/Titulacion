@@ -53,4 +53,9 @@ export class ServiciocateringService {
     const url = `${this.url}upload-fotografia/${idServicio}`;
     return this.http.post<any>(url, formData);
   }
+
+  getFotoUrl(nombre: string, thumb = false): string {
+  // thumb=false|true debe ir como string, el back lo parsea
+  return `${this.url}getfotografia/${encodeURIComponent(nombre)}/${thumb}`;
+}
 }  
