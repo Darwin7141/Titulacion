@@ -53,7 +53,7 @@ export class MenusService {
   }
 
   // Helper para imágenes de menú
-  getMenuFotoUrl(nombre: string, thumb = false): string {
+  getMenuFotoUrl(nombre: string, thumb = true): string {
     return `${this.url}getMenu/${encodeURIComponent(nombre)}/${thumb}`;
   }
 
