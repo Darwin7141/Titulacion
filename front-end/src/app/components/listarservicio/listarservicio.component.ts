@@ -73,22 +73,21 @@ volver(): void {
     
   }
 
-  obtenerServicios(): void {
-    this.cateringService.getServicio().subscribe({
-      next: (data) => {
-        // Transformamos cada servicio para que tenga 'fotografiaUrl'
-        this.servicio = data.map(serv => {
-          const fotografiaUrl = `${environment.apiUrl}/getfotografia/${serv.imagen}/true`;
-          return { ...serv, fotografiaUrl };
-        });
-        this.servFiltrados = this.servicio;
-        this.updatePagedData();  
-      },
-      error: (err) => {
-        console.error('Error al obtener los servicios:', err);
-      },
-    });
-  }
+ obtenerServicios(): void {
+  this.cateringService.getServicio().subscribe({
+    next: (data) => {
+      this.servicio = data.map(serv => ({
+        ...serv,
+        fotografiaUrl: serv?.imagen
+          ? this.cateringService.getFotoUrl(serv.imagen, true) // prueba con thumb
+          : null
+      }));
+      this.servFiltrados = this.servicio;
+      this.updatePagedData();
+    },
+    error: (err) => console.error('Error al obtener los servicios:', err),
+  });
+}
   
 
   
