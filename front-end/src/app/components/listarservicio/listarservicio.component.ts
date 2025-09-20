@@ -79,7 +79,7 @@ volver(): void {
       this.servicio = data.map(serv => ({
         ...serv,
         fotografiaUrl: serv?.imagen
-          ? this.cateringService.getFotoUrl(serv.imagen, true) // prueba con thumb
+          ? this.cateringService.getFotoUrl(serv.imagen, false) // prueba con thumb
           : null
       }));
       this.servFiltrados = this.servicio;
