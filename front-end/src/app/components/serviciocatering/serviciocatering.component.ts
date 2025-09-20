@@ -40,7 +40,7 @@ export class ServiciocateringComponent implements OnInit {
       
       private tipoService: TipocateringService,
       private serviceTipo: TipocateringService,
-      private servCatering: ServiciocateringService,
+      public servCatering: ServiciocateringService,
       @Optional() private dialogRef: MatDialogRef<ServiciocateringComponent> ,
       @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
       
