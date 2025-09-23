@@ -101,19 +101,19 @@ export class NotificacionesService {
 
   fetchNotificacionesCliente(codigocliente: string) {
     return this.http.get<NotifData[]>(
-      `${environment.apiUrl}/notificaciones/cliente/${codigocliente}`
+      `${environment.apiUrl}notificaciones/cliente/${codigocliente}`
     );
   }
 
  marcarComoLeida(id: number) {
     return this.http.put(
-      `${environment.apiUrl}/notificaciones/${id}/leer`, {}
+      `${environment.apiUrl}notificaciones/${id}/leer`, {}
     );
   }
 
   marcarTodasComoLeidas(codigocliente: string) {
     return this.http.put(
-      `${environment.apiUrl}/notificaciones/cliente/${codigocliente}/leer`, {}
+      `${environment.apiUrl}notificaciones/cliente/${codigocliente}/leer`, {}
     );
   }
 
@@ -132,14 +132,14 @@ export class NotificacionesService {
 
 markAllExpiracionesAdminAsRead(): Observable<void> {
   return this.http.put<void>(
-    `${this.baseUrl}/notificaciones/expiraciones/admin/leer`,
+    `${this.baseUrl}notificaciones/expiraciones/admin/leer`,
     {}
   );
 }
 
  getExpiracionesAdmin(): Observable<{ id: number, mensaje: string, timestamp: string }[]> {
     return this.http.get<{ id: number, mensaje: string, timestamp: string }[]>(
-      `${environment.apiUrl}/notificaciones/expiraciones/admin`
+      `${environment.apiUrl}notificaciones/expiraciones/admin`
     );
   }
 

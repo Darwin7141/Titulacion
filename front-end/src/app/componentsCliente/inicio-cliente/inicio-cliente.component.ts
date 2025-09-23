@@ -240,7 +240,7 @@ private fusionarPorId(listaA: ClienteNoti[], listaB: ClienteNoti[]): ClienteNoti
           <small style="display:block;color:#6b7280;margin-bottom:2px">${fecha}</small>
           ${n.texto}
         </span>
-        <button class="swal-pro-see js-ver-visto" data-id="${n.id}">Visto</button>
+        <button class="swal-pro-see" onclick="window.marcarVistoCliente(${n.id})">Visto</button>
       </li>
     `;
   });
@@ -262,19 +262,8 @@ private fusionarPorId(listaA: ClienteNoti[], listaB: ClienteNoti[]): ClienteNoti
     customClass: {
       popup: 'swal-pro swal-pro--cliente',
       confirmButton: 'swal-pro-confirm',
-      htmlContainer: 'swal-pro-html swal-pro-html--cliente' 
-    },
-    didOpen: (popup) => {
-  const botones = popup.querySelectorAll('.js-ver-visto'); // NodeListOf<Element>
-  botones.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const idStr = (btn as Element).getAttribute('data-id'); // ✔
-      if (!idStr) return;
-      const id = Number(idStr);
-      this._ngZone.run(() => this.marcarVisto(id));
-    });
-  });
-},
+      htmlContainer: 'swal-pro-html swal-pro-html--cliente' // <- aquí metemos el scroll
+    }
   }).then(result => {
     if (result.isConfirmed && this.codigocliente) {
       this.notiSvc.marcarTodasComoLeidas(this.codigocliente).subscribe(() => {
