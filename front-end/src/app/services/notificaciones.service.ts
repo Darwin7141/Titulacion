@@ -119,13 +119,13 @@ export class NotificacionesService {
 
   getCancelacionesAdmin(): Observable<{ id: string; mensaje: string; creado_en: string }[]> {
   return this.http.get<{ id: string; mensaje: string; creado_en: string }[]>(
-    `${this.baseUrl}/reservas/cancelaciones/admin`
+    `${this.baseUrl}reservas/cancelaciones/admin`
   );
 }
 
   markAllCancelacionesAdminAsRead(): Observable<void> {
   return this.http.put<void>(
-    `${this.baseUrl}/reservas/cancelaciones/admin/leer`,
+    `${this.baseUrl}reservas/cancelaciones/admin/leer`,
     {}
   );
 }
