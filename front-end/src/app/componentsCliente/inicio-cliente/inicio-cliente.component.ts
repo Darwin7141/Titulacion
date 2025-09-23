@@ -84,23 +84,45 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
     this.userEmail = user?.correo ?? 'Invitado';
     this.codigocliente = user?.codigocliente || null;
 
-    // 1) FETCH INICIAL de notificaciones “offline”
     if (this.codigocliente) {
-      this.notiSvc.fetchNotificacionesCliente(this.codigocliente)
-        .subscribe(initial => {
-          const formatted: ClienteNoti[] = initial.map(d => ({
-            id:             (d as any).id,
-            texto:          d.mensaje,               // ← uso directo de mensaje desde la BD
-            idreserva:      d.idreserva,
-            fecha:          (d as any).creado_en     // ← uso de la fecha real en creado_en
-          }));
-          this._ngZone.run(() => {
-            this.notificaciones = formatted;
-            this.hayNuevasNotificaciones = formatted.length > 0;
-            this.cantidadNotificacionesCliente = formatted.length;
-          });
+    this.notiSvc.identifyCliente(this.codigocliente);
+  }
+
+  if (this.codigocliente) {
+    this.notiSvc.fetchNotificacionesCliente(this.codigocliente)
+      .subscribe(initial => {
+        const formatted = initial.map(d => ({
+          id:        (d as any).id,
+          texto:     d.mensaje,
+          idreserva: d.idreserva,
+          fecha:     (d as any).creado_en
+        }));
+        this._ngZone.run(() => {
+          this.notificaciones = formatted;
+          this.hayNuevasNotificaciones = formatted.length > 0;
+          this.cantidadNotificacionesCliente = formatted.length;
         });
-    }
+      });
+  }
+    const subNuevaNoti = this.notiSvc.onNuevaNotificacion()
+    .subscribe(data => {
+      if (!data) return;
+
+      this._ngZone.run(() => {
+        this.notificaciones.unshift({
+          id: data.id,
+          texto: data.mensaje,
+          idreserva: '',                 // opcional si no lo envías; o usa data.idreserva si lo mandas
+          fecha: data.timestamp
+        });
+        this.hayNuevasNotificaciones = true;
+        this.cantidadNotificacionesCliente = this.notificaciones.length;
+
+        
+        
+      });
+    });
+  this.subscripciones.push(subNuevaNoti);
 
     // 2) Suscripción a cambios de estado en tiempo real
     const subCambioEstado = this.notiSvc.onCambioEstado()

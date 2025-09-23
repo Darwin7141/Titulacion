@@ -10,12 +10,12 @@ if (!isProd && fs.existsSync(path.join(__dirname, '.env'))) {
   dotenv.config({ path: path.join(__dirname, '.env') });
 }
 
-// Carga process.env (PayPal local) solo en local
+// Carga process.env (PayPal)
 if (!isProd && fs.existsSync(path.join(__dirname, 'process.env'))) {
   dotenv.config({ path: path.join(__dirname, 'process.env'), override: true });
 }
 
-// DEBUG opcional (quítalo luego)
+
 console.log('[ENV check] PAYPAL_ENV=', process.env.PAYPAL_ENV);
 console.log('[ENV check] CID set? ', !!process.env.PAYPAL_CLIENT_ID);
 console.log('[ENV check] SEC set? ', !!process.env.PAYPAL_SECRET);
@@ -29,13 +29,11 @@ const cors     = require('cors');
 
 const app = express();
 app.set('trust proxy', 1);
-// ——————————————————————————————
-// 1) Middlewares de Express
-// ——————————————————————————————
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// — Nuevos: CORS y sesiones —
+
 const FRONTEND = process.env.FRONTEND_URL || 'http://localhost:4200';
 app.use(cors({
   origin: FRONTEND,
@@ -61,9 +59,7 @@ function ensureAuth(req, res, next) {
   return res.status(401).send({ message: 'No autorizado' });
 }
 
-// ——————————————————————————————
-// 2) Rutas REST de tu aplicación
-// ——————————————————————————————
+// Rutas
 require('./server/routes/usuarios')(app);
 require('./server/routes/gestionclientes')(app);
 require('./server/routes/cargoempleados')(app);
@@ -73,7 +69,7 @@ require('./server/routes/empleados')(app);
 
 require('./server/routes/administrador')(app);
 
-// Protegemos proveedor
+
 app.use('/api/proveedor', ensureAuth);
 require('./server/routes/proveedor')(app);
 
@@ -100,18 +96,14 @@ app.get('*', (_req, res) => {
   res.status(200).send({ message: 'Bienvenido al servidor NodeJS' });
 });
 
-// ——————————————————————————————
-// 3) Servidor HTTP (listen lo hace www.js)
-// ——————————————————————————————
+
 const server = http.createServer(app);
 const io = new socketIO.Server(server, {
   cors: { origin: '*', methods: ['GET', 'POST'] }
 });
 app.set('io', io);
 
-// ——————————————————————————————
-// 4) Socket.IO
-// ——————————————————————————————
+// Socket io
 io.on('connection', (socket) => {
   console.log(`🔌 [Socket.IO] Cliente conectado: ${socket.id}`);
 
@@ -131,9 +123,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// ——————————————————————————————
-// 5) DB ready → tareas periódicas (y sync opcional)
-// ——————————————————————————————
+
 const db = require('./server/models');
 const { checkExpiracionesYNotificar } = require('./server/controllers/notificaciones');
 
@@ -142,7 +132,7 @@ const { checkExpiracionesYNotificar } = require('./server/controllers/notificaci
     await db.sequelize.authenticate();
     console.log('[DB] Conectado a Postgres');
 
-    // Sincroniza SOLO si lo pides con RUN_SYNC=true
+    // Opcion de sincronizar
     if (process.env.RUN_SYNC === 'true') {
       try {
         console.log('[DB] Sincronizando tablas…');
@@ -150,18 +140,18 @@ const { checkExpiracionesYNotificar } = require('./server/controllers/notificaci
         console.log('[DB] Tablas sincronizadas');
       } catch (e) {
         console.error('[DB] Sync falló:', e.message);
-        // seguimos igual; no bloqueamos el servidor ni las tareas
+        
       }
     }
 
   } catch (err) {
     console.error('[DB] Error de conexión:', err);
   } finally {
-    // SIEMPRE corre las tareas aunque sync haya fallado
+    
     setImmediate(() => checkExpiracionesYNotificar(io));
     setInterval(() => checkExpiracionesYNotificar(io), 24 * 60 * 60 * 1000);
   }
 })();
 
-// www.js se encargará de llamar a `server.listen(...)`.
+
 module.exports = { app, server };

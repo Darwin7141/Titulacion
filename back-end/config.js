@@ -14,7 +14,7 @@ module.exports = {
     ...base
   },
   test: {
-    // si lo usas, cámbialo a PG también o déjalo así para pruebas locales
+    
     username: "root",
     password: null,
     database: "database_test",
@@ -24,7 +24,7 @@ module.exports = {
   production: {
     ...base,
     dialectOptions: {
-      ssl: { require: true, rejectUnauthorized: false }  // necesario en Render PG
+      ssl: { require: true, rejectUnauthorized: false }  
     }
   }
 };

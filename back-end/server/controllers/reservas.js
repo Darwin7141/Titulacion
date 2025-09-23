@@ -110,20 +110,28 @@ async function create(req, res) {
     });
 
 
-    await modelos.notificaciones.create({
-  codigocliente: codigocliente,
-  tipo:          'RESERVA',
-  mensaje:       `Tienes una nueva reserva con código: ${nextCodigo}`,
-  idreserva:     nextCodigo,
-  leida:         false
+   const notiCreada = await modelos.notificaciones.create({
+  codigocliente,
+  tipo: 'RESERVA',
+  mensaje: `Tienes una nueva reserva con código: ${nextCodigo}`,
+  idreserva: nextCodigo,
+  leida: false
 });
 
     // 6) Emitimos un evento global “nueva-reserva” para que el ADMIN escuchando
-    io.emit('nueva-reserva', {
-  idreserva:    nextCodigo,
+ io.to(`cliente_${codigocliente}`).emit('nueva-notificacion', {
+  id: notiCreada.id,
+  mensaje: notiCreada.mensaje,
+  timestamp: new Date().toISOString(),
   codigocliente,
-  mensaje:      `Se creó la reserva ${nextCodigo}`,
-  timestamp:    new Date()
+  idreserva: nextCodigo
+});
+
+io.to('ADMIN').emit('nueva-reserva', {
+  idreserva: nextCodigo,
+  codigocliente,
+  mensaje: `Se creó la reserva ${nextCodigo}`,
+  timestamp: new Date().toISOString()
 });
 
     return res.status(201).json({

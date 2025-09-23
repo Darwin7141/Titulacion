@@ -48,9 +48,6 @@ export class NotificacionesService {
       console.log('[NotificacionesService] Socket.IO desconectado');
     });
 
-    
-  
-
     // 1) Si el usuario es cliente, debe identificarse:
     const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
     const codigocliente = user?.codigocliente;
@@ -146,12 +143,14 @@ markAllExpiracionesAdminAsRead(): Observable<void> {
     );
   }
 
-
- 
   desconectar() {
     if (this.socket) {
       this.socket.disconnect();
     }
   }
+
+  identifyCliente(codigocliente: string) {
+  this.socket.emit('identificar-cliente', codigocliente);
+}
 }
 
