@@ -78,6 +78,34 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
     this._router.navigate(['login']);
   }
 
+  private CLAVE_LS_BASE = 'notificaciones_cliente_pendientes';
+
+private claveCache(): string {
+  return `${this.CLAVE_LS_BASE}_${this.codigocliente}`;
+}
+
+private cargarCacheNotificaciones(): ClienteNoti[] {
+  try {
+    const crudo = localStorage.getItem(this.claveCache());
+    return crudo ? JSON.parse(crudo) as ClienteNoti[] : [];
+  } catch {
+    return [];
+  }
+}
+
+private guardarCacheNotificaciones(lista: ClienteNoti[]) {
+  localStorage.setItem(this.claveCache(), JSON.stringify(lista));
+}
+
+
+private fusionarPorId(listaA: ClienteNoti[], listaB: ClienteNoti[]): ClienteNoti[] {
+  const porId = new Map<number, ClienteNoti>();
+  [...listaA, ...listaB].forEach(n => porId.set(n.id, n));
+  return Array.from(porId.values())
+    .sort((x, y) => new Date(y.fecha).getTime() - new Date(x.fecha).getTime());
+}
+
+
   ngOnInit() {
 
     const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
@@ -88,64 +116,81 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
     this.notiSvc.identifyCliente(this.codigocliente);
   }
 
+  const cacheInicial = this.cargarCacheNotificaciones();
+  this.notificaciones = cacheInicial;
+  this.hayNuevasNotificaciones = cacheInicial.length > 0;
+  this.cantidadNotificacionesCliente = cacheInicial.length;
+
   if (this.codigocliente) {
     this.notiSvc.fetchNotificacionesCliente(this.codigocliente)
-      .subscribe(initial => {
-        const formatted = initial.map(d => ({
-          id:        (d as any).id,
-          texto:     d.mensaje,
-          idreserva: d.idreserva,
-          fecha:     (d as any).creado_en
+      .subscribe(nuevasDesdeApi => {
+        const notisApi: ClienteNoti[] = (nuevasDesdeApi as any[]).map(n => ({
+          id:        n.id,
+          texto:     n.mensaje,
+          idreserva: n.idreserva,
+          fecha:     n.creado_en
         }));
+
+        const fusionadas = this.fusionarPorId(this.notificaciones, notisApi);
+
         this._ngZone.run(() => {
-          this.notificaciones = formatted;
-          this.hayNuevasNotificaciones = formatted.length > 0;
-          this.cantidadNotificacionesCliente = formatted.length;
+          this.notificaciones = fusionadas;
+          this.hayNuevasNotificaciones = fusionadas.length > 0;
+          this.cantidadNotificacionesCliente = fusionadas.length;
+          this.guardarCacheNotificaciones(fusionadas);
         });
       });
   }
-    const subNuevaNoti = this.notiSvc.onNuevaNotificacion()
-    .subscribe(data => {
-      if (!data) return;
+
+  // 5) Socket: nueva notificación en vivo (mensaje ya “listo para mostrar”)
+  const subNuevaNotificacion = this.notiSvc.onNuevaNotificacion()
+    .subscribe(datos => {
+      if (!datos) return;
+
+      const notificacionNueva: ClienteNoti = {
+        id:        datos.id,
+        texto:     datos.mensaje,
+        idreserva: (datos as any).idreserva ?? '',
+        fecha:     datos.timestamp
+      };
+
+      const fusionadas = this.fusionarPorId([notificacionNueva], this.notificaciones);
 
       this._ngZone.run(() => {
-        this.notificaciones.unshift({
-          id: data.id,
-          texto: data.mensaje,
-          idreserva: '',                 // opcional si no lo envías; o usa data.idreserva si lo mandas
-          fecha: data.timestamp
-        });
+        this.notificaciones = fusionadas;
         this.hayNuevasNotificaciones = true;
-        this.cantidadNotificacionesCliente = this.notificaciones.length;
-
-        
-        
+        this.cantidadNotificacionesCliente = fusionadas.length;
+        this.guardarCacheNotificaciones(fusionadas);
       });
     });
-  this.subscripciones.push(subNuevaNoti);
+  this.subscripciones.push(subNuevaNotificacion);
 
-    // 2) Suscripción a cambios de estado en tiempo real
-    const subCambioEstado = this.notiSvc.onCambioEstado()
-  .subscribe((data: NotifData & { id?: number } | null) => {
-    if (!data || data.codigocliente !== this.codigocliente) return;
-    // ya que la noti viene con mensaje correcto, no hace falta reconstruirlo:
-    const textoNoti = data.mensaje;
-    this._ngZone.run(() => {
-      this.notificaciones.push({
-        id: data.id!,                 // ← usamos el id real
-        texto: textoNoti,
-        idreserva: data.idreserva!,
-        fecha: data.timestamp
+  
+  const subCambioEstado = this.notiSvc.onCambioEstado()
+    .subscribe((datos: NotifData & { id?: number } | null) => {
+      if (!datos || datos.codigocliente !== this.codigocliente) return;
+
+      const notificacionEstado: ClienteNoti = {
+        id:        datos.id!,
+        texto:     datos.mensaje,
+        idreserva: datos.idreserva!,
+        fecha:     datos.timestamp
+      };
+
+      const fusionadas = this.fusionarPorId([notificacionEstado], this.notificaciones);
+
+      this._ngZone.run(() => {
+        this.notificaciones = fusionadas;
+        this.hayNuevasNotificaciones = true;
+        this.cantidadNotificacionesCliente = fusionadas.length;
+        this.guardarCacheNotificaciones(fusionadas);
       });
-      this.hayNuevasNotificaciones = this.notificaciones.length > 0;
-      this.cantidadNotificacionesCliente = this.notificaciones.length;
     });
-  });
-    this.subscripciones.push(subCambioEstado);
-    this.cargarImagenesServicios();
-    this.cargarServiciosSidebar(); 
-    
-  }
+  this.subscripciones.push(subCambioEstado);
+  this.cargarImagenesServicios();
+  this.cargarServiciosSidebar();
+}
+
 
   ngOnDestroy() {
     this.subscripciones.forEach(s => s.unsubscribe && s.unsubscribe());
@@ -225,6 +270,7 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
         this.notificaciones = [];
         this.hayNuevasNotificaciones = false;
         this.cantidadNotificacionesCliente = 0;
+        this.guardarCacheNotificaciones([]);
       });
     }
   });
@@ -236,6 +282,7 @@ export class InicioClienteComponent implements OnInit, OnDestroy {
       this.notificaciones = this.notificaciones.filter(n => n.id !== id);
       this.hayNuevasNotificaciones = this.notificaciones.length > 0;
       this.cantidadNotificacionesCliente = this.notificaciones.length;
+      this.guardarCacheNotificaciones(this.notificaciones);
       Swal.close();
       if (this.notificaciones.length) {
         this.verNotificacionesCliente();

@@ -11,8 +11,8 @@ export interface NotifData {
   mensaje: string;
   timestamp: string;
   clienteNombre?: string;
-  nuevoEstado?: string;    // para evento de cambio de estado
-  tipoPago?: string;       // para evento de pago
+  nuevoEstado?: string;    
+  tipoPago?: string;       
   montoPago?: number;
 }
 

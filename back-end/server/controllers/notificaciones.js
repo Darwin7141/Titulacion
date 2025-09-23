@@ -29,11 +29,7 @@ async function checkExpiracionesYNotificar(io, diasAdelanto = 7) {
   }
 }
 
-/**
- * Handler Express:
- * 1) dispara la comprobación
- * 2) devuelve al cliente HTTP la lista de expiraciones calculada
- */
+
 async function listExpiraciones(req, res) {
   try {
     const io = req.app.get('io');
