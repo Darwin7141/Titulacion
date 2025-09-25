@@ -8,6 +8,7 @@ module.exports = (app) => {
     app.get('/api/reservas',  resController.getAll);
     app.get('/api/reserva/cliente/:codigocliente', resController.getByCliente);
     app.post('/api/reserva/clienteYReserva', resController.createClienteYReserva);
+    app.get('/api/reservas/countByDate/:fecha', resController.countByDate);
     app.get('/api/reservas/:idreserva', resController.getOne);
     app.post('/api/reservas/:idreserva/pago/primerPago', resController.procesarPrimerPago);
     app.post('/api/reservas/:idreserva/pago/segundoPago', resController.procesarSegundoPago);
@@ -17,7 +18,7 @@ module.exports = (app) => {
     app.get('/api/dashboard/reservas-6m',   resController.getReservasUltimosSeisMeses);
     app.get('/api/dashboard/top-servicios', resController.getServiciosMasReservados);
     app.get('/api/reservas/fechas', resController.listFechas);
-    app.get('/api/reservas/countByDate/:fecha', resController.countByDate);
+    
     
 
    
