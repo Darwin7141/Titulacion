@@ -76,14 +76,14 @@
 
             </ng-container>
 
-          </div> <!-- /pagos-row -->
+          </div> 
 
-        </div> <!-- /left-col -->
+        </div> 
 
       </div>
     </mat-card-header>
 
-    <!-- ─────────────── CONTENIDO (tabla) ─────────────── -->
+    <!--  CONTENIDO (tabla)-->
     <mat-card-content class="table-container">
 
       <div class="table-scroll">
@@ -97,7 +97,7 @@
               <th>Cliente</th>
               <th>Dirección</th>
               <th>Fecha Evento</th>
-              <th>Cant. Personas</th>
+              <th>Cantidad</th>
               <th>Total</th>
               <th>1.º&nbsp;Pago</th>
               <th>2.º&nbsp;Pago</th>
@@ -113,7 +113,7 @@
               <td>{{ res.cliente.ci }}</td>
               <td>{{ res.cliente.nombre }}</td>
               <td>{{ res.direccionevento }}</td>
-              <td>{{ res.fechaevento | date:'shortDate' }}</td>
+              <td>{{ res.fechaevento  }}</td>
               <td>{{ res.cantpersonas }}</td>
               <td>{{ res.total | currency:'USD':'symbol' }}</td>
               <td>{{ res.primer_pago | currency:'USD':'symbol' }}</td>
