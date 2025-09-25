@@ -389,8 +389,11 @@ private fmtMoneda = (v: number) =>
       .format(v ?? 0);
 
 /* ───── helper fecha corta ───── */
-private fmtFecha = (iso: string) =>
-  new Date(iso).toLocaleDateString('es-EC');
+private fmtFecha = (v: string) => {
+  const ymd = String(v).slice(0, 10); // "YYYY-MM-DD"
+  const [y, m, d] = ymd.split('-');
+  return `${d}/${m}/${y}`;            // "dd/MM/yyyy"
+};
 
 /* ================== PDF ================== */
 async downloadPdf(filtrarIdEstado?: number): Promise<void> {
