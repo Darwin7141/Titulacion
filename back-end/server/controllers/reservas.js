@@ -5,6 +5,7 @@ const { enviarNotificacionReserva } = require('../controllers/contacto');
 const { fn, col, literal } = require('sequelize');
 const sequelize = modelos.sequelize; 
 
+
 async function create(req, res) {
   const io = req.app.get('io');
   const {
@@ -35,6 +36,21 @@ async function create(req, res) {
         });
       }
       estadoParaInsertar = estadoSolicitada.idestado;
+    }
+
+    const estCancelada = await modelos.estado_reserva.findOne({
+      where: { estado_reserva: 'Cancelada' },
+      attributes: ['idestado']
+    });
+    const idCancelada = estCancelada?.idestado;
+    const whereCount = { fechaevento };
+
+    if (idCancelada) {
+      whereCount.idestado = { [Op.ne]: idCancelada };
+    }
+    const count = await modelos.reservas.count({ where: whereCount });
+    if (count >= 3) {
+      return res.status(409).json({ error: 'FECHA_NO_DISPONIBLE', count });
     }
 
     // 2) Generar idreserva (código interno como "R001", "R002", etc.)
@@ -233,6 +249,27 @@ async function createClienteYReserva(req, res) {
       }
       estadoParaInsertar = estadoSolicitada.idestado;
     }
+
+    const estCancelada = await modelos.estado_reserva.findOne({
+      where: { estado_reserva: 'Cancelada' },
+      attributes: ['idestado'],
+      transaction: t
+    });
+    const idCancelada = estCancelada?.idestado;
+
+    const whereCount = { fechaevento };
+
+    if (idCancelada) {
+      whereCount.idestado = { [Op.ne]: idCancelada };
+    }
+
+    const count = await modelos.reservas.count({ where: whereCount, transaction: t });
+    if (count >= 3) {
+      await t.rollback();
+      return res.status(409).json({ error: 'FECHA_NO_DISPONIBLE', count });
+    }
+
+
 
     // Generar un nuevo id de reserva
     const lastReserva = await modelos.reservas.findOne({ order: [['idreserva','DESC']],
@@ -924,6 +961,31 @@ async function listFechas(req, res) {
   }
 }
 
+async function countByDate(req, res) {
+  try {
+    const { fecha } = req.params; // "YYYY-MM-DD"
+
+    // Busca el ID del estado "Cancelada"
+    const estCancelada = await modelos.estado_reserva.findOne({
+      where: { estado_reserva: 'Cancelada' },
+      attributes: ['idestado']
+    });
+    const idCancelada = estCancelada?.idestado;
+
+    const whereBase = { fechaevento: fecha };
+    if (idCancelada) {
+      // Excluir canceladas del conteo
+      whereBase.idestado = { [Op.ne]: idCancelada };
+    }
+
+    const count = await modelos.reservas.count({ where: whereBase });
+    return res.json({ count });
+  } catch (e) {
+    console.error('COUNT_BY_DATE_FAILED', e);
+    return res.status(500).json({ error: 'COUNT_BY_DATE_FAILED' });
+  }
+}
+
 
 module.exports = {
     create,
@@ -941,6 +1003,7 @@ module.exports = {
     getCancelacionesAdmin,
     getReservasUltimosSeisMeses,
     getServiciosMasReservados,
-    listFechas
+    listFechas,
+    countByDate
 
   };

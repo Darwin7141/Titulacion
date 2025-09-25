@@ -15,7 +15,7 @@ const transportador = nodemailer.createTransport({
 
 // Función para enviar correos de recuperación
 async function enviarCorreoRecuperacion(correo, token) {
-  const enlaceRecuperacion = `http://localhost:4200/restablecer-contrasena/${token}`; // URL del front-end
+  const enlaceRecuperacion = `https://servicios-daayfood.vercel.app//restablecer-contrasena/${token}`; // URL del front-end
 
   const opcionesCorreo = {
     from: 'd.morales1305@gmail.com',

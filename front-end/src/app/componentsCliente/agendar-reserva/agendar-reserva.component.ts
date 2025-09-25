@@ -218,28 +218,25 @@ export class AgendarReservaComponent implements OnInit{
   if (!this.validarCampos()) return;
 
   // 1) Consulto todas las reservas
-  this.reservasService.getFechas().subscribe({
-    next: (rows) => {
-      const selectedDate = this.formReserva.fechaevento; // 'YYYY-MM-DD'
-      const mismas = rows.filter(r => {
-        if (!r.fechaevento) return false;
-        const ymd = String(r.fechaevento).slice(0, 10); // por si viene con hora
-        return ymd === selectedDate;
-      }).length;
+  const selectedDate = this.formReserva.fechaevento; // "YYYY-MM-DD"
 
-      if (mismas >= 3) {
-                    Swal.fire({
-                     width: 480,
-                    html: `
-                      <div class="swal-pro-error"></div>
-                      <h2 class="swal-pro-title">Fecha no disponible</h2>
-                      <p class="swal-pro-desc">La fecha seleccionada para su reserva no está disponible. Por favor elija otra fecha para su reserva.</p>
-                    `,
-                    showConfirmButton: true,
-                    confirmButtonText: 'Entendido',
-                    buttonsStyling: false,
-                    customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
-                    });
+  this.reservasService.countByDate(selectedDate).subscribe({
+    next: ({ count }) => {
+      if (count >= 3) {
+        Swal.fire({
+          width: 480,
+          html: `
+            <div class="swal-pro-error"></div>
+            <h2 class="swal-pro-title">Fecha no disponible</h2>
+            <p class="swal-pro-desc">
+              La fecha seleccionada ya cuenta con ${count} reservas.
+              Por favor elige otra fecha.
+            </p>`,
+          showConfirmButton: true,
+          confirmButtonText: 'Entendido',
+          buttonsStyling: false,
+          customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+        });
         return;
       }
       // 2) Si hay menos de 3, sigo con mi lógica habitual

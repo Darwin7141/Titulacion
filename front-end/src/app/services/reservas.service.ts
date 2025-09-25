@@ -150,6 +150,10 @@ capturarOrdenPayPal(orderId: string) {
   return this.http.post<any>(`${this.url}paypal/capture`, { orderId });
 }
 
+countByDate(fecha: string) {
+  return this.http.get<{count: number}>(`${this.url}reservas/countByDate/${fecha}`);
+}
+
 getFechas() {
   return this.http
     .get<Array<{ idreserva: string; fechaevento: string }>>(

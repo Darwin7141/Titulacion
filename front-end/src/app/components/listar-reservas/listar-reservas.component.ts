@@ -104,11 +104,11 @@ export class ListarReservasComponent implements OnInit, OnChanges {
         this.reserva = data;
         this.resFiltrados = data;
 
-        // aplica highlight si vino por query o por Input
+        
         const hi = this.highlightedReserva || this.highlight;
         if (hi) {
           this.resFiltrados = this.resFiltrados.filter(r => r.idreserva === hi);
-          // si quieres, limpia el query param para no “pegarnos” a un id
+          
           this.router.navigate([], { relativeTo: this.route, queryParams: {} });
         }
 
@@ -527,7 +527,7 @@ async downloadPdf(filtrarIdEstado?: number): Promise<void> {
         this.pagosFiltrados.push({
           fecha   : r.fechaevento,
           reserva : r.idreserva,
-          cliente : r.cliente?.nombre ?? '(sin nombre)',  // ← NUEVO
+          cliente : r.cliente?.nombre ?? '(sin nombre)',  
           monto   : cents / 100
         });
         totalCents += cents;

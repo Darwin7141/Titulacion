@@ -16,7 +16,7 @@
         <label for="newPass">Nueva Contraseña</label>
         <input id="newPass" name="newPass" type="password"
                [(ngModel)]="pass" #newPassModel="ngModel"
-               required minlength="6" placeholder="********" />
+               required minlength="6" placeholder="" />
         <div class="error" *ngIf="newPassModel.invalid && (newPassModel.touched || f.submitted)">
   <ng-container *ngIf="newPassModel.errors?.['required']">La contraseña es obligatoria</ng-container>
   <ng-container *ngIf="newPassModel.errors?.['minlength']">Mínimo 6 caracteres</ng-container>
@@ -30,7 +30,7 @@
         <label for="confirmPass">Confirmar Contraseña</label>
         <input id="confirmPass" name="confirmPass" type="password"
                [(ngModel)]="confirm" #confirmModel="ngModel"
-               required placeholder="********" />
+               required placeholder="" />
         <div class="error" *ngIf="confirmModel.invalid && (confirmModel.touched || f.submitted)">
           Debes confirmar la contraseña
         </div>
