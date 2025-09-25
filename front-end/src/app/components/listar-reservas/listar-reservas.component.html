@@ -113,7 +113,7 @@
               <td>{{ res.cliente.ci }}</td>
               <td>{{ res.cliente.nombre }}</td>
               <td>{{ res.direccionevento }}</td>
-              <td>{{ fmtFecha(res.fechaevento)  }}</td>
+              <td>{{ res.fechaevento | date:'dd/MM/yyyy':'UTC'  }}</td>
               <td>{{ res.cantpersonas }}</td>
               <td>{{ res.total | currency:'USD':'symbol' }}</td>
               <td>{{ res.primer_pago | currency:'USD':'symbol' }}</td>
