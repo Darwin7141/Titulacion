@@ -82,9 +82,10 @@ export class ValidacionesService {
   }
 
   validarEmail(email: string): boolean {
-    const re = /^[^\s@]+@gmail\.com$/;
-    return re.test(email);
-  }
+  const e = (email ?? '').trim();
+  const re = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+  return re.test(e);
+}
 
   validarTelefono(telefono: string): boolean {
     return /^0\d{9}$/.test(telefono);
