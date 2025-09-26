@@ -4,13 +4,13 @@ const nodemailer = require('nodemailer');
 const transportador = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
-  secure: false, // STARTTLS
+  secure: false, 
   auth: {
     user: 'd.morales1305@gmail.com',
     pass: 'yxaw fkvg bhmv kcke',
   },
-  logger: true, // Habilita el registro detallado
-  debug: true,  // Habilita la depuración
+  logger: true, 
+  debug: true,  
 });
 
 // Función para enviar correos de recuperación
@@ -69,8 +69,8 @@ async function enviarCorreoNotificacionReserva({ to, subject, html }) {
   const mailOptions = {
     from: 'd.morales1305@gmail.com', // Debe coincidir con auth.user
     to,        // p. ej. 'd.morales1305@gmail.com'
-    subject,   // p. ej. '🔔 Nueva reserva: R005'
-    html       // el cuerpo HTML que armamos en el controlador de reservas
+    subject,   // p. ej. 'Nueva reserva: R005'
+    html       
   };
 
   try {

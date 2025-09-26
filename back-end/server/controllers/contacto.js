@@ -72,12 +72,12 @@ async function enviarNotificacionReserva({
 }) {
   // 1) Armar cuerpo de correo
   const serviciosStr = menusDetalle.length
-    ? menusDetalle.map(m => `${m.nombre} (x${m.cantpersonas})`).join(', ')
+    ? menusDetalle.map(m => `${m.nombre} (${m.cantpersonas}) Platos`).join(', ')
     : 'Ninguno';
 
-  const asunto = `🔔 Nueva reserva: ${idreserva}`;
+  const asunto = `Nueva reserva: ${idreserva}`;
   const cuerpoHtml = `
-    <h2>Se creó una nueva reserva en el sistema</h2>
+    <h2>Se creó una nueva reserva en la aplicación</h2>
     <p><strong>ID Reserva:</strong> ${idreserva}</p>
     <p><strong>Cliente:</strong> ${datosCliente.nombre} (Cédula: ${datosCliente.ci})</p>
     <p><strong>Teléfono:</strong> ${datosCliente.telefono}</p>
