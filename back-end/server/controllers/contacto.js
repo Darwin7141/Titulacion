@@ -70,7 +70,7 @@ async function enviarNotificacionReserva({
   menusDetalle,
   datosCliente
 }) {
-  // 1) Armar cuerpo de correo
+  // 1) Cuerpo de correo
   const serviciosStr = menusDetalle.length
     ? menusDetalle.map(m => `${m.nombre} (${m.cantpersonas} Platos) `).join(', ')
     : 'Ninguno';

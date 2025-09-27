@@ -73,7 +73,7 @@ export class ValidacionesService {
   return false;
 }
 
-  // ➕ NUEVO
+ 
   validarIdentificacionEcuador(valor: string): boolean {
     if (!/^\d+$/.test(valor)) return false;
     if (valor.length === 10) return this.validarCedulaEcuador(valor);
