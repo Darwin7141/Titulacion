@@ -109,7 +109,7 @@ private fusionarPorId(listaA: ClienteNoti[], listaB: ClienteNoti[]): ClienteNoti
   ngOnInit() {
 
     const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
-    this.userEmail = user?.correo ?? 'Invitado';
+    this.userEmail = user?.nombre ?? 'Invitado';
     this.codigocliente = user?.codigocliente || null;
 
     if (this.codigocliente) {
