@@ -231,24 +231,19 @@ button:hover{ filter:brightness(.96); }
 
 /* Icono de advertencia (círculo + admiración) */
 .swal-pro-warn{
-  width: 80px; height: 80px;
-  margin: 4px auto 8px;
-  border-radius: 50%;
-  background: #fff7ed;                 /* ámbar muy claro */
-  position: relative;
-  box-shadow: inset 0 0 0 4px #fdba74;  /* aro ámbar */
+  width:80px;height:80px;margin:4px auto 8px;border-radius:50%;
+  background:#fff7ed; 
+  position:relative;
 }
-.swal-pro-warn::before{
-  content:"";
-  position:absolute; left:50%; top:20px;
-  width:6px; height:28px; margin-left:-3px;
-  background:#f59e0b; border-radius:3px;
+.swal-pro-warn::after{ 
+  content:"";position:absolute;left:50%; top:18px;width:4px;height:28px;
+  background:#f59e0b;border-radius:2px;
+   transform:translateX(-50%);
 }
-.swal-pro-warn::after{
-  content:"";
-  position:absolute; left:50%; bottom:18px;
-  width:8px; height:8px; margin-left:-4px;
-  background:#f59e0b; border-radius:50%;
+.swal-pro-warn::before{ 
+  content:"";position:absolute;left:50%; top:54px;width:4px;height:4px;
+  background:#f59e0b;border-radius:50%;
+  transform:translateX(-50%);
 }
 
 /* Botones */
