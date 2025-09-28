@@ -40,7 +40,7 @@ type VistaCliente = 'dashboard' | 'servicios' | 'generar' | 'reservas'|'menus';
 })
 export class InicioClienteComponent implements OnInit, OnDestroy {
 
-  userEmail = '';
+  usuarioNombre = '';
   hayNuevasNotificaciones = false;
   cantidadNotificacionesCliente = 0;
   notificaciones: ClienteNoti[] = [];
@@ -109,7 +109,7 @@ private fusionarPorId(listaA: ClienteNoti[], listaB: ClienteNoti[]): ClienteNoti
   ngOnInit() {
 
     const user = JSON.parse(localStorage.getItem('identity_user') || '{}');
-    this.userEmail = user?.nombre ?? 'Invitado';
+    this.usuarioNombre = user?.nombre?.trim?.() ?? 'Invitado';
     this.codigocliente = user?.codigocliente || null;
 
     if (this.codigocliente) {

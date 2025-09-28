@@ -52,11 +52,11 @@ export class AdminComponent implements OnInit, OnDestroy{
   totalProveedores = 0;
   sidenavWidth = 45;
 
-  // ───────── Gráfico reservas 6 meses ─────────
-  reservasLabels: string[] = [];         // ej. ['Ene', 'Feb', …]
-  reservasData  : number[] = [];         // totales por mes
+  // Gráfico reservas 6 meses 
+  reservasLabels: string[] = [];         
+  reservasData  : number[] = [];         
 
-  // ───────── Servicios más reservados ─────────
+  // Servicios más reservados 
   topServicios: { nombre: string, total: number }[] = [];
   activeView: 'dashboard' | 'admin' | 'cliente' | 'cargos' |
             'empleados' | 'proveedores' | 'categorias' |
@@ -67,8 +67,6 @@ export class AdminComponent implements OnInit, OnDestroy{
   categoriasMenu: Array<{ id: number; nombre: string; icon: string }> = [];
   reservaNotificada: string | null = null; 
   
-  
-
   constructor(
     private _auth:AuthService,
     private reservasService: ReservasService,
