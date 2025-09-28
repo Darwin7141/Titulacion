@@ -264,13 +264,13 @@ button:hover{ filter:brightness(.96); }
 .swal-pro-cancel:hover{ filter:brightness(.95); }
 .swal-pro-cancel:focus{ outline:none; box-shadow:0 0 0 4px rgba(107,114,128,.22); }
 
-:host ::ng-deep .swal2-popup.paypal-modal .swal2-title,
-:host ::ng-deep .swal2-title.paypal-title {
-  font-family: "Roboto", sans-serif;
-  font-weight: 700;
-  font-size: 10px !important; /* ajusta a gusto */
-  line-height: 1.2;
-  letter-spacing: .2px;
+.swal2-popup.paypal-modal .swal2-title,
+.swal2-title.paypal-title {
+  font-family: "Roboto", sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 10px !important;  /* ajusta a gusto */
+  line-height: 1.2 !important;
+  letter-spacing: .2px !important;
 }
 
 .my-spinner{
