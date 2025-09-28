@@ -403,7 +403,8 @@ doc.text(dinero(reserva?.total), col4Right - pad, totalY, { align: 'right' });
       `,
       showCancelButton: true,
       confirmButtonText: 'Pagar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
+      customClass: { popup: 'paypal-modal', title: 'paypal-title' }
     }).then((result) => {
       if (result.isConfirmed) {
         const montoPago = parseFloat((document.getElementById('montoPago') as HTMLInputElement).value);
@@ -471,7 +472,8 @@ doc.text(dinero(reserva?.total), col4Right - pad, totalY, { align: 'right' });
       `,
       showCancelButton: true,
       confirmButtonText: 'Pagar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
+      customClass: { popup: 'paypal-modal', title: 'paypal-title' }
     }).then((result) => {
       if (result.isConfirmed) {
         const montoPago = parseFloat((document.getElementById('montoPagoFinal') as HTMLInputElement).value);
@@ -569,7 +571,7 @@ doc.text(dinero(reserva?.total), col4Right - pad, totalY, { align: 'right' });
       html: `<div id="paypal-container-${reserva.idreserva}" style="margin-top: 16px;"></div>`,
       showConfirmButton: false,
       width: 460,
-      customClass: { popup: 'paypal-modal' },
+      customClass: { popup: 'paypal-modal', title: 'paypal-title' },
       didOpen: () => {
         const paypalSDK = (window as any).paypal;
         if (!paypalSDK || !paypalSDK.Buttons) {
