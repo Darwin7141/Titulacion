@@ -266,9 +266,9 @@ button:hover{ filter:brightness(.96); }
 
 .swal-popup.paypal-modal .swal-title,
 .swal-title.paypal-title {
-  font-family: "Poppins", Arial, sans-serif;
+  font-family:"Roboto",sans-serif;
   font-weight: 700;
-  font-size: 26px;     /* ⇐ ajusta a gusto */
+  font-size: 10px;     /* ⇐ ajusta a gusto */
   line-height: 1.2;
   letter-spacing: .2px;
 }
