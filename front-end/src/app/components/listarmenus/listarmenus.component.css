@@ -215,33 +215,40 @@
 :host ::ng-deep .mat-mdc-paginator-range-label{ display:none!important; }
 
 .edit-form{
-  max-height: 80vh;            /* no más alto que la ventana */
+  position: fixed;                /* se independiza del scroll de la página */
+  left: 50%;
+  top: 6vh;
+  transform: translateX(-50%);
+  width: min(720px, 92vw);
+  max-height: 88vh;               /* límite de alto en pantalla */
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;             /* padding del contenedor */
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  z-index: 1000;                  /* por encima de la tabla */
   display: flex;
   flex-direction: column;
-  overflow: hidden;            /* el scroll será del <form> */
+  overflow: hidden;               /* el scroll lo hará el <form> */
 }
 
-
-
-
-/* El <form> ocupa el espacio restante y puede scrollear */
+/* El <form> ocupa el área y scrollea */
 .edit-form > form{
-  flex: 1 1 auto;              /* ← clave: que crezca/encaje */
-  min-height: 0;               /* ← clave: permite contraerse para que aparezca el scroll */
-  overflow-y: auto;            /* scroll vertical interno */
-  padding: 4px 0 88px;         /* espacio para las acciones pegajosas */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;               /* ← scroll interno visible */
+  padding-bottom: 84px;           /* espacio para los botones */
   box-sizing: border-box;
 }
 
-/* Acciones fijas al fondo mientras haces scroll */
+/* Botonera fija al fondo del área visible del formulario */
 .form-actions{
   position: sticky;
   bottom: 0;
-  background:#fff;
-  border-top:1px solid #eee;
-  padding:12px 0;
-  display:flex;
-  gap:10px;
-  justify-content:flex-end;
-  z-index:2;
+  background: #fff;
+  border-top: 1px solid #eee;
+  padding: 12px 0;
+  display: flex;
+  gap: 10px;
+  justify-content: center;        /* centra tus botones (como en la captura) */
+  z-index: 2;
 }
