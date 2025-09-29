@@ -85,8 +85,12 @@
   font-size:1.05rem; font-weight:700; margin:.25rem 0 .25rem;
 }
 
-.desc-list{ margin:.35rem 0 1rem 1rem; padding:0 .25rem 0 0; }
-.desc-list li{ margin: .25rem 0; }
+.desc-list{
+  list-style: none;          
+  margin: .35rem 0 1rem 0;   
+  padding: 0;                
+}
+.desc-list li{ margin: .25rem 0; text-align:justify; }
 
 /* Botón agregar */
 .add-to-list{

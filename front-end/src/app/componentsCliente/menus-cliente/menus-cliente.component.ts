@@ -168,7 +168,7 @@ export class MenusClienteComponent implements OnInit, OnChanges {
       <div class="swal-pro-check"></div>
       <h2 class="swal-pro-title">Añadido</h2>
 
-      <p class="swal-pro-desc">Se agregó "<strong>${nombre}</strong>" a la reserva</p>
+      <p class="swal-pro-desc">Se agregó <strong>${nombre}</strong> a la reserva</p>
     `,
     showConfirmButton: true,
     confirmButtonText: 'Listo',
