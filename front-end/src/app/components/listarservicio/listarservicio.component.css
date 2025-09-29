@@ -228,3 +228,32 @@
   
 }
 .btn-download mat-icon{margin-right:4px;}
+
+.edit-form{
+  /* el modal no crecerá más que la pantalla */
+  max-height: 80vh;
+  overflow: hidden;            /* el scroll lo hará el <form> */
+  display: flex;
+  flex-direction: column;
+}
+
+/* hace scroll solo el cuerpo del formulario */
+.edit-form > form{
+  overflow-y: auto;
+  max-height: 100%;
+  padding: 8px 0 88px;         /* espacio para acciones pegajosas */
+  box-sizing: border-box;
+}
+
+/* acciones siempre visibles al fondo mientras haces scroll */
+.form-actions{
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #eee;
+  padding: 12px 0;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  z-index: 2;                  /* sobre el contenido al hacer scroll */
+}
