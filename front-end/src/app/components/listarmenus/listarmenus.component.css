@@ -215,31 +215,33 @@
 :host ::ng-deep .mat-mdc-paginator-range-label{ display:none!important; }
 
 .edit-form{
-  /* el modal no crecerá más que la pantalla */
-  max-height: 80vh;
-  overflow: hidden;            /* el scroll lo hará el <form> */
+  max-height: 80vh;            /* no más alto que la ventana */
   display: flex;
   flex-direction: column;
+  overflow: hidden;            /* el scroll será del <form> */
 }
 
-/* hace scroll solo el cuerpo del formulario */
+
+
+
+/* El <form> ocupa el espacio restante y puede scrollear */
 .edit-form > form{
-  overflow-y: auto;
-  max-height: 100%;
-  padding: 8px 0 88px;         /* espacio para acciones pegajosas */
+  flex: 1 1 auto;              /* ← clave: que crezca/encaje */
+  min-height: 0;               /* ← clave: permite contraerse para que aparezca el scroll */
+  overflow-y: auto;            /* scroll vertical interno */
+  padding: 4px 0 88px;         /* espacio para las acciones pegajosas */
   box-sizing: border-box;
 }
 
-/* acciones siempre visibles al fondo mientras haces scroll */
+/* Acciones fijas al fondo mientras haces scroll */
 .form-actions{
   position: sticky;
   bottom: 0;
-  background: #fff;
-  border-top: 1px solid #eee;
-  padding: 12px 0;
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  z-index: 2;                  /* sobre el contenido al hacer scroll */
+  background:#fff;
+  border-top:1px solid #eee;
+  padding:12px 0;
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+  z-index:2;
 }
-
