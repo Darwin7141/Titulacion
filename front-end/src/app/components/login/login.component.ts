@@ -488,85 +488,97 @@ async generarPDFServiciosMenus() {
 
   // ---------- MEDIDOR: alto real de la fila según nombre + descripción ----------
   const medirAltoFilaMenu = (menu: any, anchoTexto: number) => {
-    const FS_NOMBRE = 12, LH_NOMBRE = FS_NOMBRE * 1.2;
-    const FS_DESC   = 9,  LH_DESC   = FS_DESC * 1.2;
-    const GAP       = 2;          // espacio entre nombre y descripción
-    const PAD_V     = 20;         // padding vertical total (arriba+abajo)
+  // Reservamos un margen a la derecha para el precio
+  const ANCHO_PRECIO = 70;            // columna virtual del precio
+  const maxNombre = Math.max(20, anchoTexto - ANCHO_PRECIO);
 
-    const lineasNombre = doc.splitTextToSize(String(menu.nombre || '').toUpperCase(), anchoTexto);
-    const descCruda    = String(menu.descripcion || '').trim();
-    const lineasDesc   = descCruda ? doc.splitTextToSize(descCruda, anchoTexto) : [];
+  // Tipos
+  const FS_NOMBRE_BASE = 11;          // nombre un poco más pequeño (estilo carta)
+  const FS_DESC        = 9;
+  const LH_NOMBRE      = FS_NOMBRE_BASE * 1.2;
+  const LH_DESC        = FS_DESC * 1.25;
 
-    const altoTexto = (lineasNombre.length * LH_NOMBRE) +
-                      (lineasDesc.length ? GAP : 0) +
-                      (lineasDesc.length * LH_DESC);
+  // Nombre en UNA línea: auto-fit para que quepa en maxNombre
+  const nombre = String(menu.nombre || '').toUpperCase().trim();
+  const fzNombre = this.fitFontSizeToMaxLine(doc, [nombre], FS_NOMBRE_BASE, maxNombre, 9);
 
-    return Math.max(ROW_H_MIN, altoTexto + PAD_V);
-  };
+  // Descripción envuelta
+  const desc = String(menu.descripcion || '').trim();
+  const lineasDesc = desc ? doc.splitTextToSize(desc, maxNombre) : [];
+
+  // Bloque de texto: nombre (una línea) + gap + descripción
+  const GAP = lineasDesc.length ? 2 : 0;
+  const altoTexto = (fzNombre * 1.2) + GAP + (lineasDesc.length * LH_DESC);
+
+  // Padding vertical
+  const PAD_SUP = 10, PAD_INF = 10;
+
+  // Alto final = mayor entre imagen y bloque de texto, + padding
+  return Math.max(IMG.h, altoTexto) + PAD_SUP + PAD_INF;
+};
 
   // ---------- DIBUJADOR: una fila de menú (nombre + descripción debajo) ----------
   const dibujarFilaMenu = async (menu: any, altoFila: number) => {
-    const x = CX[col], width = CW;
+  const x = CX[col], width = CW;
 
-    const imgX = x + 6;
-    const imgY = y + (altoFila - IMG.h) / 2;
+  // Padding y posiciones base
+  const PAD_SUP = 10, PAD_INF = 10, ANCHO_PRECIO = 70;
+  const imgX = x + 6;
+  const imgY = y + PAD_SUP + Math.max(0, (altoFila - PAD_SUP - PAD_INF - IMG.h)); // imagen pegada arriba
 
-    try {
-      if (menu.fotoMenuUrl) {
-        const base64 = await this.getBase64ImageRounded(menu.fotoMenuUrl, IMG.w, IMG.h, IMG.r);
-        doc.addImage(base64, 'PNG', imgX, imgY, IMG.w, IMG.h);
-      } else {
-        doc.setFillColor('#F3F4F6');
-        doc.roundedRect(imgX, imgY, IMG.w, IMG.h, IMG.r, IMG.r, 'F');
-      }
-    } catch {
+  // Imagen
+  try {
+    if (menu.fotoMenuUrl) {
+      const base64 = await this.getBase64ImageRounded(menu.fotoMenuUrl, IMG.w, IMG.h, IMG.r);
+      doc.addImage(base64, 'PNG', imgX, imgY, IMG.w, IMG.h);
+    } else {
       doc.setFillColor('#F3F4F6');
       doc.roundedRect(imgX, imgY, IMG.w, IMG.h, IMG.r, IMG.r, 'F');
     }
+  } catch {
+    doc.setFillColor('#F3F4F6');
+    doc.roundedRect(imgX, imgY, IMG.w, IMG.h, IMG.r, IMG.r, 'F');
+  }
 
-    const textoX   = imgX + IMG.w + 10;
-    const textoMax = x + width - textoX - 60;
-    const centroY  = y + altoFila / 2;
+  // Área de texto
+  const textoX   = imgX + IMG.w + 10;
+  const textoMax = x + width - textoX - 60;
+  const maxNombre = Math.max(20, textoMax - ANCHO_PRECIO);    // dejamos espacio para el precio
 
-    // tipografías
-    const FS_NOMBRE = 12, LH_NOMBRE = FS_NOMBRE * 1.2;
-    const FS_DESC   = 9,  LH_DESC   = FS_DESC * 1.2;
-    const GAP       = 2;
+  // Tipos
+  const FS_NOMBRE_BASE = 11;                                   // un poco menor que antes
+  const FS_DESC        = 9;
+  const LH_DESC        = FS_DESC * 1.25;
 
-    const lineasNombre = doc.splitTextToSize(String(menu.nombre || '').toUpperCase(), textoMax);
-    const descCruda    = String(menu.descripcion || '').trim();
-    const lineasDesc   = descCruda ? doc.splitTextToSize(descCruda, textoMax) : [];
+  // --- Nombre (una sola línea, auto-fit) ---
+  const nombre = String(menu.nombre || '').toUpperCase().trim();
+  const fzNombre = this.fitFontSizeToMaxLine(doc, [nombre], FS_NOMBRE_BASE, maxNombre, 9);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(fzNombre); doc.setTextColor(NAME_COLOR);
 
-    const altoBloqueTexto = (lineasNombre.length * LH_NOMBRE) +
-                            (lineasDesc.length ? GAP : 0) +
-                            (lineasDesc.length * LH_DESC);
+  const yTop = y + PAD_SUP + fzNombre;                         // línea del nombre alineada arriba
+  doc.text(nombre, textoX, yTop, { maxWidth: maxNombre });
 
-    // primera baseline del nombre para centrar verticalmente todo el bloque
-    let cursorY = centroY - (altoBloqueTexto / 2) + FS_NOMBRE * 0.85;
+  // --- Precio (misma línea del nombre, derecha) ---
+  const precioTxt = `$${Number(menu.precio ?? 0).toFixed(2)}`;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(fzNombre); doc.setTextColor(PRICE_COLOR);
+  doc.text(precioTxt, x + width - 6, yTop, { align: 'right' });
 
-    // nombre
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(FS_NOMBRE); doc.setTextColor(NAME_COLOR);
-    doc.text(lineasNombre, textoX, cursorY);
+  // --- Descripción debajo del nombre ---
+  const desc = String(menu.descripcion || '').trim();
+  if (desc) {
+    const lineasDesc = doc.splitTextToSize(desc, maxNombre);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(FS_DESC); doc.setTextColor(MUTED);
+    const yDesc = yTop + 2 + FS_DESC * 0.9;
+    doc.text(lineasDesc, textoX, yDesc);
+  }
 
-    // descripción (debajo del nombre, más pequeña y color atenuado)
-    if (lineasDesc.length) {
-      cursorY += lineasNombre.length * LH_NOMBRE + GAP + (FS_DESC * 0.85 - FS_NOMBRE * 0.85);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(FS_DESC); doc.setTextColor(MUTED);
-      doc.text(lineasDesc, textoX, cursorY);
-    }
+  // Separador inferior
+  doc.setDrawColor(235);
+  doc.line(x, y + altoFila, x + width, y + altoFila);
 
-    // precio (igual que antes)
-    const FS_PRECIO = 12;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(FS_PRECIO); doc.setTextColor(PRICE_COLOR);
-    const precioY = centroY + FS_PRECIO * 0.35;
-    doc.text(`$${Number(menu.precio ?? 0).toFixed(2)}`, x + width - 6, precioY, { align: 'right' });
-
-    // separador
-    doc.setDrawColor(235);
-    doc.line(x, y + altoFila, x + width, y + altoFila);
-
-    y += altoFila;
-  };
+  // Avanza Y
+  y += altoFila;
+};
 
   // ---------- empezar documento ----------
   dibujarPagina();
