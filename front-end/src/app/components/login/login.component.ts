@@ -394,13 +394,13 @@ private drawCenteredLines(
   return y;
 }
 
-// PDF Catalogo
-// PDF Catálogo (ACTUALIZADO: con descripción bajo el nombre)
+// ===== Tu PDF =====
 async generarPDFServiciosMenus() {
   const doc   = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
 
+  // ====== layout ======
   const M  = 36;
   const G  = 26;
   const W  = pageW - M * 2;
@@ -414,9 +414,9 @@ async generarPDFServiciosMenus() {
   // se recalcula por página según el alto real del título
   let BODY_Y = BODY_Y_BASE;
 
-  // Imágenes/filas
-  const IMG   = { w: 64, h: 64, r: 40 };
-  const ROW_H_MIN = IMG.h + 14;          // alto mínimo de fila (imagen + padding)
+  // Imágenes/filas (mismo estilo que tenías)
+  const IMG   = { w: 80, h: 80, r: 50 };
+  const ROW_H = IMG.h + 20;
 
   // Encabezado de servicio
   const RHDR_H        = 30;
@@ -427,7 +427,7 @@ async generarPDFServiciosMenus() {
   const MUTED       = '#6B7280';
 
   // ---------- Página (fondo + título auto-fit + pie) ----------
-  const dibujarPagina = () => {
+  const drawPage = () => {
     doc.setFillColor('#F7F4EF'); doc.rect(0, 0, pageW, pageH, 'F');
     doc.setFillColor('#FFFFFF');
     doc.roundedRect(M - 6, M - 6, pageW - (M - 6) * 2, pageH - (M - 6) * 2, 10, 10, 'F');
@@ -446,138 +446,133 @@ async generarPDFServiciosMenus() {
 
     // el cuerpo empieza debajo del título real
     BODY_Y = Math.max(BODY_Y_BASE, lastTitleY + 24);
+
+    // pie
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor('#9CA3AF');
+    const pg = doc.getCurrentPageInfo().pageNumber;
+    doc.text(`Pág. ${pg}`, pageW - M, pageH - M, { align: 'right' });
   };
 
   // ---------- control de columnas/página ----------
   let col = 0;            // 0 = izquierda, 1 = derecha
   let y   = 0;
 
-  const pasarSiguienteColumna = (): 'same-page' | 'new-page' => {
-    col++;
-    if (col > 1) {
-      doc.addPage();
-      dibujarPagina();
-      col = 0;
-      y = BODY_Y;
-      return 'new-page';
-    }
+  const goNextColumn = (): 'same-page' | 'new-page' => {
+  col++;
+  if (col > 1) {
+    doc.addPage();
+    drawPage();
+    col = 0;
     y = BODY_Y;
-    return 'same-page';
+    return 'new-page';
+  }
+  y = BODY_Y;
+  return 'same-page';
+};
+
+  const ensureSpace = (needed: number) => {
+    if (y + needed > BODY_B) goNextColumn();
   };
 
-  const asegurarEspacio = (necesario: number) => {
-    if (y + necesario > BODY_B) pasarSiguienteColumna();
-  };
-
-  // ---------- encabezado de servicio ----------
-  const dibujarEncabezadoServicio = (titulo: string, continuacion = false) => {
+  // ---------- header de servicio (auto-fit para no cortar) ----------
+  const drawServiceHeader = (title: string, cont = false) => {
     const x = CX[col], width = CW;
 
     doc.setFillColor('#F2E7DA');
     doc.roundedRect(x, y, width, RHDR_H, 8, 8, 'F');
 
-    const texto = (continuacion ? `${titulo} (cont.)` : titulo).toUpperCase();
-    const maxW  = width - 32; // padding interior
+    const text = (cont ? `${title} (cont.)` : title).toUpperCase();
+    const maxW = width - 32; // padding interior
     doc.setFont('helvetica', 'bold'); doc.setTextColor(NAME_COLOR);
-    const fz = this.fitFontSizeToMaxLine(doc, [texto], 13, maxW, 10);
+    const fz = this.fitFontSizeToMaxLine(doc, [text], 13, maxW, 10);
     doc.setFontSize(fz);
-    doc.text(texto, x + width / 2, y + 20, { align: 'center' });
+    doc.text(text, x + width / 2, y + 20, { align: 'center' });
 
     y += HDR_BLOCK_H;
   };
 
-// ---------- MEDIDOR: alto real con precio en misma línea ----------
-// Recibe: anchoNombre (hasta antes de la “columna” del precio) y anchoDesc (hasta el borde del precio)
-const medirAltoFilaMenu = (menu: any, anchoNombre: number, anchoDesc: number) => {
-  const FS_NOMBRE_BASE = 11;
-  const FS_DESC        = 9;
-  const LH_DESC        = FS_DESC * 1.28;
+  // ---------- una fila de menú (texto centrado verticalmente) ----------
+  const drawMenuRow = async (menu: any) => {
+    const x = CX[col], width = CW;
 
-  // Nombre: UNA sola línea (auto-fit) limitado por anchoNombre
-  const nombre   = String(menu.nombre || '').toUpperCase().trim();
-  const fzNombre = this.fitFontSizeToMaxLine(doc, [nombre], FS_NOMBRE_BASE, Math.max(60, anchoNombre), 8);
+    const imgX = x + 6;
+    const imgY = y + (ROW_H - IMG.h) / 2;
 
-  // Descripción: envuelta exactamente hasta el borde del precio (anchoDesc)
-  const desc        = String(menu.descripcion || '').trim();
-  const lineasDesc  = desc ? doc.splitTextToSize(desc, Math.max(60, anchoDesc)) : [];
-
-  const altoNombre = fzNombre * 1.22;
-  const GAP        = lineasDesc.length ? 2 : 0;
-  const altoTexto  = altoNombre + GAP + (lineasDesc.length * LH_DESC);
-
-  const PAD_SUP = 6, PAD_INF = 6;
-  return Math.max(altoTexto + PAD_SUP + PAD_INF, 36);
-};
-
-
-
-// ---------- DIBUJADOR: nombre ↑, precio misma línea; descripción hasta el borde del precio ----------
-const dibujarFilaMenu = async (menu: any, altoFila: number) => {
-  const x = CX[col], width = CW;
-
-  const PAD_SUP = 6, PAD_INF = 6;
-  const ANCHO_PRECIO = 64, GAP_PRECIO = 8;
-
-  // Altura disponible de la fila
-  const altoDisponible = Math.max(1, altoFila - PAD_SUP - PAD_INF);
-
-  // IMAGEN (se adapta al alto disponible)
-  const imgX = x + 6;
-  const ladoImg = Math.min(IMG.h, altoDisponible);
-  const radio   = (IMG.r / IMG.h) * ladoImg;
-  const imgY    = y + PAD_SUP + (altoDisponible - ladoImg) / 2;
-
-  try {
-    if (menu.fotoMenuUrl) {
-      const base64 = await this.getBase64ImageRounded(menu.fotoMenuUrl, ladoImg, ladoImg, radio);
-      doc.addImage(base64, 'PNG', imgX, imgY, ladoImg, ladoImg);
-    } else {
+    try {
+      if (menu.fotoMenuUrl) {
+        const base64 = await this.getBase64ImageRounded(menu.fotoMenuUrl, IMG.w, IMG.h, IMG.r);
+        doc.addImage(base64, 'PNG', imgX, imgY, IMG.w, IMG.h);
+      } else {
+        doc.setFillColor('#F3F4F6');
+        doc.roundedRect(imgX, imgY, IMG.w, IMG.h, IMG.r, IMG.r, 'F');
+      }
+    } catch {
       doc.setFillColor('#F3F4F6');
-      doc.roundedRect(imgX, imgY, ladoImg, ladoImg, radio, radio, 'F');
+      doc.roundedRect(imgX, imgY, IMG.w, IMG.h, IMG.r, IMG.r, 'F');
     }
-  } catch {
-    doc.setFillColor('#F3F4F6');
-    doc.roundedRect(imgX, imgY, ladoImg, ladoImg, radio, radio, 'F');
+
+    const textX   = imgX + IMG.w + 10;
+    const textMax = x + width - textX - 60;
+
+    const centerY = y + ROW_H / 2;
+
+    // nombre
+    const FS_NAME = 12, LINE_H = FS_NAME * 1.2;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(FS_NAME); doc.setTextColor(NAME_COLOR);
+    const nameLines = doc.splitTextToSize(String(menu.nombre || '').toUpperCase(), textMax);
+    const nameY = centerY - ((nameLines.length - 1) * LINE_H) / 2 + FS_NAME * 0.35;
+    doc.text(nameLines, textX, nameY);
+
+    // precio
+    const FS_PRICE = 12;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(FS_PRICE); doc.setTextColor(PRICE_COLOR);
+    const priceY = centerY + FS_PRICE * 0.35;
+    doc.text(`$${Number(menu.precio ?? 0).toFixed(2)}`, x + width - 6, priceY, { align: 'right' });
+
+    // separador
+    doc.setDrawColor(235);
+    doc.line(x, y + ROW_H, x + width, y + ROW_H);
+
+    y += ROW_H;
+  };
+
+  // ---------- empezar documento ----------
+  drawPage();
+  col = 0;
+  y   = BODY_Y;
+
+  // Recorremos servicios de forma secuencial (flujo 2 columnas)
+  for (const s of this.servicios) {
+    const title = String(s?.nombre || '').trim();
+
+    // Menús de ese servicio (ordenados)
+    const menus = this.menus
+      .filter((m: any) => m.idservicio === s.idservicio)
+      .sort((a: any, b: any) => String(a.nombre || '').localeCompare(String(b.nombre || '')));
+
+    // aseguro que quepa header + al menos 1 fila
+    ensureSpace(HDR_BLOCK_H + ROW_H);
+    drawServiceHeader(title, false);
+
+    for (let i = 0; i < menus.length; i++) {
+  if (y + ROW_H > BODY_B) {
+    const moved = goNextColumn();
+    // 👇 Solo repite encabezado si pasaste a una *nueva página*
+    if (moved === 'new-page') {
+      drawServiceHeader(title, true); // "(cont.)" en página nueva
+    }
   }
-
-  // Geometría de texto
-  const textoX       = imgX + ladoImg + 10;       // inicia a la derecha de la imagen real
-  const priceRightX  = x + width - 6;             // borde derecho EXACTO del precio
-  const anchoNombre  = (priceRightX - GAP_PRECIO - ANCHO_PRECIO) - textoX; // antes de la columna del precio
-  const anchoDesc    = priceRightX - textoX;      // llega justo al último dígito del precio
-
-  // Nombre (1 línea, auto-fit)
-  const FS_NOMBRE_BASE = 11, FS_DESC = 9;
-  const nombre   = String(menu.nombre || '').toUpperCase().trim();
-  const fzNombre = this.fitFontSizeToMaxLine(doc, [nombre], FS_NOMBRE_BASE, Math.max(60, anchoNombre), 8);
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(fzNombre); doc.setTextColor(NAME_COLOR);
-
-  const yNombre = y + PAD_SUP + fzNombre;
-  doc.text(nombre, textoX, yNombre);  // sin maxWidth → 1 línea
-
-  // Precio (misma línea, alineado a la derecha)
-  const precioTxt = `$${Number(menu.precio ?? 0).toFixed(2)}`;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(fzNombre); doc.setTextColor(PRICE_COLOR);
-  doc.text(precioTxt, priceRightX, yNombre, { align: 'right' });
-
-  // Descripción (debajo, EXACTAMENTE hasta el borde del precio)
-  const desc = String(menu.descripcion || '').trim();
-  if (desc) {
-    const lineasDesc = doc.splitTextToSize(desc, Math.max(60, anchoDesc));
-    const yDesc = yNombre + 2 + FS_DESC * 0.9;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(FS_DESC); doc.setTextColor(MUTED);
-    doc.text(lineasDesc, textoX, yDesc);
-  }
-
-  // Separador pegado al final del texto (sin aire)
-  doc.setDrawColor(235);
-  doc.line(x, y + altoFila, x + width, y + altoFila);
-  y += altoFila;
-};
-
-
-  doc.save('catalogo.pdf');
+  await drawMenuRow(menus[i]);
 }
+
+    // pequeño respiro tras terminar un servicio
+    ensureSpace(12);
+    y += 12;
+  }
+
+  doc.save('catalogo_2columnas.pdf');
+}
+
 
 
 async addPageNumbers(doc: jsPDF, pageW: number, pageH: number) {
