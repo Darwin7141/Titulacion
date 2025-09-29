@@ -415,8 +415,8 @@ async generarPDFServiciosMenus() {
   let BODY_Y = BODY_Y_BASE;
 
   // Imágenes/filas
-  const IMG   = { w: 80, h: 80, r: 50 };
-  const ROW_H_MIN = IMG.h + 20;          // alto mínimo de fila (imagen + padding)
+  const IMG   = { w: 64, h: 64, r: 40 };
+  const ROW_H_MIN = IMG.h + 14;          // alto mínimo de fila (imagen + padding)
 
   // Encabezado de servicio
   const RHDR_H        = 30;
@@ -488,51 +488,49 @@ async generarPDFServiciosMenus() {
 
   // ---------- MEDIDOR: alto real de la fila según nombre + descripción ----------
   // ---------- MEDIDOR: alto real con nombre arriba + precio en la misma línea ----------
+// ---------- MEDIDOR: alto real con nombre arriba + precio en la misma línea ----------
 const medirAltoFilaMenu = (menu: any, anchoTexto: number) => {
-  // Reserva fija para la “columna” del precio y un pequeño gap
   const ANCHO_PRECIO = 64;
   const GAP_PRECIO   = 8;
 
-  // Área real disponible para el nombre/desc
-  const anchoNombre = Math.max(60, anchoTexto - ANCHO_PRECIO - GAP_PRECIO);
-  const anchoDesc   = Math.max(60, anchoTexto - 12); // la desc puede usar casi todo
+  // El bloque de texto (nombre y descripción) llega hasta donde termina el precio
+  const anchoBloque = Math.max(60, anchoTexto - ANCHO_PRECIO - GAP_PRECIO);
 
-  // Tipos (estética de carta)
-  const FS_NOMBRE_BASE = 11;     // nombre más pequeño que antes
+  // Tipos
+  const FS_NOMBRE_BASE = 11;
   const FS_DESC        = 9;
-  const LH_NOMBRE      = FS_NOMBRE_BASE * 1.25;
-  const LH_DESC        = FS_DESC * 1.35;
+  const LH_NOMBRE      = FS_NOMBRE_BASE * 1.22;
+  const LH_DESC        = FS_DESC * 1.28;
 
-  // Nombre: **una sola línea** (auto-fit) para que el precio quepa en esa misma línea
-  const nombre = String(menu.nombre || '').toUpperCase().trim();
-  const fzNombre = this.fitFontSizeToMaxLine(doc, [nombre], FS_NOMBRE_BASE, anchoNombre, 8);
+  // Nombre en UNA línea (auto-fit)
+  const nombre   = String(menu.nombre || '').toUpperCase().trim();
+  const fzNombre = this.fitFontSizeToMaxLine(doc, [nombre], FS_NOMBRE_BASE, anchoBloque, 8);
 
-  // Descripción envuelta en varias líneas
-  const desc = String(menu.descripcion || '').trim();
-  const lineasDesc = desc ? doc.splitTextToSize(desc, anchoDesc) : [];
+  // Descripción envuelta con el MISMO ancho del bloque (no pasa bajo el precio)
+  const desc        = String(menu.descripcion || '').trim();
+  const lineasDesc  = desc ? doc.splitTextToSize(desc, anchoBloque) : [];
+  const GAP         = lineasDesc.length ? 2 : 0;
 
-  // Alto de texto = línea del nombre + gap + líneas de descripción
-  const GAP = lineasDesc.length ? 3 : 0;
-  const altoTexto = (fzNombre * 1.25) + GAP + (lineasDesc.length * LH_DESC);
+  // Alto del texto
+  const altoTexto = (fzNombre * 1.22) + GAP + (lineasDesc.length * LH_DESC);
 
-  // Padding vertical
-  const PAD_SUP = 10, PAD_INF = 10;
+  // Paddings más pequeños para compactar
+  const PAD_SUP = 6, PAD_INF = 6;
 
-  // Alto final de la fila
-  return Math.max(IMG.h, altoTexto) + PAD_SUP + PAD_INF;
+  return Math.max(ROW_H_MIN, altoTexto + PAD_SUP + PAD_INF);
 };
 
 
-  // ---------- DIBUJADOR: una fila de menú (nombre + descripción debajo) ----------
-  // ---------- DIBUJADOR: imagen a la izquierda, nombre ↑ y precio en la misma línea ----------
+
+ // ---------- DIBUJADOR: imagen izquierda, nombre ↑ y precio en la misma línea ----------
 const dibujarFilaMenu = async (menu: any, altoFila: number) => {
   const x = CX[col], width = CW;
 
-  // Layout y paddings
-  const PAD_SUP = 10, PAD_INF = 10;
+  // Layout compacto
+  const PAD_SUP = 6, PAD_INF = 6;
   const ANCHO_PRECIO = 64, GAP_PRECIO = 8;
 
-  // IMAGEN (pegada arriba)
+  // IMAGEN (64x64)
   const imgX = x + 6;
   const imgY = y + PAD_SUP;
   try {
@@ -549,46 +547,40 @@ const dibujarFilaMenu = async (menu: any, altoFila: number) => {
   }
 
   // ÁREAS DE TEXTO
-  const textoX     = imgX + IMG.w + 10;                  // inicia a la derecha de la imagen
-  const textoMax   = x + width - textoX - 12;            // ancho total disponible para texto
-  const anchoNombre= Math.max(60, textoMax - ANCHO_PRECIO - GAP_PRECIO);
-  const anchoDesc  = Math.max(60, textoMax);             // la descripción usa casi todo
+  const textoX      = imgX + IMG.w + 10;
+  const textoMax    = x + width - textoX - 12;
+  const anchoBloque = Math.max(60, textoMax - ANCHO_PRECIO - GAP_PRECIO); // nombre+desc
+  const FS_NOMBRE_BASE = 11, FS_DESC = 9;
 
-  // TIPOS
-  const FS_NOMBRE_BASE = 11;
-  const FS_DESC        = 9;
-
-  // --- Nombre (una sola línea, auto-fit) ---
-  const nombre = String(menu.nombre || '').toUpperCase().trim();
-  const fzNombre = this.fitFontSizeToMaxLine(doc, [nombre], FS_NOMBRE_BASE, anchoNombre, 8);
+  // Nombre (una línea, auto-fit)
+  const nombre   = String(menu.nombre || '').toUpperCase().trim();
+  const fzNombre = this.fitFontSizeToMaxLine(doc, [nombre], FS_NOMBRE_BASE, anchoBloque, 8);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(fzNombre); doc.setTextColor(NAME_COLOR);
 
-  const yNombre = y + PAD_SUP + fzNombre;                // alineado al borde superior de la imagen
-  // ¡Ojo!: NO pasamos maxWidth para evitar re-envolver el nombre (queda en una línea)
-  doc.text(nombre, textoX, yNombre);
+  const yNombre = y + PAD_SUP + fzNombre;     // alineado al tope de la imagen
+  doc.text(nombre, textoX, yNombre);          // sin maxWidth: 1 sola línea
 
-  // --- Precio (misma línea, extremo derecho) ---
+  // Precio (misma línea, a la derecha)
   const precioTxt = `$${Number(menu.precio ?? 0).toFixed(2)}`;
   doc.setFont('helvetica', 'normal'); doc.setFontSize(fzNombre); doc.setTextColor(PRICE_COLOR);
   doc.text(precioTxt, x + width - 6, yNombre, { align: 'right' });
 
-  // --- Descripción (debajo del nombre, ancho cómodo) ---
+  // Descripción (debajo, con el MISMO ancho del bloque → queda alineada con el precio)
   const desc = String(menu.descripcion || '').trim();
   if (desc) {
-    const lineasDesc = doc.splitTextToSize(desc, anchoDesc);
-    const yDesc = yNombre + 3 + FS_DESC * 0.95;
+    const lineasDesc = doc.splitTextToSize(desc, anchoBloque);
+    const yDesc = yNombre + 2 + FS_DESC * 0.9;
     doc.setFont('helvetica', 'normal'); doc.setFontSize(FS_DESC); doc.setTextColor(MUTED);
     doc.text(lineasDesc, textoX, yDesc);
   }
 
-  // Separador y avance
+  // Separador fino y avance
   doc.setDrawColor(235);
   doc.line(x, y + altoFila, x + width, y + altoFila);
   y += altoFila;
 };
 
 
-  // ---------- empezar documento ----------
   dibujarPagina();
   col = 0;
   y   = BODY_Y;
