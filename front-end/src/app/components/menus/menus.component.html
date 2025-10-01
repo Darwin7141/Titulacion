@@ -3,98 +3,101 @@
   <!-- overlay opcional de carga -->
   
   <!-- tarjeta -->
+ <!-- menus.component.html -->
+<div class="registro-panel">
   <div class="registro-panel-content">
-    <!-- Título dinámico -->
+
     <h2 mat-dialog-title>{{ esEdicion ? 'Editar Menú' : 'Agregar Menú' }}</h2>
 
-<mat-dialog-content class="dialog-content" cdkScrollable>
-  <form #menuForm="ngForm" (ngSubmit)="guardar()" autocomplete="on">
+    <mat-dialog-content class="dialog-content" cdkScrollable>
+      <form #menuForm="ngForm" (ngSubmit)="guardar()" autocomplete="on">
 
-    <!-- Grid simple -->
-    <div class="form-grid">
+        <!-- Grid simple -->
+        <div class="form-grid">
 
-      <!-- Código (solo en edición) -->
-      <div class="form-group" *ngIf="esEdicion">
-        <label for="codigo">Código</label>
-        <input id="codigo" name="idmenu" type="text"
-               [(ngModel)]="menu.idmenu" disabled>
-      </div>
+          <!-- Código (solo en edición) -->
+          <div class="form-group" *ngIf="esEdicion">
+            <label for="codigo">Código</label>
+            <input id="codigo" name="idmenu" type="text"
+                   [(ngModel)]="menu.idmenu" disabled>
+          </div>
 
-      <!-- Nombre -->
-      <div class="form-group">
-        <label for="nombre">Nombre</label>
-        <input id="nombre" name="nombre" type="text"
-               [(ngModel)]="menu.nombre"
-               placeholder="Nombre del menú"
-               required cdkFocusInitial>
-      </div>
+          <!-- Nombre -->
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text"
+                   [(ngModel)]="menu.nombre"
+                   placeholder="Nombre del menú"
+                   required cdkFocusInitial>
+          </div>
 
-      <!-- Precio -->
-      <div class="form-group">
-        <label for="precio">Precio</label>
-        <input id="precio" name="precio" type="number" min="0" step="0.01"
-               [(ngModel)]="menu.precio" placeholder="Costo" required>
-      </div>
+          <!-- Precio -->
+          <div class="form-group">
+            <label for="precio">Precio</label>
+            <input id="precio" name="precio" type="number" min="0" step="0.01"
+                   [(ngModel)]="menu.precio" placeholder="Costo" required>
+          </div>
 
-      <!-- Descripción (ocupa 2 columnas) -->
-      <div class="form-group span-2">
-        <label for="descripcion">Descripción</label>
-        <input id="descripcion" name="descripcion" type="text"
-               [(ngModel)]="menu.descripcion"
-               placeholder="Descripción" required>
-      </div>
+          <!-- Descripción (ocupa 2 columnas) -->
+          <div class="form-group span-2">
+            <label for="descripcion">Descripción</label>
+            <input id="descripcion" name="descripcion" type="text"
+                   [(ngModel)]="menu.descripcion"
+                   placeholder="Descripción" required>
+          </div>
 
-      <!-- Servicio -->
-      <div class="form-group">
-        <label for="idservicio">Servicio</label>
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-select id="idservicio" name="idservicio"
-                      [(ngModel)]="menu.idservicio" required
-                      placeholder="Seleccione un servicio">
-            <mat-option value="" disabled>Seleccione un servicio</mat-option>
-            <mat-option *ngFor="let s of tipo" [value]="s.idservicio">
-              {{ s.nombre }}
-            </mat-option>
-          </mat-select>
-          <mat-error>Debe seleccionar un servicio</mat-error>
-        </mat-form-field>
-      </div>
+          <!-- Servicio -->
+          <div class="form-group">
+            <label for="idservicio">Servicio</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-select id="idservicio" name="idservicio"
+                          [(ngModel)]="menu.idservicio" required
+                          placeholder="Seleccione un servicio">
+                <mat-option value="" disabled>Seleccione un servicio</mat-option>
+                <mat-option *ngFor="let s of tipo" [value]="s.idservicio">
+                  {{ s.nombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error>Debe seleccionar un servicio</mat-error>
+            </mat-form-field>
+          </div>
 
-      <!-- Carga de imagen (ocupa 2 columnas) -->
-      <div class="form-group span-2">
-        <label for="imagen">Imagen</label>
-        <input id="imagen" type="file"
-               accept="image/png,image/jpeg,image/jpg,image/gif"
-               (change)="onNewImageSelected($event)">
+          <!-- Carga de imagen (ocupa 2 columnas) -->
+          <div class="form-group span-2">
+            <label for="imagen">Imagen</label>
+            <input id="imagen" type="file"
+                   accept="image/png,image/jpeg,image/jpg,image/gif"
+                   (change)="onNewImageSelected($event)">
 
-        <!-- Preview de la nueva imagen -->
-        <div *ngIf="previewUrl" class="preview">
-          <p class="hint">Vista previa (no guardada aún):</p>
-          <img [src]="previewUrl" alt="Preview">
-        </div>
+            <!-- Preview de la nueva imagen -->
+            <div *ngIf="previewUrl" class="preview">
+              <p class="hint">Vista previa (no guardada aún):</p>
+              <img [src]="previewUrl" alt="Preview">
+            </div>
 
-        <!-- Imagen actual (si no hay preview y es edición) -->
-        <div *ngIf="!previewUrl && esEdicion && menu?.imagen" class="preview">
-          <p class="hint">Imagen actual:</p>
-          <img [src]="menuCatering.getMenuFotoUrl(menu.imagen, false)"
-               [alt]="menu.nombre">
-        </div>
-      </div>
+            <!-- Imagen actual (si no hay preview y es edición) -->
+            <div *ngIf="!previewUrl && esEdicion && menu?.imagen" class="preview">
+              <p class="hint">Imagen actual:</p>
+              <img [src]="menuCatering.getMenuFotoUrl(menu.imagen, false)"
+                   [alt]="menu.nombre">
+            </div>
+          </div>
 
-    </div> <!-- /form-grid -->
+        </div><!-- /form-grid -->
 
-    <!-- Para permitir submit con Enter aún si las acciones están fuera -->
-    <button type="submit" class="sr-only" [disabled]="!menuForm.valid"></button>
-  </form>
-</mat-dialog-content>
+        <!-- Permite submit con Enter aunque las acciones estén fuera -->
+        <button type="submit" class="sr-only" [disabled]="!menuForm.valid"></button>
+      </form>
+    </mat-dialog-content>
 
-<mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-stroked-button (click)="cancelar()">Cancelar</button>
-  <button mat-raised-button color="primary"
-          (click)="guardar()" [disabled]="isLoading">
-    {{ isLoading ? 'Guardando…' : (esEdicion ? 'Guardar' : 'Registrar') }}
-  </button>
-      </div>
-    </form>
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
+      <button mat-raised-button color="primary" type="button"
+              (click)="guardar()" [disabled]="isLoading">
+        {{ isLoading ? 'Guardando…' : (esEdicion ? 'Guardar' : 'Registrar') }}
+      </button>
+    </mat-dialog-actions>
+
   </div>
 </div>
+
