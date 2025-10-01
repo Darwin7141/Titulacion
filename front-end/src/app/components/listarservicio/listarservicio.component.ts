@@ -330,10 +330,10 @@ abrirDialogoAgregar(): void {
             editarServicios(servicio: any): void {
             this.dialog.open(ServiciocateringComponent, {
               width: '600px',
-              panelClass: 'servicios-dialog',
+              maxHeight: '90vh',  
               disableClose: true,
               autoFocus: false,
-              
+              panelClass: 'servicios-dialog',
               data: { servicio }                
             }).afterClosed().subscribe(flag => {
               if (flag) this.obtenerServicios();   
