@@ -248,8 +248,10 @@ obtenerMenus(): void {
           editarMenus(menu: any): void {
             this.dialog.open(MenusComponent, {
             width: '600px',
+            maxHeight: '90vh',
             disableClose: true,
             autoFocus: false,
+            panelClass: 'menus-dialog',
             data: { menu }                
             }).afterClosed().subscribe(flag => {
             if (flag) this.obtenerMenus();   
