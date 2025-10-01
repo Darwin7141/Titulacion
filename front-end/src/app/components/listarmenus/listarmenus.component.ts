@@ -237,9 +237,10 @@ obtenerMenus(): void {
   abrirDialogoAgregar(): void {
       const dialogRef = this.dialog.open(MenusComponent, {
         width: '600px',
-        maxHeight: '90vh',          // o el ancho que prefieras
-        disableClose: true,
-      autoFocus: false  
+        maxHeight: '90vh',         // o el ancho que prefieras
+         disableClose: true,
+      autoFocus: false,
+      panelClass: 'menus-dialog',  
       }).afterClosed().subscribe(flag => {
         if (flag) this.obtenerMenus();   });
                 }

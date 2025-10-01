@@ -106,60 +106,47 @@
   </mat-card>
 
   <!-- ─────────── FORMULARIO DE EDICIÓN (sin cambios de estilo) ─────────── -->
-  <!-- ─────────── FORMULARIO DE EDICIÓN (EMBEBIDO CON SCROLL) ─────────── -->
-<div *ngIf="isEditMode" class="edit-form">
-  <h3>Editar Menú</h3>
+  <div *ngIf="isEditMode" class="edit-form">
+    <h3>Editar Menú</h3>
 
-  <form (ngSubmit)="guardarEdicion()" class="edit-form__form">
-
-    <!-- Contenido que scrollea -->
-    <div class="scroll-body" cdkScrollable>
+    <form (ngSubmit)="guardarEdicion()">
 
       <div class="form-group">
         <label>Código</label>
-        <input
-          type="text"
-          [(ngModel)]="menuSeleccionado.idmenu"
-          name="idmenu"
-          disabled>
+        <input type="text"
+               [(ngModel)]="menuSeleccionado.idmenu"
+               name="idmenu" disabled>
       </div>
 
       <div class="form-group">
         <label>Nombre</label>
-        <input
-          type="text"
-          [(ngModel)]="menuSeleccionado.nombre"
-          name="nombre"
-          required>
+        <input type="text"
+               [(ngModel)]="menuSeleccionado.nombre"
+               name="nombre" required>
       </div>
 
       <div class="form-group">
         <label>Descripción</label>
-        <input
-          type="text"
-          [(ngModel)]="menuSeleccionado.descripcion"
-          name="descripcion"
-          required>
+        <input type="text"
+               [(ngModel)]="menuSeleccionado.descripcion"
+               name="descripcion" required>
       </div>
 
       <div class="form-group">
         <label>Precio</label>
-        <input
-          type="text"
-          [(ngModel)]="menuSeleccionado.precio"
-          name="precio"
-          required>
+        <input type="text"
+               [(ngModel)]="menuSeleccionado.precio"
+               name="precio" required>
       </div>
 
       <div class="form-group">
-        <mat-form-field class="col-xs-12" appearance="outline">
-          <mat-select
-            #idServicioField="ngModel"
-            name="idservicio"
-            [(ngModel)]="menuSeleccionado.idservicio"
-            required
-            placeholder="Seleccione un servicio">
-            <mat-option *ngFor="let t of tipo" [value]="t.idservicio">
+        <mat-form-field class="col-xs-12">
+          <mat-select #idServicioField="ngModel"
+                      name="idservicio"
+                      [(ngModel)]="menuSeleccionado.idservicio"
+                      required placeholder="Seleccione un servicio">
+            <mat-option *ngFor="let t of tipo"
+                        [value]="t.idservicio">
               {{ t.nombre }}
             </mat-option>
           </mat-select>
@@ -170,52 +157,34 @@
       </div>
 
       <div class="form-group">
-        <label>Imagen actual</label>
+        <label>Muestra (imagen actual)</label>
         <div *ngIf="menuSeleccionado.fotografiaUrl">
-          <img
-            [src]="menuSeleccionado.fotografiaUrl"
-            alt="Imagen de {{ menuSeleccionado.nombre }}"
-            width="120" height="80">
+          <img [src]="menuSeleccionado.fotografiaUrl"
+               alt="Imagen de {{ menuSeleccionado.nombre }}"
+               width="120" height="80">
         </div>
 
-        <label for="nuevaImagen" style="margin-top:8px; display:block;">Cambiar imagen</label>
-        <input
-          id="nuevaImagen"
-          type="file"
-          accept="image/*"
-          (change)="onNewImageSelected($event)">
+        <label for="nuevaImagen">Cambiar imagen:</label>
+        <input id="nuevaImagen" type="file"
+               (change)="onNewImageSelected($event)">
       </div>
 
-    </div>
-    <!-- /scroll-body -->
+      <div class="form-actions">
+        <button type="button"
+                mat-raised-button color="warn"
+                (click)="cancelarEdicion()">Cancelar</button>
 
-    <!-- Acciones fijas al fondo -->
-    <div class="form-actions">
-      <button
-        type="button"
-        mat-raised-button
-        color="warn"
-        (click)="cancelarEdicion()">
-        Cancelar
-      </button>
+        <button type="submit"
+                mat-raised-button color="primary">Guardar</button>
+      </div>
 
-      <button
-        type="submit"
-        mat-raised-button
-        color="primary"
-        [disabled]="isLoading">
-        {{ isLoading ? 'Guardando…' : 'Guardar' }}
-      </button>
-    </div>
+    </form>
+  </div>
 
-  </form>
+  <!-- Botón FAB “Volver” (si lo usas en otros listados) -->
+  <button mat-icon-button class="btn-back"
+          matTooltip="Volver"
+          (click)="volver()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
 </div>
-
-<!-- Botón FAB “Volver” -->
-<button
-  mat-icon-button
-  class="btn-back"
-  matTooltip="Volver"
-  (click)="volver()">
-  <mat-icon>arrow_back</mat-icon>
-</button>

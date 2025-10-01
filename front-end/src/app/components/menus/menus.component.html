@@ -5,97 +5,95 @@
   <!-- tarjeta -->
   <div class="registro-panel-content">
     <!-- Título dinámico -->
-    <h3>{{ esEdicion ? 'Editar Menú' : 'Agregar Menú' }}</h3>
+    <h2 mat-dialog-title>{{ esEdicion ? 'Editar Menú' : 'Agregar Menú' }}</h2>
 
-    <!-- Un único submit → guardar() decide si crea o actualiza -->
-    <form #menuForm="ngForm"
-          (ngSubmit)="guardar()"
-          autocomplete="on">
+<mat-dialog-content class="dialog-content" cdkScrollable>
+  <form #menuForm="ngForm" (ngSubmit)="guardar()" autocomplete="on">
 
-      <!-- grid 2 columnas -->
-      <div class="form-grid">
+    <!-- Grid simple -->
+    <div class="form-grid">
 
-        <!-- Código (solo visible en edición) -->
-        <div class="form-group" *ngIf="esEdicion">
-          <label for="codigo">Código</label>
-          <input id="codigo" name="idmenu" type="text"
-                 [(ngModel)]="menu.idmenu"
-                 disabled>
-        </div>
+      <!-- Código (solo en edición) -->
+      <div class="form-group" *ngIf="esEdicion">
+        <label for="codigo">Código</label>
+        <input id="codigo" name="idmenu" type="text"
+               [(ngModel)]="menu.idmenu" disabled>
+      </div>
 
-        <!-- nombre -->
-        <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" name="nombre" type="text"
-                 [(ngModel)]="menu.nombre"
-                 placeholder="Nombre del menú"
-                 required
-                 cdkFocusInitial>
-        </div>
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" name="nombre" type="text"
+               [(ngModel)]="menu.nombre"
+               placeholder="Nombre del menú"
+               required cdkFocusInitial>
+      </div>
 
-        <!-- precio -->
-        <div class="form-group">
-          <label for="precio">Precio</label>
-          <input id="precio" name="precio" type="number" min="0" step="0.01"
-                 [(ngModel)]="menu.precio"
-                 placeholder="Costo"
-                 required>
-        </div>
+      <!-- Precio -->
+      <div class="form-group">
+        <label for="precio">Precio</label>
+        <input id="precio" name="precio" type="number" min="0" step="0.01"
+               [(ngModel)]="menu.precio" placeholder="Costo" required>
+      </div>
 
-        <!-- descripción (ocupa dos columnas) -->
-        <div class="form-group" style="grid-column:1 / span 2;">
-          <label for="descripcion">Descripción</label>
-          <input id="descripcion" name="descripcion" type="text"
-                 [(ngModel)]="menu.descripcion"
-                 placeholder="Descripción"
-                 required>
-        </div>
+      <!-- Descripción (ocupa 2 columnas) -->
+      <div class="form-group span-2">
+        <label for="descripcion">Descripción</label>
+        <input id="descripcion" name="descripcion" type="text"
+               [(ngModel)]="menu.descripcion"
+               placeholder="Descripción" required>
+      </div>
 
-        <!-- servicio -->
-        <div class="form-group">
-          <label for="idservicio">Servicio</label>
-          <select id="idservicio" name="idservicio"
-                  [(ngModel)]="menu.idservicio"
-                  required>
-            <option value="" disabled selected>Seleccione un servicio</option>
-            <option *ngFor="let s of tipo" [value]="s.idservicio">
+      <!-- Servicio -->
+      <div class="form-group">
+        <label for="idservicio">Servicio</label>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-select id="idservicio" name="idservicio"
+                      [(ngModel)]="menu.idservicio" required
+                      placeholder="Seleccione un servicio">
+            <mat-option value="" disabled>Seleccione un servicio</mat-option>
+            <mat-option *ngFor="let s of tipo" [value]="s.idservicio">
               {{ s.nombre }}
-            </option>
-          </select>
+            </mat-option>
+          </mat-select>
+          <mat-error>Debe seleccionar un servicio</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Carga de imagen (ocupa 2 columnas) -->
+      <div class="form-group span-2">
+        <label for="imagen">Imagen</label>
+        <input id="imagen" type="file"
+               accept="image/png,image/jpeg,image/jpg,image/gif"
+               (change)="onNewImageSelected($event)">
+
+        <!-- Preview de la nueva imagen -->
+        <div *ngIf="previewUrl" class="preview">
+          <p class="hint">Vista previa (no guardada aún):</p>
+          <img [src]="previewUrl" alt="Preview">
         </div>
 
-        <!-- imagen (toda la fila) -->
-        <div class="form-group file-group" style="grid-column:1 / span 2;">
-          <label for="imagen">Imagen:</label>
-          <input id="imagen" type="file"
-                 accept="image/png,image/jpeg,image/jpg,image/gif"
-                 (change)="onNewImageSelected($event)">
-
-          <!-- Preview nueva -->
-          <div *ngIf="previewUrl" style="margin-top:8px;">
-            <p style="margin:.25rem 0 .5rem; color:#666;">Vista previa (no guardada aún):</p>
-            <img [src]="previewUrl" alt="Preview" style="max-width:260px; border-radius:8px;">
-          </div>
-
-          <!-- Imagen actual (edición) -->
-          <div *ngIf="!previewUrl && esEdicion && menu?.imagen" style="margin-top:8px;">
-            <p style="margin:.25rem 0 .5rem; color:#666;">Imagen actual:</p>
-            <img [src]="menuCatering.getMenuFotoUrl(menu.imagen, false)"
-                 [alt]="menu.nombre" style="max-width:260px; border-radius:8px;">
-          </div>
+        <!-- Imagen actual (si no hay preview y es edición) -->
+        <div *ngIf="!previewUrl && esEdicion && menu?.imagen" class="preview">
+          <p class="hint">Imagen actual:</p>
+          <img [src]="menuCatering.getMenuFotoUrl(menu.imagen, false)"
+               [alt]="menu.nombre">
         </div>
-        </div>
-      <!-- botones -->
-      <div class="registro-buttons">
-        <button type="button"
-                class="btn-cancel"
-                (click)="cancelar()">Cancelar</button>
+      </div>
 
-        <button type="submit"
-                class="btn-register"
-                [disabled]="!menuForm.valid">
-          {{ esEdicion ? 'Guardar' : 'Registrar' }}
-        </button>
+    </div> <!-- /form-grid -->
+
+    <!-- Para permitir submit con Enter aún si las acciones están fuera -->
+    <button type="submit" class="sr-only" [disabled]="!menuForm.valid"></button>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary"
+          (click)="guardar()" [disabled]="isLoading">
+    {{ isLoading ? 'Guardando…' : (esEdicion ? 'Guardar' : 'Registrar') }}
+  </button>
       </div>
     </form>
   </div>

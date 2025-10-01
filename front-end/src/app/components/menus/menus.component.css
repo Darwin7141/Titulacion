@@ -102,3 +102,63 @@
   color: #555;
   font-family: "Roboto", sans-serif;
 }
+
+:host ::ng-deep .menus-dialog .mat-mdc-dialog-surface{
+  display: flex;
+  flex-direction: column;
+}
+
+/* El área de contenido ocupa el alto disponible y scrollea */
+:host ::ng-deep .menus-dialog .mat-mdc-dialog-content,
+.dialog-content{
+  flex: 1 1 auto;
+  overflow: auto;
+  max-height: none;
+  padding-right: 8px; /* evita salto por la barra */
+}
+
+/* Acciones pegadas al fondo y siempre visibles */
+:host ::ng-deep .menus-dialog .mat-mdc-dialog-actions,
+.dialog-actions{
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 8px;
+  box-shadow: 0 -6px 14px -12px rgba(0,0,0,.35);
+  z-index: 2;
+}
+
+/* ——— Estética del formulario ——— */
+.form-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+}
+
+.form-group{ display:flex; flex-direction:column; }
+
+.span-2{ grid-column: 1 / span 2; }
+
+.form-group label{
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select{
+  height: 40px;
+  border: 1px solid #d3dae6;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.preview{ margin-top: 8px; }
+.preview .hint{ margin:.25rem 0 .5rem; color:#666; }
+.preview img{ max-width: 260px; border-radius: 8px; display:block; }
+
+/* accesibilidad: botón submit oculto visualmente */
+.sr-only{
+  position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
