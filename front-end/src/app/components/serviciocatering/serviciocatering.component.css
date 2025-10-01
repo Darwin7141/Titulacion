@@ -102,3 +102,31 @@
   color: #555;
   font-family: "Roboto", sans-serif;
 }
+:host ::ng-deep .servicios-dialog .mat-mdc-dialog-surface{
+  display:flex;
+  flex-direction:column;
+}
+
+:host ::ng-deep .servicios-dialog .mat-mdc-dialog-content,
+.dialog-content{
+  flex:1 1 auto;
+  overflow:auto;
+  max-height:none;
+  padding-right:8px;
+}
+
+:host ::ng-deep .servicios-dialog .mat-mdc-dialog-actions,
+.dialog-actions{
+  position:sticky;
+  bottom:0;
+  background:#fff;
+  padding-top:8px;
+  box-shadow:0 -6px 14px -12px rgba(0,0,0,.35);
+  z-index:2;
+}
+
+/* opcional: botón submit oculto para Enter */
+.sr-only{
+  position:absolute!important; width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}

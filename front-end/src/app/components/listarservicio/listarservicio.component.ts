@@ -317,9 +317,11 @@ async downloadPdf(): Promise<void> {
 
 abrirDialogoAgregar(): void {
     const dialogRef = this.dialog.open(ServiciocateringComponent, {
-      width: '600px',          
+      width: '600px',
+      maxHeight: '90vh',          
        disableClose: true,
-    autoFocus: false  
+    autoFocus: false,
+    panelClass: 'servicios-dialog',
     }).afterClosed().subscribe(flag => {
               if (flag) this.obtenerServicios();   
             });
@@ -328,8 +330,10 @@ abrirDialogoAgregar(): void {
             editarServicios(servicio: any): void {
             this.dialog.open(ServiciocateringComponent, {
               width: '600px',
+              panelClass: 'servicios-dialog',
               disableClose: true,
               autoFocus: false,
+              
               data: { servicio }                
             }).afterClosed().subscribe(flag => {
               if (flag) this.obtenerServicios();   
