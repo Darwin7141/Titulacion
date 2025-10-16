@@ -951,13 +951,31 @@ body {
 }
 
 /* En móviles/tablets el fondo con fixed suele dar tirones → usa scroll */
-@media (max-width: 1024px) {
-  .login-page-bg {
-    background-attachment: scroll;   /* ya lo tenías */
-    background-size: cover;          /* llena la pantalla */
-    background-repeat: no-repeat;    /* por si acaso */
-    background-position: 10% 10%; 
-    background-image: url("https://images.pexels.com/photos/612790/pexels-photo-612790.jpeg?auto=compress&cs=tinysrgb&w=2400");
+@media (max-width: 1024px){
+  .login-page-bg{
+    background-attachment: scroll;   /* iOS/Android */
+    /* mantén la calidad en retina móvil */
+    background-image: image-set(
+      url("https://images.pexels.com/photos/612790/pexels-photo-612790.jpeg?w=1600") 1x,
+      url("https://images.pexels.com/photos/612790/pexels-photo-612790.jpeg?w=3200") 2x
+    );
+    background-size: cover;
+    background-position: 50% 30%;    /* sube un poco el encuadre (ajústalo 25–35%) */
+  }
+}
+
+/* MÓVIL ESTRECHO: centra un poco más a la derecha si lo necesitas */
+@media (max-width: 600px){
+  .login-page-bg{
+    background-position: 55% 34%;    /* mueve foco horizontal/vertical para “parecer PC” */
+  }
+}
+
+/* Evita que el zoom (Ken Burns) meta blur en pantallas pequeñas */
+@media (max-width: 768px){
+  .hero-container{
+    animation: none !important;      /* quita el scale que suaviza la imagen */
+    min-height: 100svh;              /* alto real del viewport móvil */
   }
 }
 
