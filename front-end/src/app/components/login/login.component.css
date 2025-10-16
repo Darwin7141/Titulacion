@@ -956,7 +956,7 @@ body {
     background-attachment: scroll;   /* ya lo tenías */
     background-size: cover;          /* llena la pantalla */
     background-repeat: no-repeat;    /* por si acaso */
-    background-position: 25% 35%; 
+    background-position: 10% 10%; 
   }
 }
 
