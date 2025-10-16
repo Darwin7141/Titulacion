@@ -922,40 +922,85 @@ body > header + * {
 .recuperar-close:hover{ background: #f3f4f6; color:#111827; }
 .recuperar-close:focus{ outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,.15); }
 
-/* Evita scroll horizontal por anchos accidentales */
+/* ====== BASE ====== */
 html, body { max-width: 100%; overflow-x: hidden; }
 
-/* iOS: el fondo con fixed salta en móviles */
-@media (max-width: 768px){
+/* En móviles/tablets el fondo con fixed suele dar tirones → usa scroll */
+@media (max-width: 1024px){
   .login-page-bg{ background-attachment: scroll; }
 }
 
-/* NAVBAR más compacta en tablet/móvil (sin hamburguesa) */
+/* ====== NAVBAR (tablet y móvil) ====== */
 @media (max-width: 992px){
-  .navbar{ padding: 12px 16px; }
-  .nav-menu ul{
-    flex-wrap: wrap;              /* permite salto de línea */
-    justify-content: center;
-    gap: 10px 18px;
+  /* 2 filas: menú y botón */
+  .navbar{
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
   }
-  body > header + *{ margin-top: 72px; } /* navbar fija más baja */
+
+  /* Menú: centrado y con posibilidad de envolver */
+  .nav-menu ul{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 14px;
+  }
+  .nav-menu a{
+    font-size: clamp(13px, 2.8vw, 15px);
+    letter-spacing: .2px;
+    white-space: nowrap;
+  }
+
+  /* Botón de sesión: su propia fila y centrado */
+  .nav-logo{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0 12px 6px;
+  }
+  .inicio-sesion{
+    padding: 8px 16px;
+    font-size: clamp(13px, 2.8vw, 15px);
+    line-height: 1.1;
+  }
+
+  /* La navbar al tener 2 filas, empuja el contenido */
+  body > header + *{ margin-top: 130px; }
 }
 
-/* HERO en columna en móviles (anula el inline si lo dejas) */
+/* Pantallas muy pequeñas → un poco más de margen y tipografía menor */
+@media (max-width: 480px){
+  .nav-menu a{ font-size: clamp(12px, 3.2vw, 14px); }
+  body > header + *{ margin-top: 155px; }
+}
+
+/* ====== HERO en columna en móviles ====== */
 @media (max-width: 768px){
   .hero-container{
     padding: 24px 16px;
     min-height: 80vh;
-    flex-direction: column !important; /* vence el style inline */
+    flex-direction: column !important;   /* anula tu inline row */
     text-align: center;
   }
-  .hero-text h1{ font-size: 34px; }
-  .hero-text p{ font-size: 15px; }
+  .hero-text h1{
+    font-size: clamp(28px, 7vw, 50px);
+  }
+  .hero-text p{
+    font-size: clamp(14px, 2.6vw, 18px);
+    max-width: min(680px, 92vw);
+    margin-inline: auto;
+  }
   .cta-box{ gap: 12px; flex-wrap: wrap; }
-  .cta-btn{ padding: 10px 18px; }
+  .cta-btn{
+    padding: 10px 18px;
+    font-size: clamp(14px, 2.8vw, 16px);
+  }
 }
 
-/* LOGIN / RECUPERAR: que no floten en pantallas pequeñas */
+/* ====== Login / Recuperar: no flotan en móvil ====== */
 @media (max-width: 576px){
   .login-card{
     position: static; transform:none; top:auto; left:auto;
@@ -965,35 +1010,44 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .recuperar-card__inner{ max-width: 94vw; padding: 16px; }
 }
 
-/* SOBRE NOSOTROS: respiro lateral y bordes suaves en móvil */
+/* ====== Sobre nosotros ====== */
 @media (max-width: 768px){
   .sobre-wrapper{ padding: 0 16px; }
   .sobre-image img{ border-radius: 24px; }
 }
 
-/* SERVICIOS: grid fluido (mejor que flex fijo) */
-.servicios-cards{
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px 24px;
+/* ====== Servicios: grid fluido ====== */
+@media (max-width: 992px){
+  .servicios-cards{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px 24px;
+  }
+  .servicio-card{ 
+    width: auto; 
+    margin-top: 3rem; 
+  }
+  .servicio-card-imagen{ 
+    width: 76%; 
+    max-width: 260px; 
+    height: 108px; 
+  }
 }
-.servicio-card{ width: auto; margin-top: 3rem; }
-.servicio-card-imagen{ width: 76%; max-width: 260px; height: 108px; }
 
-/* CONTACTO y REGISTRO: 1 columna en móviles */
+/* ====== Contacto & Registro ====== */
 @media (max-width: 768px){
   .form-contacto{ padding: 16px; }
   .form-grid{ grid-template-columns: 1fr; gap: 14px; }
   .registro-buttons{ justify-content: center; }
 }
 
-/* FOOTER compacto en pantallas pequeñas */
+/* ====== Footer compacto ====== */
 @media (max-width: 576px){
   .footer-container{ padding: 20px; }
   .social-icon{ width: 28px; height: 28px; }
 }
 
-/* Accesibilidad: si el usuario pide menos movimiento */
+/* ====== Accesibilidad ====== */
 @media (prefers-reduced-motion: reduce){
   .hero-container{ animation: none !important; }
 }
