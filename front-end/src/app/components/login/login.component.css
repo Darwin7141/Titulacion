@@ -922,28 +922,31 @@ body > header + * {
 .recuperar-close:hover{ background: #f3f4f6; color:#111827; }
 .recuperar-close:focus{ outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,.15); }
 
-/* ===== FIX iOS: fondo fijo tiembla en móviles ===== */
+/* Evita scroll horizontal por anchos accidentales */
+html, body { max-width: 100%; overflow-x: hidden; }
+
+/* iOS: el fondo con fixed salta en móviles */
 @media (max-width: 768px){
   .login-page-bg{ background-attachment: scroll; }
 }
 
-/* ===== NAVBAR compacto en tablet/móvil ===== */
+/* NAVBAR más compacta en tablet/móvil (sin hamburguesa) */
 @media (max-width: 992px){
   .navbar{ padding: 12px 16px; }
   .nav-menu ul{
-    flex-wrap: wrap;                 /* permite salto de línea */
+    flex-wrap: wrap;              /* permite salto de línea */
     justify-content: center;
     gap: 10px 18px;
   }
-  body > header + *{ margin-top: 72px; }  /* navbar fija más baja */
+  body > header + *{ margin-top: 72px; } /* navbar fija más baja */
 }
 
-/* ===== HERO: columna en móvil (override del inline) ===== */
+/* HERO en columna en móviles (anula el inline si lo dejas) */
 @media (max-width: 768px){
   .hero-container{
     padding: 24px 16px;
     min-height: 80vh;
-    flex-direction: column !important;   /* vence el style inline */
+    flex-direction: column !important; /* vence el style inline */
     text-align: center;
   }
   .hero-text h1{ font-size: 34px; }
@@ -952,7 +955,7 @@ body > header + * {
   .cta-btn{ padding: 10px 18px; }
 }
 
-/* ===== LOGIN/RECUPERAR: que no queden flotantes en móviles ===== */
+/* LOGIN / RECUPERAR: que no floten en pantallas pequeñas */
 @media (max-width: 576px){
   .login-card{
     position: static; transform:none; top:auto; left:auto;
@@ -962,13 +965,13 @@ body > header + * {
   .recuperar-card__inner{ max-width: 94vw; padding: 16px; }
 }
 
-/* ===== SOBRE NOSOTROS: respiro lateral ===== */
+/* SOBRE NOSOTROS: respiro lateral y bordes suaves en móvil */
 @media (max-width: 768px){
   .sobre-wrapper{ padding: 0 16px; }
   .sobre-image img{ border-radius: 24px; }
 }
 
-/* ===== SERVICIOS: grid fluido (mejor que flex fijo) ===== */
+/* SERVICIOS: grid fluido (mejor que flex fijo) */
 .servicios-cards{
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -977,20 +980,20 @@ body > header + * {
 .servicio-card{ width: auto; margin-top: 3rem; }
 .servicio-card-imagen{ width: 76%; max-width: 260px; height: 108px; }
 
-/* ===== FORM CONTACTO/REGISTRO: 1 columna en móvil ===== */
+/* CONTACTO y REGISTRO: 1 columna en móviles */
 @media (max-width: 768px){
   .form-contacto{ padding: 16px; }
   .form-grid{ grid-template-columns: 1fr; gap: 14px; }
   .registro-buttons{ justify-content: center; }
 }
 
-/* ===== FOOTER compacto ===== */
+/* FOOTER compacto en pantallas pequeñas */
 @media (max-width: 576px){
   .footer-container{ padding: 20px; }
   .social-icon{ width: 28px; height: 28px; }
 }
 
-/* ===== Accesibilidad: si el usuario pide menos movimiento ===== */
+/* Accesibilidad: si el usuario pide menos movimiento */
 @media (prefers-reduced-motion: reduce){
   .hero-container{ animation: none !important; }
 }
