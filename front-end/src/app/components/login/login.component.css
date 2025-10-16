@@ -928,13 +928,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
 /* ===== ≤1024px — hero como en desktop y fondo estable ===== */
 @media (max-width: 1024px){
   .login-page-bg{
-    background-attachment: scroll;   /* evita tirones en móviles */
-    background-size: cover;          /* llena el viewport */
-    background-position: 50% 32%;    /* encuadre parecido a PC (ajústalo 28–38% si quieres) */
+    background-attachment: scroll;    /* evita tirones en móviles */
+    background-size: cover;           /* llena el viewport */
+    background-position: 50% 32%;     /* encuadre similar a PC (ajusta 28–38% si quieres) */
   }
 }
 
-/* ===== ≤992px — navbar en 2 filas sin “empujar” de más ===== */
+/* ===== ≤992px — navbar en 2 filas SIN empujar de más ===== */
 @media (max-width: 992px){
   .navbar{
     padding: 10px 12px;
@@ -948,9 +948,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
     letter-spacing:.2px; white-space:nowrap;
   }
   .nav-logo{ width:100%; display:flex; justify-content:center; padding:0 12px 6px; }
-  .inicio-sesion{ padding:8px 16px; font-size: clamp(13px, 2.8vw, 15px); line-height:1.1; }
+  .inicio-sesion{ padding:8px 16px; font-size: clamp(13px, 2.8vw, 15px); }
 
-  /* margen justo para compensar la navbar de 2 filas */
+  /* margen justo para la navbar de 2 filas */
   body > header + *{ margin-top: 110px; }
 
   /* Servicios en grid fluido */
@@ -962,13 +962,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .servicio-card-imagen{ width:76%; max-width:260px; height:108px; }
 }
 
-/* ===== ≤768px — hero compacto y MODAL de login centrado ===== */
+/* ===== ≤768px — hero compacto y LOGIN modal centrado ===== */
 @media (max-width: 768px){
   /* Menos aire entre Inicio y Sobre Nosotros */
   .hero-container{
     padding: 20px 16px;
-    min-height: 66svh;             /* compacto; usa svh para barras móviles */
-    margin-bottom: 8px;             /* reduce hueco hacia la siguiente sección */
+    min-height: 66svh;                /* más compacto; svh se adapta a barras móviles */
+    margin-bottom: 8px;
     flex-direction: column !important;
     text-align: center;
   }
@@ -981,23 +981,27 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .cta-box{ gap: 12px; flex-wrap: wrap; }
   .cta-btn{ padding: 10px 18px; font-size: clamp(14px, 2.8vw, 16px); }
 
-  /* ---- LOGIN como overlay centrado, con scroll interno si hace falta ---- */
+  /* ---- LOGIN: overlay centrado y sin cortes ---- */
   .login-card{
     position: fixed !important;
     top: 50% !important; left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    z-index: 2001;                         /* por encima de todo */
+    z-index: 2001;                         /* por encima de la navbar */
     width: clamp(310px, 92vw, 480px);
-    max-height: min(92vh, 92dvh);          /* nunca se corta: usa dvh/svh para móviles */
-    overflow: auto;                         /* scroll interno si es alto */
-    -webkit-overflow-scrolling: touch;
+    max-height: 90svh;                      /* altura segura en móvil */
+    overflow: hidden;                       /* el scroll va dentro del inner */
     margin: 0; padding: 0;
   }
   .login-card__inner{
+    background:#fff; border-radius:12px;
     padding: 18px;
-    border-radius: 12px;
     box-shadow: 0 12px 40px rgba(0,0,0,.25);
-    background: #fff;                      /* asegura fondo sólido del card */
+    max-height: inherit;                    /* hereda 90svh */
+    overflow: auto;                         /* scroll interno si hace falta */
+    -webkit-overflow-scrolling: touch;
+    /* respiraderos para notch/homebar */
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+    padding-top: max(18px, env(safe-area-inset-top));
   }
   /* backdrop oscuro detrás del modal */
   .login-card::before{
@@ -1022,7 +1026,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .social-icon{ width: 28px; height: 28px; }
 }
 
-/* ===== ≤480px — tipografía de la navbar más ajustada y margen fino ===== */
+/* ===== ≤480px — tipografía navbar y margen fino ===== */
 @media (max-width: 480px){
   .nav-menu a{ font-size: clamp(12px, 3.2vw, 14px); }
   body > header + *{ margin-top: 120px; }
