@@ -922,51 +922,53 @@ body > header + * {
 .recuperar-close:hover{ background: #f3f4f6; color:#111827; }
 .recuperar-close:focus{ outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,.15); }
 
-/* ====== BASE ====== */
-/* ===== BASE: impedir scroll horizontal ===== */
+/* ===== BASE (no afecta PC) ===== */
 html, body { max-width: 100%; overflow-x: hidden; }
 
-/* ================== ≤1024px ================== */
-/* Fondo: evitar tirones y reencuadrar como en desktop */
+/* ===== ≤1024px — fondo estable y encuadre similar a desktop ===== */
 @media (max-width: 1024px){
   .login-page-bg{
-    background-attachment: scroll;
-    background-size: cover;
-    background-position: center 35%;
+    background-attachment: scroll;     /* evita tirones */
+    background-size: cover;            /* llena pantalla */
+    background-position: 50% 22%;      /* sube el encuadre (se ve más “mesa” como en PC) */
   }
 }
 
-/* ================== ≤992px ================== */
-/* Navbar en 2 filas y menos empuje del contenido (reduce “aire”) */
+/* ===== ≤992px — navbar en 2 filas y menos empuje del contenido ===== */
 @media (max-width: 992px){
   .navbar{
     padding: 10px 12px;
-    display: flex; flex-direction: column; align-items: stretch; gap: 6px;
+    display: flex; flex-direction: column; gap: 6px;
   }
-  .nav-menu ul{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px 14px; }
-  .nav-menu a{ font-size: clamp(13px, 2.8vw, 15px); letter-spacing:.2px; white-space:nowrap; }
+  .nav-menu ul{
+    display:flex; flex-wrap:wrap; justify-content:center; gap: 8px 14px;
+  }
+  .nav-menu a{
+    font-size: clamp(13px, 2.8vw, 15px);
+    letter-spacing:.2px; white-space:nowrap;
+  }
   .nav-logo{ width:100%; display:flex; justify-content:center; padding:0 12px 6px; }
   .inicio-sesion{ padding:8px 16px; font-size: clamp(13px, 2.8vw, 15px); line-height:1.1; }
 
-  /* Empuje por navbar más alta */
-  body > header + *{ margin-top: 120px; }
+  /* Empuje por navbar más alta (un poco menos que antes) */
+  body > header + *{ margin-top: 110px; }
 
-  /* Servicios: grid fluido */
+  /* Servicios en grid fluido */
   .servicios-cards{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
-    gap:16px 24px;
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px 24px;
   }
-  .servicio-card{ width:auto; margin-top:3rem; }
-  .servicio-card-imagen{ width:76%; max-width:260px; height:108px; }
+  .servicio-card{ width:auto; margin-top: 3rem; }
+  .servicio-card-imagen{ width: 76%; max-width: 260px; height: 108px; }
 }
 
-/* ================== ≤768px ================== */
-/* Hero compacto + columna (reduce espacio entre secciones) */
+/* ===== ≤768px — hero compacto y modal de login centrado ===== */
 @media (max-width: 768px){
+  /* Menos aire entre Inicio y Sobre nosotros */
   .hero-container{
     padding: 20px 16px;
-    min-height: 70vh;                     /* antes 80vh */
+    min-height: 66vh;                 /* baja un poco la altura del hero */
+    margin-bottom: 12px;              /* reduce el hueco hacia la siguiente sección */
     flex-direction: column !important;
     text-align: center;
   }
@@ -976,48 +978,55 @@ html, body { max-width: 100%; overflow-x: hidden; }
     max-width: min(680px, 92vw);
     margin-inline: auto;
   }
-  .cta-box{ gap:12px; flex-wrap:wrap; }
-  .cta-btn{ padding:10px 18px; font-size: clamp(14px, 2.8vw, 16px); }
+  .cta-box{ gap: 12px; flex-wrap: wrap; }
+  .cta-btn{ padding: 10px 18px; font-size: clamp(14px, 2.8vw, 16px); }
 
-  /* Login/Recuperar como MODAL centrado y superpuesto */
+  /* --- Login superpuesto (modal) sin agrandar la navbar --- */
   .login-card{
     position: fixed !important;
-    top:50% !important; left:50% !important;
+    inset: 50% auto auto 50% !important;  /* top/left al 50% */
     transform: translate(-50%, -50%) !important;
-    max-width: 92vw; width:auto;
-    margin:0; padding:0; z-index:2000;
+    width: clamp(310px, 92vw, 480px);
+    margin: 0; padding: 0;
+    z-index: 2000;                        /* sobre la navbar */
   }
-  .login-card__inner{ padding:18px; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,.25); }
+  .login-card__inner{
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.25);
+  }
+  /* Backdrop oscuro detrás del modal (sin JS) */
   .login-card::before{
-    content:""; position:fixed; inset:0;
-    background: rgba(0,0,0,.45); backdrop-filter: blur(1px);
-    z-index:-1;
+    content:"";
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(1px);
+    z-index: -1;
   }
 
   /* Sobre nosotros y formularios */
-  .sobre-wrapper{ padding:0 16px; }
-  .sobre-image img{ border-radius:24px; }
-  .form-contacto{ padding:16px; }
-  .form-grid{ grid-template-columns:1fr; gap:14px; }
-  .registro-buttons{ justify-content:center; }
+  .sobre-wrapper{ padding: 0 16px; }
+  .sobre-image img{ border-radius: 24px; }
+  .form-contacto{ padding: 16px; }
+  .form-grid{ grid-template-columns: 1fr; gap: 14px; }
+  .registro-buttons{ justify-content: center; }
 }
 
-/* ================== ≤576px ================== */
-/* Footer compacto y tipografías algo menores */
+/* ===== ≤576px — footer compacto ===== */
 @media (max-width: 576px){
-  .footer-container{ padding:20px; }
-  .social-icon{ width:28px; height:28px; }
+  .footer-container{ padding: 20px; }
+  .social-icon{ width: 28px; height: 28px; }
 }
 
-/* ===== Accesibilidad ===== */
-@media (prefers-reduced-motion: reduce){
-  .hero-container{ animation:none !important; }
-}
-
-/* ================== ≤480px ================== */
-/* Navbar muy pequeña y pequeño ajuste del empuje */
+/* ===== ≤480px — pequeño ajuste navbar ===== */
 @media (max-width: 480px){
   .nav-menu a{ font-size: clamp(12px, 3.2vw, 14px); }
-  body > header + *{ margin-top: 135px; }
+  body > header + *{ margin-top: 125px; } /* un pelín más de margen si hay dos filas */
 }
+
+/* Accesibilidad: sin animación si el usuario lo pide */
+@media (prefers-reduced-motion: reduce){
+  .hero-container{ animation: none !important; }
+}
+
 
