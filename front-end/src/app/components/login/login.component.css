@@ -961,10 +961,7 @@ body {
   }
 }
 
-@media (max-width: 768px){
-  .hero-container{ animation: none !important; }
-  .hero-container::before{ background: rgba(0,0,0,.42); }
-}
+
 
 /* ====== NAVBAR (tablet y móvil) ====== */
 @media (max-width: 992px) {
