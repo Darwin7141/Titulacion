@@ -2,57 +2,66 @@
 <div class="registro-panel">
   <div class="registro-panel-content">
     <!-- Título dinámico -->
-    <h3>{{ esEdicion ? 'Editar Cargo' : 'Agregar Cargo' }}</h3>
+    <h3>{{ esEdicion ? "Editar Cargo" : "Agregar Cargo" }}</h3>
 
     <!-- Usamos guardar() para ambos casos -->
-    <form #cargoForm="ngForm"
-          (ngSubmit)="guardar()"
-          autocomplete="on">
-
+    <form #cargoForm="ngForm" (ngSubmit)="guardar()" autocomplete="on">
       <div class="form-grid">
-
         <!-- Código (solo visible en edición) -->
         <div class="form-group" *ngIf="esEdicion">
           <label for="codigo">Código</label>
-          <input id="codigo" name="codigocargo" type="text"
-                 [(ngModel)]="cargos.idcargo"
-                 disabled>
+          <input
+            id="codigo"
+            name="codigocargo"
+            type="text"
+            [(ngModel)]="cargos.idcargo"
+            disabled
+          />
         </div>
 
         <!-- Nombre del cargo -->
         <div class="form-group">
           <label for="nombrecargo">Nombre</label>
-          <input id="nombrecargo" name="nombrecargo" type="text"
-                 [(ngModel)]="cargos.nombrecargo"
-                 placeholder="Ingrese el nombre del cargo"
-                 required
-                 cdkFocusInitial>
+          <input
+            id="nombrecargo"
+            name="nombrecargo"
+            type="text"
+            [(ngModel)]="cargos.nombrecargo"
+            placeholder="Ingrese el nombre del cargo"
+            required
+            cdkFocusInitial
+          />
         </div>
 
         <!-- Descripción -->
         <div class="form-group">
           <label for="descripcion">Descripción</label>
-          <input id="descripcion" name="descripcion" type="text"
-                 [(ngModel)]="cargos.descripcion"
-                 placeholder="Ingrese una descripción"
-                 required>
+          <input
+            id="descripcion"
+            name="descripcion"
+            type="text"
+            [(ngModel)]="cargos.descripcion"
+            placeholder="Ingrese una descripción"
+            required
+          />
         </div>
-
-      </div><!-- /form-grid -->
+      </div>
+      <!-- /form-grid -->
 
       <!-- Botones -->
       <div class="registro-buttons">
-        <button type="button"
-                class="btn-cancel"
-                (click)="cancelar()">Cancelar</button>
+        <button type="button" class="btn-cancel" (click)="cancelar()">
+          Cancelar
+        </button>
 
-        <button type="submit"
-                class="btn-register"
-                [disabled]="!cargoForm.valid">
-          {{ esEdicion ? 'Guardar' : 'Registrar' }}
+        <button
+          type="submit"
+          class="btn-register"
+          [disabled]="!cargoForm.valid"
+        >
+          {{ esEdicion ? "Guardar" : "Registrar" }}
         </button>
       </div>
-
     </form>
   </div>
 </div>
