@@ -2,22 +2,34 @@
 <div class="login-page-bg">
 
   <!-- ============ NAVBAR ============ -->
-  <header class="navbar">
-    <nav class="nav-menu">
-      <ul>
-        <li><a href="#" (click)="scrollTo('home', $event)">INICIO</a></li>
-        <li><a href="#" (click)="scrollTo('sobre-nosotros', $event)">SOBRE NOSOTROS</a></li>
-        <li><a href="#" (click)="scrollTo('servicios', $event)">SERVICIOS</a></li>
-        <li><a href="#" (click)="scrollTo('planes', $event)">CONTÁCTANOS</a></li>
-      </ul>
-    </nav>
+  <header class="navbar" [class.menu-open]="menuOpen">
+  <!-- Botón hamburguesa (solo se ve en móvil) -->
+  <button
+    class="hamburger"
+    type="button"
+    aria-label="Abrir menú"
+    [attr.aria-expanded]="menuOpen"
+    (click)="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
 
-    <div class="nav-logo">
-    <button class="inicio-sesion" (click)="toggleLogin()">
-      Iniciar Sesión
-    </button>
-    
+  <!-- Menú -->
+  <nav class="nav-menu">
+    <ul>
+      <li><a href="#" (click)="scrollTo('home', $event); closeMenuOnNavClick()">INICIO</a></li>
+      <li><a href="#" (click)="scrollTo('sobre-nosotros', $event); closeMenuOnNavClick()">SOBRE NOSOTROS</a></li>
+      <li><a href="#" (click)="scrollTo('servicios', $event); closeMenuOnNavClick()">SERVICIOS</a></li>
+      <li><a href="#" (click)="scrollTo('planes', $event); closeMenuOnNavClick()">CONTÁCTANOS</a></li>
+    </ul>
+  </nav>
+
+  <!-- Botón iniciar sesión -->
+  <div class="nav-logo">
+    <button class="inicio-sesion" (click)="toggleLogin()">Iniciar Sesión</button>
   </div>
+
+  <!-- Sombra/overlay detrás del menú (móvil) -->
+  <div class="nav-backdrop" (click)="toggleMenu()" *ngIf="menuOpen"></div>
 
 
 <!-- FORMULARIO INLINE -->

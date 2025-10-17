@@ -65,6 +65,7 @@ export class LoginComponent implements OnInit {
   servicios: any[] = []; // aquí guardaremos los servicios
   menus: any[] = [];
   isLoadingRecuperar = false;
+  menuOpen = false;
 
   constructor(
     
@@ -936,6 +937,22 @@ async addPageNumbers(doc: jsPDF, pageW: number, pageH: number) {
             customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' } })
       }
     )};
+
+    toggleMenu(): void {
+  this.menuOpen = !this.menuOpen;
+  // Evita scroll de fondo cuando el menú está abierto
+  if (this.menuOpen) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+closeMenuOnNavClick(): void {
+  if (this.menuOpen) {
+    this.toggleMenu();
+  }
+}
 }
 
   

@@ -923,3 +923,88 @@ body > header + * {
 .recuperar-close:focus{ outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,.15); }
 
 /* Solo un botón, alineado a la derecha */
+
+.hamburger{
+  display: none;
+  position: relative;
+  width: 32px; height: 24px;
+  border: none; background: transparent; cursor: pointer;
+  padding: 0; margin-right: 8px;
+  z-index: 1002; /* por encima del drawer */
+}
+.hamburger span{
+  position: absolute; left: 0; right: 0;
+  height: 2px; background:#1B1B1B; border-radius: 2px;
+  transition: transform .25s ease, top .25s ease, opacity .2s ease;
+}
+.hamburger span:nth-child(1){ top: 0; }
+.hamburger span:nth-child(2){ top: 11px; }
+.hamburger span:nth-child(3){ top: 22px; }
+
+/* Estado activo (X) */
+.menu-open .hamburger span:nth-child(1){
+  top: 11px; transform: rotate(45deg);
+}
+.menu-open .hamburger span:nth-child(2){
+  opacity: 0;
+}
+.menu-open .hamburger span:nth-child(3){
+  top: 11px; transform: rotate(-45deg);
+}
+
+/* Drawer del menú en móvil */
+@media (max-width: 992px){
+  .hamburger{ display: inline-block; }
+
+  /* Navbar compacta en móvil */
+  .navbar{
+    padding: 10px 14px;
+  }
+
+  /* El nav se vuelve panel deslizante */
+  .nav-menu{
+    position: fixed;
+    top: 56px;                 /* justo debajo de la navbar */
+    left: 0;
+    width: 100%;
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(6px);
+    transform: translateY(-120%);
+    transition: transform .28s ease;
+    box-shadow: 0 8px 18px rgba(0,0,0,.08);
+    z-index: 1001;
+  }
+  .menu-open .nav-menu{
+    transform: translateY(0);
+  }
+
+  .nav-menu ul{
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 12px;
+  }
+  .nav-menu li{ border-bottom: 1px solid rgba(0,0,0,.06); }
+  .nav-menu a{
+    display: block;
+    padding: 12px 6px;
+    font-size: 16px;
+  }
+
+  /* Botón Iniciar sesión a la derecha, pero sin invadir */
+  .nav-logo .inicio-sesion{
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  /* Overlay detrás del menú */
+  .nav-backdrop{
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.35);
+    z-index: 1000;
+  }
+
+  /* Empuje al hero para que no lo tape la barra fija */
+  .hero-container{ padding-top: 88px; }
+}
+
