@@ -1043,3 +1043,41 @@ body > header + * {
     margin-top: 16px;
   }
 }
+@media (min-width: 993px){
+
+  /* Navbar como la de escritorio */
+  .navbar{
+    position: fixed;           /* como la tenías */
+    top: 0; left: 0; right: 0;
+    height: auto;
+    padding: 15px 24px !important;
+    background: rgba(255,255,255,.92) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 2px 6px rgba(0,0,0,.05);
+    border: 0;
+    z-index: 999;
+  }
+
+  /* Menú horizontal normal de desktop */
+  .nav-menu{
+    position: static !important;
+    transform: none !important;
+    height: auto !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    pointer-events: auto !important;
+  }
+  .nav-menu ul{
+    flex-direction: row !important;
+    padding: 0 !important;
+    gap: 28px !important;
+  }
+
+  /* Oculta hamburguesa/backdrop en desktop */
+  .hamburger{ display: none !important; }
+  .nav-backdrop{ display: none !important; }
+
+  /* El hero no necesita empuje extra en desktop */
+  .hero-container{ padding-top: 0 !important; }
+}
