@@ -924,3 +924,160 @@ body > header + * {
 
 /* Solo un botón, alineado a la derecha */
 
+/* ====== MÓVIL (≤ 992px) ====== */
+@media (max-width: 992px){
+
+  /* 0) Anula cualquier empuje de desktop debajo del header */
+  body > header + * { margin-top: 0 !important; }
+
+  /* 1) Navbar: pegada arriba, SIN blur, SIN pseudo-elementos y SIN bordes */
+  .navbar{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background: #f3f3f3 !important;      /* gris sólido que “llega” hasta arriba */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 0 !important;
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);/* sombra solo abajo */
+    z-index: 1003;
+
+    /* alto de la barra + notch si lo hubiera */
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 26px 12px 14px !important;
+  }
+  /* Mata cualquier overlay antiguo (causa típica de la franja) */
+  .navbar::before,
+  .navbar::after{ content: none !important; display: none !important; }
+
+  /* 2) Hamburguesa limpia (sin recuadro negro) */
+  .hamburger{
+    display: inline-block;
+    width: 40px; height: 28px;
+    margin-left: 4px;
+    position: relative;
+    z-index: 1004;
+    border: 0; background: transparent;
+    outline: none;
+    -webkit-appearance: none;
+            appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hamburger span{
+    position: absolute;
+    left: 6px; width: 28px; height: 3px;
+    background: #2b2b2b; border-radius: 2px;
+    transition: transform .25s, top .25s, opacity .2s;
+  }
+  .hamburger span:nth-child(1){ top: 4px; }
+  .hamburger span:nth-child(2){ top: 12px; }
+  .hamburger span:nth-child(3){ top: 20px; }
+  .menu-open .hamburger span:nth-child(1){ top: 12px; transform: rotate(45deg); }
+  .menu-open .hamburger span:nth-child(2){ opacity: 0; }
+  .menu-open .hamburger span:nth-child(3){ top: 12px; transform: rotate(-45deg); }
+
+  /* 3) Botón con aire al borde derecho */
+  .nav-logo .inicio-sesion{
+    margin-right: 12px;
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+
+  /* 4) Drawer justo debajo de la barra (una sola fila, sin dobles capas) */
+  .nav-menu{
+    position: fixed;
+    top: calc(60px + env(safe-area-inset-top, 0px)) !important;
+    left: 0; right: 0;
+    width: 100%;
+    background: #ffffff;
+    transform: translateY(-150%);
+    transition: transform .28s ease;
+    box-shadow: 0 8px 18px rgba(0,0,0,.08);
+    z-index: 1001;
+    border: 0;
+  }
+  .menu-open .nav-menu{ transform: translateY(0); }
+
+  .nav-menu ul{
+    display: flex; flex-direction: column;
+    padding: 8px 12px; gap: 0;
+  }
+  .nav-menu li{ border-bottom: 1px solid rgba(0,0,0,.06); }
+  .nav-menu a{ display: block; padding: 12px 6px; font-size: 16px; }
+
+  /* 5) Backdrop del drawer */
+  .nav-backdrop{
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.35);
+    z-index: 1000;
+  }
+
+  /* 6) Solo un empuje para que el header no tape el hero */
+  .hero-container{
+    padding-top: calc(96px + env(safe-area-inset-top, 0px));
+  }
+
+  .sobre-wrapper{
+    padding: 0 20px;           /* margen lateral */
+    flex-wrap: wrap;
+    justify-content: center;   /* centra el contenido */
+  }
+
+  /* columna de texto más centrada y contenida */
+  .sobre-text{
+    width: 100%;
+    max-width: 680px;          /* no se estira hasta el filo */
+    margin: 0 auto;            /* centra horizontalmente */
+  }
+
+  /* el párrafo gana respiro lateral sin afectar desktop */
+  .sobre-text p{
+    padding-inline: 12px;      /* aire a ambos lados */
+    max-width: 640px;          /* un poco más contenido */
+    margin: 0 auto;            /* centrado dentro del contenedor */
+  }
+
+  /* si la imagen va debajo, que tenga un respiro arriba */
+  .sobre-image{
+    width: 100%;
+    margin-top: 16px;
+  }
+}
+@media (min-width: 993px){
+
+  /* Navbar como la de escritorio */
+  .navbar{
+    position: fixed;           /* como la tenías */
+    top: 0; left: 0; right: 0;
+    height: auto;
+    padding: 15px 24px !important;
+    background: rgba(255,255,255,.92) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 2px 6px rgba(0,0,0,.05);
+    border: 0;
+    z-index: 999;
+  }
+
+  /* Menú horizontal normal de desktop */
+  .nav-menu{
+    position: static !important;
+    transform: none !important;
+    height: auto !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    pointer-events: auto !important;
+  }
+  .nav-menu ul{
+    flex-direction: row !important;
+    padding: 0 !important;
+    gap: 28px !important;
+  }
+
+  /* Oculta hamburguesa/backdrop en desktop */
+  .hamburger{ display: none !important; }
+  .nav-backdrop{ display: none !important; }
+
+  /* El hero no necesita empuje extra en desktop */
+  .hero-container{ padding-top: 0 !important; }
+}
