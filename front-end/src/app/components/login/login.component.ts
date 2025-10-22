@@ -107,6 +107,7 @@ export class LoginComponent implements OnInit {
   }
     
 abrirRegistro() {
+    this.showLoginForm = false; 
     this.registroRef = this.dialog.open(this.registroDialog, {
       width: '640px',
       autoFocus: false
@@ -896,6 +897,7 @@ async addPageNumbers(doc: jsPDF, pageW: number, pageH: number) {
   }
   
   abrirRecuperar() {
+    this.showLoginForm = false; 
     this.recuperarRef = this.dialog.open(this.recuperarDialog, {
       width: '360px',
       panelClass: 'recuperar-dialog-container',
