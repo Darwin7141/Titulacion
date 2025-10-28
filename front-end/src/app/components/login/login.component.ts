@@ -110,7 +110,9 @@ abrirRegistro() {
     this.showLoginForm = false; 
     this.registroRef = this.dialog.open(this.registroDialog, {
       width: '640px',
-      autoFocus: false
+      autoFocus: false,
+      panelClass: 'registro-dialog-container',        
+      backdropClass: 'registro-dialog-backdrop'
     });
   
   }
