@@ -1,18 +1,15 @@
-/* =========================
-   Tarjeta del formulario
-   ========================= */
-.edit-sheet{
+.edit-sheet {
   max-width: 960px;
   margin: 0 auto;
   padding: 16px;
   background: #fff;
-                /* ← AJUSTA AQUÍ el redondeo visible */
-  box-shadow: 0 8px 50px rgba(0,0,0,.06);
-  font-family:"Roboto",sans-serif;
+
+  box-shadow: 0 8px 50px rgba(0, 0, 0, 0.06);
+  font-family: "Roboto", sans-serif;
 }
 
 /* Título */
-.sheet-title{
+.sheet-title {
   text-align: center;
   font-size: 22px;
   font-weight: 550;
@@ -21,93 +18,413 @@
 }
 
 /* Campos */
-.meta-grid{
+.meta-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
   margin-bottom: 8px;
 }
-@media (max-width: 720px){ .meta-grid{ grid-template-columns: 1fr; } }
-
-.form-field{ display:flex; flex-direction:column; gap:6px; }
-.field-label{ font-size:13px; font-weight:600; color:#374151; }
-.field-input{
-  height: 42px; padding: 0 12px;
-  border: 1px solid #d1d5db; border-radius: 10px; outline: 0;
-  font-size: 14px; color:#111827; background:#fff;
+@media (max-width: 720px) {
+  .meta-grid {
+    grid-template-columns: 1fr;
+  }
 }
-.field-input:focus{ border-color:#3f51b5; box-shadow:0 0 0 3px rgba(63,81,181,.12); }
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+.field-input {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  outline: 0;
+  font-size: 14px;
+  color: #111827;
+  background: #fff;
+}
+.field-input:focus {
+  border-color: #3f51b5;
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.12);
+}
 
 /* Toolbar */
-.toolbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:12px 0 6px; }
-.toolbar-title{ margin:0; font-size:16px; color:#111827; }
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 12px 0 6px;
+}
+.toolbar-title {
+  margin: 0;
+  font-size: 16px;
+  color: #111827;
+}
 
 /* Tabla */
-.table-wrap{ overflow-x:auto; }
-.tabla{
-  width:100%; border-collapse:collapse; font-size:14px;
-  border:1px solid #ececec; border-radius:14px; overflow:hidden;
+.table-wrap {
+  overflow-x: auto;
 }
-.tabla th, .tabla td{ padding:10px 12px; text-align:left; }
-.tabla thead th{ background:#f7f7f9; color:#111827; font-weight:700; border-bottom:1px solid #ececec; }
-.tabla tbody td{ border-top:1px solid #f1f1f1; }
-.col-cantidad{ width:120px; }
-.qty-input{ text-align:center; }
-.col-actions{ width:56px; text-align:center; }
-.mono{ font-variant-numeric: tabular-nums; }
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.tabla th,
+.tabla td {
+  padding: 10px 12px;
+  text-align: left;
+}
+.tabla thead th {
+  background: #f7f7f9;
+  color: #111827;
+  font-weight: 700;
+  border-bottom: 1px solid #ececec;
+}
+.tabla tbody td {
+  border-top: 1px solid #f1f1f1;
+}
+.col-cantidad {
+  width: 120px;
+}
+.qty-input {
+  text-align: center;
+}
+.col-actions {
+  width: 56px;
+  text-align: center;
+}
+.mono {
+  font-variant-numeric: tabular-nums;
+}
 
 /* Resumen */
-.summary{
-  display:flex; gap:18px; flex-wrap:wrap; justify-content:flex-end;
-  margin:14px 0 6px; padding-top:6px; border-top:1px dashed #e5e7eb;
+.summary {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin: 14px 0 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #e5e7eb;
 }
-.summary-item{ font-size:15px; color:#111827; }
-.summary-item span{ color:#6b7280; margin-right:6px; }
+.summary-item {
+  font-size: 15px;
+  color: #111827;
+}
+.summary-item span {
+  color: #6b7280;
+  margin-right: 6px;
+}
 
 /* Botones */
-.btn{ display:inline-flex; align-items:center; gap:8px; border:none; cursor:pointer; line-height:1; padding:10px 14px; font-size:14px; border-radius:10px; }
-.btn i{ font-size:16px; }
-.primary{ background:#22c55e !important; color:#fff !important; }
-.ghost{ background:#dc3545 !important; color:#fff !important;}
-.add-button{ background:#22c55e !important; color:#fff !important; }
-.icon{ width:36px; height:36px; padding:0; justify-content:center; }
-.danger{ background:#dc3545; color:#fff; }
-.actions{ display:flex; justify-content:center; gap:12px; margin-top:10px; }
-
-.dialog-reserva .mat-mdc-dialog-container .mdc-dialog__surface{
-  border-radius: 14px !important;   /* súbelo a 48px/56px si lo quieres más redondo */
-  overflow: hidden;                  /* recorta contenido en las esquinas */
-  box-shadow: 0 12px 32px rgba(0,0,0,.12);
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+.btn i {
+  font-size: 16px;
+}
+.primary {
+  background: #22c55e !important;
+  color: #fff !important;
+}
+.ghost {
+  background: #dc3545 !important;
+  color: #fff !important;
+}
+.add-button {
+  background: #22c55e !important;
+  color: #fff !important;
+}
+.icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+}
+.danger {
+  background: #dc3545;
+  color: #fff;
+}
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-/* Evitar doble “tarjeta” dentro del modal (opcional) */
-.dialog-reserva .edit-sheet{
+.dialog-reserva .mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 14px !important;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.dialog-reserva .edit-sheet {
   background: transparent;
   box-shadow: none;
-  border-radius: 0;                  /* ya redondeamos el surface del modal */
+  border-radius: 0;
   padding: 16px 20px;
 }
 
-.dialog-reserva .mdc-dialog__surface{
-  max-height: 88vh;          /* no excede la pantalla */
-  width: 'auto';
+.dialog-reserva .mdc-dialog__surface {
+  max-height: 88vh;
+  width: "auto";
   display: flex;
   flex-direction: column;
 }
 
-/* 2) Que el cuerpo del formulario sea el área scrollable */
-.dialog-reserva .edit-sheet{
-  flex: 1 1 auto;            /* ocupa el espacio disponible del modal */
-  overflow: auto;            /* ← aquí aparece el scroll cuando hace falta */
+.dialog-reserva .edit-sheet {
+  flex: 1 1 auto;
+  overflow: auto;
   padding: 16px 20px;
 }
 
-/* 3) Mantén las acciones visibles (pegadas abajo del área scrollable) */
-.dialog-reserva .actions{
+.dialog-reserva .actions {
   position: sticky;
   bottom: 0;
-  background: #fff;          /* coincide con el surface del modal */
+  background: #fff;
   padding-top: 10px;
   margin-top: 10px;
-  border-top: 1px solid #eee; /* opcional, separador */
+  border-top: 1px solid #eee;
+}
+
+/* Responsive*/
+@media (max-width: 992px) {
+  .dialog-reserva .mdc-dialog__surface {
+    max-width: 720px !important;
+    width: 92vw !important;
+    max-height: 92vh !important;
+    margin: 0 !important;
+    border-radius: 14px !important;
+  }
+  .dialog-reserva .edit-sheet {
+    padding: 14px 16px !important;
+  }
+  .tabla th,
+  .tabla td {
+    padding: 9px 10px;
+  }
+}
+
+.cdk-overlay-pane.dialog-reserva {
+  max-width: none !important;
+}
+
+@media (max-width: 992px) {
+  .cdk-overlay-pane.dialog-reserva {
+    width: 92vw !important;
+  }
+
+  .dialog-reserva .mdc-dialog__surface {
+    max-width: 720px !important;
+    width: 100% !important;
+    max-height: 92vh !important;
+    margin: 0 !important;
+    border-radius: 14px !important;
+  }
+
+  .dialog-reserva .edit-sheet {
+    padding: 14px 16px !important;
+  }
+  .tabla th,
+  .tabla td {
+    padding: 9px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cdk-overlay-pane.dialog-reserva {
+    width: 96vw !important;
+  }
+  .dialog-reserva .mdc-dialog__surface {
+    max-width: 96vw !important;
+    width: 96vw !important;
+    max-height: 92vh !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
+  }
+  .dialog-reserva .mat-mdc-dialog-container {
+    padding: 0 !important;
+  }
+  .dialog-reserva .edit-sheet {
+    padding: 12px 14px !important;
+  }
+  .sheet-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .meta-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .field-input {
+    height: 40px;
+    font-size: 14px;
+    padding: 0 10px;
+  }
+
+  .tabla th,
+  .tabla td {
+    padding: 8px 8px;
+  }
+  .col-cantidad {
+    width: 88px;
+  }
+  .col-actions {
+    width: 44px;
+  }
+  .qty-input {
+    text-align: center;
+  }
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabla thead {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .tabla thead tr {
+    display: grid;
+    grid-template-columns: 1fr 72px 78px 44px; /* Menú / Cantidad / Subtotal / (icono) */
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    background: #f7f7f9;
+    border: 1px solid #ececec;
+    border-radius: 12px;
+  }
+
+  .tabla {
+    border-collapse: separate !important;
+  }
+  .tabla thead th {
+    display: block;
+    border: 0 !important;
+    border-bottom: 0 !important;
+    border-right: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0;
+    text-align: center;
+  }
+
+  .tabla thead th:nth-child(3) {
+    display: none;
+  }
+  .tabla thead th:nth-child(4) {
+    grid-column: 3;
+  }
+  .tabla thead th:nth-child(5) {
+    grid-column: 4;
+    visibility: hidden;
+  }
+
+  .tabla tbody tr {
+    display: grid;
+    grid-template-columns: 1fr 72px 78px 44px; /* Menú / Cantidad / Subtotal / Eliminar */
+    gap: 10px;
+    padding: 10px;
+    background: #f7f7f9;
+    border: 1px solid #ececec;
+    border-radius: 12px;
+    box-sizing: border-box;
+  }
+  .tabla tbody td {
+    border: none !important;
+    padding: 0 !important;
+    background: transparent;
+  }
+
+  .tabla tbody td:nth-child(1) .field-input {
+    width: 100%;
+    height: 42px;
+  }
+
+  .tabla tbody td.col-cantidad,
+  .tabla tbody td:nth-child(2) {
+    justify-self: stretch;
+  }
+  .tabla tbody td.col-cantidad .qty-input,
+  .tabla tbody td:nth-child(2) .qty-input {
+    width: 100%;
+    height: 42px;
+    text-align: center;
+  }
+
+  .tabla tbody td:nth-child(3) {
+    display: none;
+  } /* Precio */
+  .tabla tbody td:nth-child(4) {
+    display: block; /* Subtotal visible */
+    align-self: center;
+    justify-self: center;
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+    grid-column: 3;
+  }
+
+  .tabla tbody td.col-actions,
+  .tabla tbody td:last-child {
+    justify-self: end;
+    align-self: center;
+    grid-column: 4;
+  }
+  .tabla tbody td .btn.icon.danger {
+    width: 44px;
+    height: 42px;
+    border-radius: 10px;
+  }
+
+  .tabla tbody tr + tr {
+    margin-top: 10px;
+  }
+
+  .summary {
+    justify-content: space-between;
+    background: #f7f7f9;
+    border: 1px solid #ececec;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-top: 12px;
+  }
+  .summary-item {
+    font-size: 14px;
+  }
+
+  .actions {
+    gap: 10px;
+    padding-top: 8px;
+  }
+  .actions .btn {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 14px;
+    height: 44px;
+  }
 }

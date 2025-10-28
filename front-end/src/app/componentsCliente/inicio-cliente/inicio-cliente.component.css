@@ -1,381 +1,495 @@
-
-:host{
-  display:block;
-  height:100vh;
-  margin:0;
-  padding:0;
-  font-family:"Roboto",sans-serif;
+:host {
+  display: block;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", sans-serif;
 }
 
-.welcome-card{
-  align-items:center;
-  font-family:"Roboto", sans-serif;
-  background:#28c2f1;
-  color:#fff;
-  display:flex;                 /* centra el texto */
-  justify-content:center;
-  
-  border-radius:8px;
-  height:50px;
+.welcome-card {
+  align-items: center;
+  font-family: "Roboto", sans-serif;
+  background: #28c2f1;
+  color: #fff;
+  display: flex; /* centra el texto */
+  justify-content: center;
+
+  border-radius: 8px;
+  height: 50px;
 }
 
 /* ↓ aquí ajustas el tamaño del título */
-.welcome-card h1{
-  margin:6px 0;
-  font-size:28px;               /* antes era gigante; ajusta a gusto */
-  line-height:1.2;
-  font-weight:600;
-  text-align:center;
+.welcome-card h1 {
+  margin: 6px 0;
+  font-size: 28px; /* antes era gigante; ajusta a gusto */
+  line-height: 1.2;
+  font-weight: 600;
+  text-align: center;
 }
 
-
 /* 1) Toolbar fija arriba */
-:host ::ng-deep .mat-toolbar.toolbar{
-  position:fixed;
-  top:0;left:0;right:0;
-  height:64px;
-  padding:0 16px;
-  display:flex;
-  align-items:center;
-  z-index:1000;
-  background:#3f51b5;
-  color:#fff;
-  font-size:16px;
-  font-weight:500;
+:host ::ng-deep .mat-toolbar.toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+  background: #3f51b5;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 /* 2) Empuja iconos/botones a la derecha */
-.spacer{flex:1 1 auto;}
+.spacer {
+  flex: 1 1 auto;
+}
 
 /* 3) Título dentro de la toolbar */
-.app-title{
-  margin-left:46px;
-  font-size:1.25rem;
-  font-weight:500;
+.app-title {
+  margin-left: 46px;
+  font-size: 1.25rem;
+  font-weight: 500;
 }
 
 /* 4) Sidebar fija bajo toolbar */
-:host ::ng-deep .mat-sidenav{
-  position:fixed !important;
-  top:64px;bottom:0;left:0;
-  overflow-y:auto;
-  background:#fff;
-  box-shadow:2px 0 5px rgba(0,0,0,.1);
-  transition:transform .25s ease,width .25s ease;          /* animación */
+:host ::ng-deep .mat-sidenav {
+  position: fixed !important;
+  top: 64px;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  background: #fff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, width 0.25s ease; /* animación */
 }
 /* 5) Contenido principal desplazado por toolbar+sidebar */
-:host ::ng-deep .mat-sidenav-content{
-  margin-top:64px;
-  height:calc(100vh - 64px);
-  overflow-y:auto;
-  background:#f5f5f5;
-  transition:margin .25s ease;                               /* animación */
+:host ::ng-deep .mat-sidenav-content {
+  margin-top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  background: #f5f5f5;
+  transition: margin 0.25s ease; /* animación */
 }
 
-:host ::ng-deep .mat-sidenav.mat-drawer-opened{
-  width:240px !important;                                    /* ancho normal */
-  transform:translateX(0) !important;
+:host ::ng-deep .mat-sidenav.mat-drawer-opened {
+  width: 240px !important; /* ancho normal */
+  transform: translateX(0) !important;
 }
-:host ::ng-deep .mat-drawer-opened + .mat-drawer-content{
-  margin-left:240px !important;
+:host ::ng-deep .mat-drawer-opened + .mat-drawer-content {
+  margin-left: 240px !important;
 }
 
 /* ⭐ ESTADO CERRADO (cuando haces drawer.toggle()) */
-:host ::ng-deep .mat-sidenav.mat-drawer-closed{
-  width:64px !important;                                     /* “mini-bar”  */
+:host ::ng-deep .mat-sidenav.mat-drawer-closed {
+  width: 64px !important; /* “mini-bar”  */
   /* default de Angular era translateX(-100%); lo ajustamos:      */
-  transform:translateX(calc(-100% + 64px)) !important;        /* deja 64 px visible */
+  transform: translateX(calc(-100% + 64px)) !important; /* deja 64 px visible */
 }
 
 /* el contenido se recoloca con el selector hermano + ------------ */
-:host ::ng-deep .mat-drawer-closed + .mat-drawer-content{
-  margin-left:64px !important;
+:host ::ng-deep .mat-drawer-closed + .mat-drawer-content {
+  margin-left: 64px !important;
 }
 
 /* ⭐ OCULTAR texto y flechas cuando está cerrado ----------------- */
 :host ::ng-deep .mat-drawer-closed span,
 :host ::ng-deep .mat-drawer-closed .mdc-list-item__primary-text,
-:host ::ng-deep .mat-drawer-closed .expand-icon{
-  display:none;
+:host ::ng-deep .mat-drawer-closed .expand-icon {
+  display: none;
 }
 
 /* Iconos centrados en la columna de 64 px ------------------------ */
-:host ::ng-deep .mat-drawer-closed mat-icon[matListIcon]{
-  margin-right:0;
-  justify-content:center;
+:host ::ng-deep .mat-drawer-closed mat-icon[matListIcon] {
+  margin-right: 0;
+  justify-content: center;
 }
 
 /* 6) Wrapper interior */
-.content-wrapper{padding:16px;box-sizing:border-box;}
+.content-wrapper {
+  padding: 16px;
+  box-sizing: border-box;
+}
 
 /* 7) Estilo base para TODOS los list-items (menú + submenú) */
 :host ::ng-deep mat-list-item,
-:host ::ng-deep .mat-mdc-list-item{
-  height:48px;
-  padding:0 16px;
-  display:flex;
-  align-items:center;
-  font-size:14px;
-  font-weight:500;
-  cursor:pointer;
-  transition:background .2s;
+:host ::ng-deep .mat-mdc-list-item {
+  height: 48px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 :host ::ng-deep mat-list-item:hover,
-:host ::ng-deep .mat-mdc-list-item:hover{
-  background:rgba(211,40,40,.04);
+:host ::ng-deep .mat-mdc-list-item:hover {
+  background: rgba(211, 40, 40, 0.04);
 }
 
 /* 7.1) Icono genérico */
 :host ::ng-deep mat-list-item mat-icon[matListIcon],
-:host ::ng-deep .mat-mdc-list-item mat-icon[matListIcon]{
-  font-size:22px;
-  margin-right:12px;
-  color:#000;
-  display:inline-flex;
-  align-items:center;
+:host ::ng-deep .mat-mdc-list-item mat-icon[matListIcon] {
+  font-size: 22px;
+  margin-right: 12px;
+  color: #000;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* 7.2) Flecha expandible (comportamiento base) */
 :host ::ng-deep mat-list-item .expand-icon,
-:host ::ng-deep .mat-mdc-list-item .expand-icon{
-  position:absolute;                 /* anclada al list-item           */
-  right:16px;                        /* misma separación que padding   */
-  top:50%;                           /* centro vertical                */
-  transform:translateY(-50%);        /* corrige la mitad de su alto    */
-  font-size:20px;transition:transform .25s;
-  width:24px;height:24px;            /* garantiza misma “columna”      */
-  display:inline-flex;align-items:center;justify-content:center;
+:host ::ng-deep .mat-mdc-list-item .expand-icon {
+  position: absolute; /* anclada al list-item           */
+  right: 16px; /* misma separación que padding   */
+  top: 50%; /* centro vertical                */
+  transform: translateY(-50%); /* corrige la mitad de su alto    */
+  font-size: 20px;
+  transition: transform 0.25s;
+  width: 24px;
+  height: 24px; /* garantiza misma “columna”      */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 :host ::ng-deep mat-list-item.open .expand-icon,
-:host ::ng-deep .mat-mdc-list-item.open .expand-icon{
-  transform:translateY(-50%) rotate(180deg); /* rota sin desalinear */
+:host ::ng-deep .mat-mdc-list-item.open .expand-icon {
+  transform: translateY(-50%) rotate(180deg); /* rota sin desalinear */
 }
 
-
-:root{
-  --mp-font-size:17px;       /* tamaño de texto de primer nivel   */
-  --mp-font-color:#0d47a1;   /* color   de texto de primer nivel  */
-  --mp-icon-size:24px;       /* tamaño del icono                  */
+:root {
+  --mp-font-size: 17px; /* tamaño de texto de primer nivel   */
+  --mp-font-color: #0d47a1; /* color   de texto de primer nivel  */
+  --mp-icon-size: 24px; /* tamaño del icono                  */
 }
 
 /* Texto del menú principal */
-:host ::ng-deep mat-list-item.menu-principal .mdc-list-item__primary-text{
-  font-size:15px !important;
-  color:#080808 !important;
-  font-weight:600;
-  font-family:"Roboto",sans-serif;
+:host ::ng-deep mat-list-item.menu-principal .mdc-list-item__primary-text {
+  font-size: 15px !important;
+  color: #080808 !important;
+  font-weight: 600;
+  font-family: "Roboto", sans-serif;
   font-weight: 150;
 }
 
 /* Icono del menú principal */
-:host ::ng-deep mat-list-item.menu-principal mat-icon[matListIcon]{
-  font-size:20px; 
-  margin-right:12px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--mp-font-color);
+:host ::ng-deep mat-list-item.menu-principal mat-icon[matListIcon] {
+  font-size: 20px;
+  margin-right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mp-font-color);
 }
 
 /* Flecha centrada verticalmente */
-:host ::ng-deep mat-list-item.menu-principal .expand-icon{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+:host ::ng-deep mat-list-item.menu-principal .expand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ────────────────────────────────────────────────────────────────
    8) SUBMENÚS
    ────────────────────────────────────────────────────────────────*/
 
-:host ::ng-deep .submenu{background:#fafafa;}
+:host ::ng-deep .submenu {
+  background: #fafafa;
+}
 
 /* contenedor del sub-item */
 :host ::ng-deep .submenu a.mat-list-item,
 :host ::ng-deep .submenu a.mat-mdc-list-item,
-:host ::ng-deep .submenu .mat-mdc-list-item{
-  height:34px;
-  padding-left:48px !important;
-  transition:background .2s;
+:host ::ng-deep .submenu .mat-mdc-list-item {
+  height: 34px;
+  padding-left: 48px !important;
+  transition: background 0.2s;
 }
 
 /* texto REAL (clase MDC) */
-:host ::ng-deep .submenu .mdc-list-item__primary-text{
-  font-size:14px !important;
-  font-weight:500;
-  color:#535554 !important;
+:host ::ng-deep .submenu .mdc-list-item__primary-text {
+  font-size: 14px !important;
+  font-weight: 500;
+  color: #535554 !important;
 }
 
 /* icono sub-menú */
-:host ::ng-deep .submenu mat-icon[matListIcon]{
-  font-size:20px;
-  margin-right:12px;
-  color:#535554 !important;
-  display:inline-flex;
-  align-items:center;
+:host ::ng-deep .submenu mat-icon[matListIcon] {
+  font-size: 20px;
+  margin-right: 12px;
+  color: #535554 !important;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* hover sub-menú */
 :host ::ng-deep .submenu a.mat-list-item:hover,
-:host ::ng-deep .submenu a.mat-mdc-list-item:hover{
-  background:rgba(37,180,37,.08);
+:host ::ng-deep .submenu a.mat-mdc-list-item:hover {
+  background: rgba(37, 180, 37, 0.08);
 }
 
 /* ────────────────────────────────────────────────────────────────
    9) Layout dashboard (sin cambios)
    ────────────────────────────────────────────────────────────────*/
-.stats-row{
-  display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;
+.stats-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
 }
-.stat-card{
-  position:relative;overflow:hidden;
-  flex:1 1 220px;min-width:180px;
-  padding:18px 20px;color:#fff;border-radius:8px;
-  box-shadow:0 2px 6px rgba(0,0,0,.12);
-  isolation:isolate;                  /* para stacking context  */
-  transition:transform .25s;
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  flex: 1 1 220px;
+  min-width: 180px;
+  padding: 18px 20px;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  isolation: isolate; /* para stacking context  */
+  transition: transform 0.25s;
 }
-.stat-card:hover{ transform:translateY(-3px); }
+.stat-card:hover {
+  transform: translateY(-3px);
+}
 
-.stat-card .label{
-  font-size:14px;font-weight:500;opacity:.9;
-  letter-spacing:.4px;
+.stat-card .label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+  letter-spacing: 0.4px;
 }
-.stat-card .value{
-  display:flex;align-items:center;gap:6px;
-  font-size:32px;font-weight:700;margin-top:6px;
+.stat-card .value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 6px;
 }
-.stat-card .trend{font-size:22px;opacity:.85;}
+.stat-card .trend {
+  font-size: 22px;
+  opacity: 0.85;
+}
 
 /*  ░░  fondos gradiente  ░░ */
-.blue  {background:linear-gradient(135deg,#a3d9db 0%,#39d7e2 100%);}
-.green {background:linear-gradient(135deg,#b1a2b6 0%,#a11ebb 100%);}
-.orange{background:linear-gradient(135deg,#8a8988 0%,#353434 100%);}
+.blue {
+  background: linear-gradient(135deg, #a3d9db 0%, #39d7e2 100%);
+}
+.green {
+  background: linear-gradient(135deg, #b1a2b6 0%, #a11ebb 100%);
+}
+.orange {
+  background: linear-gradient(135deg, #8a8988 0%, #353434 100%);
+}
 
 /*  ░░  círculos decorativos  ░░ */
 .stat-card::before,
-.stat-card::after{
-  content:"";position:absolute;border-radius:50%;
-  pointer-events:none;mix-blend-mode:soft-light;
+.stat-card::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
 }
-.stat-card::before{
-  width:220%;height:220%;
-  top:-60%;right:-60%;
-  background:rgba(255,255,255,.15);
+.stat-card::before {
+  width: 220%;
+  height: 220%;
+  top: -60%;
+  right: -60%;
+  background: rgba(255, 255, 255, 0.15);
 }
-.stat-card::after{
-  width:180%;height:180%;
-  bottom:-50%;left:-50%;
-  border:2px solid rgba(255,255,255,.25);
+.stat-card::after {
+  width: 180%;
+  height: 180%;
+  bottom: -50%;
+  left: -50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
 }
 
 /*  flecha verde ↑ si deseas otra lógica cámbiala con ngClass  */
-.blue  .trend,
+.blue .trend,
 .green .trend,
-.orange.trend{color:#fff;}
+.orange.trend {
+  color: #fff;
+}
 /* ───────── Paneles grid ───────── */
-.dashboard-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:16px;
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
-.panel{padding:16px;border-radius:8px;}
-.panel canvas{width:100% !important;max-height:280px;}
+.panel {
+  padding: 16px;
+  border-radius: 8px;
+}
+.panel canvas {
+  width: 100% !important;
+  max-height: 280px;
+}
 
-.top-list{margin:0;padding:0 0 0 16px;}
-.top-list li{display:flex;justify-content:space-between;margin:4px 0;}
-.badge{background:#ececec;border-radius:12px;padding:2px 8px;font-weight:600;}
-@media(max-width:900px){
-  .dashboard-grid{grid-template-columns:1fr;}
+.top-list {
+  margin: 0;
+  padding: 0 0 0 16px;
+}
+.top-list li {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+.badge {
+  background: #ececec;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.top-list{
-  list-style:none;margin:0;padding:8px 0;
+.top-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
 }
-.top-list li{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:6px 4px; font-size:15px; font-weight:500;
+.top-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 /* puntito de color */
-.top-list .dot{
-  width:10px;height:10px;border-radius:50%;margin-right:8px;
-  flex-shrink:0;
+.top-list .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0;
 }
 /* nombre del servicio */
-.top-list .name{
-  flex:1;           /* ocupa todo el espacio intermedio */
-  padding-left:4px;
+.top-list .name {
+  flex: 1; /* ocupa todo el espacio intermedio */
+  padding-left: 4px;
 }
 
 /* badge numérico */
-.top-list .badge{
-  background:#f1f1f1;color:#555;font-size:13px;
-  padding:2px 10px;border-radius:12px;font-weight:600;
-  min-width:44px;text-align:center;
+.top-list .badge {
+  background: #f1f1f1;
+  color: #555;
+  font-size: 13px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  min-width: 44px;
+  text-align: center;
 }
 
 /* Colores distintos para cada fila (máx. 6) */
-.rank-0 .dot{ background:#00bcd4;}  /* cyan   */
-.rank-1 .dot{ background:#ff9800;}  /* orange */
-.rank-2 .dot{ background:#e91e63;}  /* pink   */
-.rank-3 .dot{ background:#8e24aa;}  /* purple */
-.rank-4 .dot{ background:#2196f3;}  /* blue   */
-.rank-5 .dot{ background:#607d8b;}  /* grey   */
+.rank-0 .dot {
+  background: #00bcd4;
+} /* cyan   */
+.rank-1 .dot {
+  background: #ff9800;
+} /* orange */
+.rank-2 .dot {
+  background: #e91e63;
+} /* pink   */
+.rank-3 .dot {
+  background: #8e24aa;
+} /* purple */
+.rank-4 .dot {
+  background: #2196f3;
+} /* blue   */
+.rank-5 .dot {
+  background: #607d8b;
+} /* grey   */
 
 /* ==== carrusel horizontal ==== */
-.slider-card{
-  position:relative;
-  height:480px;            
-  padding:0;               
-  overflow:hidden;
-  
+.slider-card {
+  position: relative;
+  height: 480px;
+  padding: 0;
+  overflow: hidden;
 }
 
-.slide{
-  position:absolute; inset:0;
-  opacity:0; transition:opacity .7s ease;
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease;
 }
-.slide.active{ opacity:1; }
-
-.slide img{
-  width:100%;
-  height:100%;
-  object-fit:cover;     
-  object-position:center;
+.slide.active {
+  opacity: 1;
 }
 
-.caption{
-  position:absolute; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,.45);
-  color:#fff; padding:16px 24px;
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
-.caption h2{ margin:0 0 4px; font-weight:600; font-size:1.6rem; }
-.caption p { margin:0;        font-size:1rem;  }
-
-.nav{
-  position:absolute; top:50%; transform:translateY(-50%);
-  z-index:10; background:rgba(0,0,0,.35);
-  color:#fff !important;        /* icono blanco */
+.caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  padding: 16px 24px;
 }
-.nav.prev{ left:12px;  }
-.nav.next{ right:12px; }
 
-:host ::ng-deep .sidenav .menu-item .mdc-list-item__primary-text{
-  font-size: 14px !important;     /* ↓ antes 15–18px */
+.caption h2 {
+  margin: 0 0 4px;
+  font-weight: 600;
+  font-size: 1.6rem;
+}
+.caption p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff !important; /* icono blanco */
+}
+.nav.prev {
+  left: 12px;
+}
+.nav.next {
+  right: 12px;
+}
+
+:host ::ng-deep .sidenav .menu-item .mdc-list-item__primary-text {
+  font-size: 14px !important; /* ↓ antes 15–18px */
   line-height: 1.2;
 }
-:host ::ng-deep .sidenav .menu-item mat-icon[matListIcon]{
-  font-size: 16px !important;     /* ↓ antes 18–22px */
+:host ::ng-deep .sidenav .menu-item mat-icon[matListIcon] {
+  font-size: 16px !important; /* ↓ antes 18–22px */
   width: 16px !important;
   height: 16px !important;
   line-height: 16px !important;
 }
-:host ::ng-deep .sidenav .menu-item{
-  height: 36px !important;        /* filas un poco más compactas */
+:host ::ng-deep .sidenav .menu-item {
+  height: 36px !important; /* filas un poco más compactas */
 }
 
 /* Flecha de “Servicios” del mismo tamaño que los iconos */
-:host ::ng-deep .sidenav .menu-principal .expand-icon{
+:host ::ng-deep .sidenav .menu-principal .expand-icon {
   font-size: 16px !important;
   width: 16px !important;
   height: 16px !important;
@@ -383,24 +497,22 @@
 }
 
 /* ====== Submenú (items dentro de “Servicios”) ====== */
-:host ::ng-deep .sidenav .submenu .submenu-item .mdc-list-item__primary-text{
-  font-size: 13px !important;     /* un toque menor que el principal */
+:host ::ng-deep .sidenav .submenu .submenu-item .mdc-list-item__primary-text {
+  font-size: 13px !important; /* un toque menor que el principal */
 }
-:host ::ng-deep .sidenav .submenu .submenu-item mat-icon[matListIcon]{
+:host ::ng-deep .sidenav .submenu .submenu-item mat-icon[matListIcon] {
   font-size: 15px !important;
   width: 15px !important;
   height: 15px !important;
   line-height: 15px !important;
 }
-:host ::ng-deep .sidenav .submenu .submenu-item{
+:host ::ng-deep .sidenav .submenu .submenu-item {
   height: 30px !important;
-  padding-left: 44px !important;  /* ligera sangría */
+  padding-left: 44px !important; 
 }
 
-
-/* ====== SOLO MÓVIL/TABLET ====== */
+/* Responsive*/
 @media (max-width: 992px) {
-
   /* --- sidenav superpuesto --- */
   :host ::ng-deep .mat-sidenav {
     width: 260px !important;
@@ -410,7 +522,7 @@
     bottom: 0;
     z-index: 1200;
     transform: translateX(-100%) !important;
-    box-shadow: 3px 0 8px rgba(0,0,0,0.3);
+    box-shadow: 3px 0 8px rgba(0, 0, 0, 0.3);
   }
   :host ::ng-deep .mat-sidenav.mat-drawer-opened {
     transform: translateX(0) !important;
@@ -452,67 +564,73 @@
     top: 50%;
     bottom: auto;
     transform: translateY(-50%);
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
   }
-  .nav.prev { left: 6px; }
-  .nav.next { right: 6px; }
+  .nav.prev {
+    left: 6px;
+  }
+  .nav.next {
+    right: 6px;
+  }
 
   /* título superior un poco más pequeño */
   .welcome-card h1 {
     font-size: 20px;
   }
 
-  
-
-  :host ::ng-deep .mat-toolbar.toolbar{
+  :host ::ng-deep .mat-toolbar.toolbar {
     display: flex;
     align-items: center;
-    gap: 8px;              /* espacio entre elementos */
+    gap: 8px; /* espacio entre elementos */
     padding: 0 10px;
-    min-height: 56px;      /* un pelín más compacta */
+    min-height: 56px; /* un pelín más compacta */
   }
 
   /* Botón de menú: que NO esté posicionado con "left" */
-  .edge-menu{
+  .edge-menu {
     position: static !important;
     left: auto !important;
     margin: 0 4px 0 0;
   }
 
   /* Título más compacto y sin empujar */
-  .app-title{
+  .app-title {
     margin-left: 0;
     font-size: 1rem;
     white-space: nowrap;
   }
 
   /* Asegura que los iconos de la derecha no se monten */
-  .spacer{ flex: 1 1 auto; }
-  :host ::ng-deep .mat-toolbar.toolbar .mat-icon-button{
-    width: 40px; height: 40px;
+  .spacer {
+    flex: 1 1 auto;
+  }
+  :host ::ng-deep .mat-toolbar.toolbar .mat-icon-button {
+    width: 40px;
+    height: 40px;
   }
 
   /* Botón con el nombre del usuario: que no rompa la línea */
-  :host ::ng-deep .mat-toolbar.toolbar .mat-mdc-button .mdc-button__label{
-    max-width: 120px;              /* ajusta si necesitas más/menos */
+  :host ::ng-deep .mat-toolbar.toolbar .mat-mdc-button .mdc-button__label {
+    max-width: 120px; /* ajusta si necesitas más/menos */
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;       /* «Franklin Ac…» */
+    text-overflow: ellipsis; /* «Franklin Ac…» */
     vertical-align: middle;
   }
-
 }
 
-
-/* Aún más compacto en móviles pequeños */
-@media (max-width: 420px){
-  .slider-card{ height: 200px; }
-  .caption h2{ font-size: .95rem; }
-  .caption p{  font-size: .8rem; }
-  :host ::ng-deep .mat-toolbar.toolbar .mat-mdc-button .mdc-button__label{
-    display: none;                 /* oculta el texto, queda el ícono */
+@media (max-width: 420px) {
+  .slider-card {
+    height: 200px;
   }
-  
+  .caption h2 {
+    font-size: 0.95rem;
+  }
+  .caption p {
+    font-size: 0.8rem;
+  }
+  :host ::ng-deep .mat-toolbar.toolbar .mat-mdc-button .mdc-button__label {
+    display: none; /* oculta el texto, queda el ícono */
+  }
 }
-
