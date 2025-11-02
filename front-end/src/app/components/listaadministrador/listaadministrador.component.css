@@ -278,6 +278,14 @@
     overflow-x: auto;               /* si no cabe, permitir scroll horizontal */
     -webkit-overflow-scrolling: touch;
   }
-  .buscador.slim { width: calc(100% - 110px); max-width: 260px; margin-top: 8px; }
-  .btn-add { margin-left: auto; margin-top: 8px; }
+
+  .left-group {
+  display: flex;
+  align-items: center;   /* centra verticalmente los hijos (input + iconos) */
+  gap: 8px;
+  
+}
+  
+  .buscador.slim { max-width: 260px; margin-top: 18px !important; }
+  .btn-add { margin-left: auto; margin-top: 0 !important; }
 }
