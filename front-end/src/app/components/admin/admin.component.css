@@ -322,4 +322,49 @@
 .rank-4 .dot{ background:#2196f3;}  /* blue   */
 .rank-5 .dot{ background:#607d8b;}  /* grey   */
 
+@media (max-width: 992px) {
+  
+  
+
+  :host ::ng-deep .mat-toolbar.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* espacio entre elementos */
+    padding: 0 10px;
+    min-height: 56px; /* un pelín más compacta */
+  }
+
+  /* Botón de menú: que NO esté posicionado con "left" */
+  .edge-menu {
+    
+    left: auto !important;
+    margin: 0 4px 0 0;
+    
+  }
+
+  /* Título más compacto y sin empujar */
+  .app-title {
+    margin-left: 0;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  /* Asegura que los iconos de la derecha no se monten */
+  .spacer {
+    flex: 1 1 auto;
+  }
+  :host ::ng-deep .mat-toolbar.toolbar .mat-icon-button {
+    width: 40px;
+    height: 40px;
+  }
+
+ 
+}
+
+@media (max-width: 420px) {
+  
+  :host ::ng-deep .mat-toolbar.toolbar .mat-mdc-button .mdc-button__label {
+    display: none; /* oculta el texto, queda el ícono */
+  }
+}
 

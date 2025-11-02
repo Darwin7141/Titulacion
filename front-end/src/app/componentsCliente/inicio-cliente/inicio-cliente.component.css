@@ -588,7 +588,7 @@
 
   /* Botón de menú: que NO esté posicionado con "left" */
   .edge-menu {
-    position: static !important;
+    
     left: auto !important;
     margin: 0 4px 0 0;
   }
@@ -609,15 +609,7 @@
     height: 40px;
   }
 
-  /* Botón con el nombre del usuario: que no rompa la línea */
-  :host ::ng-deep .mat-toolbar.toolbar .mat-mdc-button .mdc-button__label {
-    max-width: 120px; /* ajusta si necesitas más/menos */
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* «Franklin Ac…» */
-    vertical-align: middle;
-  }
+  
 }
 
 @media (max-width: 420px) {
