@@ -85,9 +85,9 @@
 
     <!--  CONTENIDO (tabla)-->
     <mat-card-content class="table-container">
-
+      
       <div class="table-scroll">
-
+        <div class="admin-table-wrapper">
         <!-- ───────────────────── TABLA RESERVAS ───────────────────── -->
         <table class="admin-table" *ngIf="displayedReservas.length > 0">
           <thead>
@@ -155,14 +155,14 @@
             </tr>
           </tbody>
         </table>
-
+        
         <!-- mensaje sin resultados -->
         <p class="no-data"
            *ngIf="displayedReservas.length === 0 && searchTerm">
           No se encontró ninguna reserva con la información proporcionada.
         </p>
       </div> <!-- /table-scroll -->
-
+      </div>
       <!-- botón Descargar (listado) -->
       <button mat-raised-button color="accent"
               class="btn-download"

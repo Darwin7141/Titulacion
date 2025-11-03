@@ -25,6 +25,7 @@
     </mat-card-header>
 
     <mat-card-content>
+      <div class="admin-table-wrapper">
       <table class="admin-table">
         <thead>
           <tr>
@@ -48,7 +49,7 @@
           </tr>
         </tbody>
       </table>
-
+      </div>
       <mat-paginator
         [length]="catFiltrados.length"
         [pageSize]="pageSize"

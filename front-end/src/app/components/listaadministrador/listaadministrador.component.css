@@ -163,7 +163,7 @@
   margin: 24px auto 0;
 }
 
----------------------------- :host ::ng-deep .mat-paginator,
+:host ::ng-deep .mat-paginator,
 :host ::ng-deep .mat-mdc-paginator {
   display: flex;
   justify-content: center; /* centra todo el paginador */
@@ -288,4 +288,6 @@
   
   .buscador.slim { max-width: 260px; margin-top: 18px !important; }
   .btn-add { margin-left: auto; margin-top: 0 !important; }
+
+  
 }

@@ -244,3 +244,53 @@ font-family: "Roboto",sans-serif;
 :host ::ng-deep .mat-mdc-paginator-range-label{
   display: none !important;
 }
+
+@media (max-width: 992px) {
+  .tabla-wrapper {
+    padding: 8px;
+  }
+
+  .mat-card.tabla-card {
+    margin: 0;
+  }
+
+  /* envoltorio para scroll */
+  .admin-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    padding-bottom: 8px;
+  }
+
+  /* darle a la tabla un ancho mínimo para que no se comprima */
+  .admin-table {
+    min-width: 900px; /* ajusta según columnas; menor = menos scroll */
+  }
+
+  /* compactar paddings */
+  .admin-table th, .admin-table td {
+    padding: 8px 10px;
+    font-size: 13px;
+    
+  }
+
+  /* barra superior: permitir wrap y hacer botones más pequeños */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;              /* importante: no permitir wrap */
+    overflow-x: auto;               /* si no cabe, permitir scroll horizontal */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .left-group {
+  display: flex;
+  align-items: center;   /* centra verticalmente los hijos (input + iconos) */
+  gap: 8px;
+  
+}
+
+  .buscador.slim { max-width: 260px; margin-top: 18px !important; }
+  .btn-add { margin-left: auto; margin-top: 0 !important; }
+}
