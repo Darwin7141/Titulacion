@@ -160,6 +160,129 @@ export class AgendarReservaComponent implements OnInit{
     this.formReserva.cantpersonas = sumCant;
   }
 
+  private parseFecha(value: unknown): Date | null {
+  if (value instanceof Date) {
+    // normalizar a medianoche local
+    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  }
+  if (!value) return null;
+  const s = String(value).trim();
+  if (!s) return null;
+
+  // dd/MM/yyyy
+  if (s.includes('/')) {
+    const [dd, mm, yyyy] = s.split('/');
+    const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // YYYY-MM-DD
+  if (s.includes('-')) {
+    const [yyyy, mm, dd] = s.split('-');
+    const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // fallback
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// --- Formatea Date a 'YYYY-MM-DD' para tu API ---
+private toYMD(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+// --- Mostrar alerta "fecha inválida" ---
+private alertaFechaInvalida(): void {
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-error"></div>
+      <h2 class="swal-pro-title">Fecha no permitida</h2>
+      <p class="swal-pro-desc">Seleccione una fecha válida para el evento</p>
+    `,
+    showConfirmButton: true,
+    confirmButtonText: 'Entendido',
+    buttonsStyling: false,
+    customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+  });
+}
+
+// --- Mostrar alerta "fecha pasada" ---
+private alertaFechaPasada(): void {
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-error"></div>
+      <h2 class="swal-pro-title">Fecha no permitida</h2>
+      <p class="swal-pro-desc">La fecha del evento debe ser posterior a la fecha actual</p>
+    `,
+    showConfirmButton: true,
+    confirmButtonText: 'Entendido',
+    buttonsStyling: false,
+    customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+  });
+}
+
+// --- Mostrar alerta "fecha llena" ---
+private alertaFechaLlena(count: number): void {
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-error"></div>
+      <h2 class="swal-pro-title">Fecha no disponible</h2>
+      <p class="swal-pro-desc">
+        La fecha seleccionada ya cuenta con ${count} reservas.
+        Por favor elige otra fecha.
+      </p>
+    `,
+    showConfirmButton: true,
+    confirmButtonText: 'Entendido',
+    buttonsStyling: false,
+    customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+  });
+}
+
+// --- Handler que se ejecuta cuando el usuario cambia la fecha ---
+onFechaChange(value: any): void {
+  // 1) Normalizar la fecha a Date (medianoche local)
+  const fecha = this.parseFecha(value);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+
+  if (!fecha) {
+    this.formReserva.fechaevento = '';
+    this.alertaFechaInvalida();
+    return;
+  }
+  if (fecha <= hoy) {
+    this.formReserva.fechaevento = '';
+    this.alertaFechaPasada();
+    return;
+  }
+
+  // 2) Persistimos en el modelo en formato 'YYYY-MM-DD'
+  const ymd = this.toYMD(fecha);
+  this.formReserva.fechaevento = ymd;
+
+  // 3) Verificar disponibilidad (máx 3 reservas)
+  this.reservasService.countByDate(ymd).subscribe({
+    next: ({ count }) => {
+      if (count >= 3) {
+        this.formReserva.fechaevento = '';
+        this.alertaFechaLlena(count);
+      }
+    },
+    error: (err) => {
+      console.error('No pude verificar la disponibilidad de la fecha.', err);
+      // (Opcional) no alerto aquí para no "castigar" al usuario por un fallo de red
+    }
+  });
+}
+
   // ================== VALIDAR CAMPOS Y GENERAR RESERVA ==================
   private validarCampos(): boolean {
     const hoy = new Date();

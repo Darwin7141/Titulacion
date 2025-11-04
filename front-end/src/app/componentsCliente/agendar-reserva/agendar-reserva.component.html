@@ -46,6 +46,7 @@
           [(ngModel)]="formReserva.fechaevento"
           name="fechaevento"
           required
+          (ngModelChange)="onFechaChange($event)"
         />
         <mat-icon class="date-icon">calendar</mat-icon>
       </div>
