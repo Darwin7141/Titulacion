@@ -29,6 +29,7 @@ export class EditarReservaComponent implements OnInit {
   // necesitarás la lista de menús:
   menusDisponibles: any[] = [];
   reservaIndex: number = -1;
+  private fechaOriginal = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -57,6 +58,7 @@ export class EditarReservaComponent implements OnInit {
         // Ej: { idreserva, fechaevento, direccionevento, total, detalles: [...] }
         this.reserva.idreserva = resp.idreserva;
         this.reserva.fechaevento = resp.fechaevento;
+        this.fechaOriginal = resp.fechaevento;
         this.reserva.direccionevento = resp.direccionevento;
         this.reserva.precio = resp.precio;
         this.reserva.cantpersonas = resp.cantpersonas;
@@ -77,6 +79,64 @@ export class EditarReservaComponent implements OnInit {
       },
     });
   }
+
+  private validarFechaEvento(): boolean {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  const fechaEvento = new Date(this.reserva.fechaevento);
+  if (!this.reserva.fechaevento || isNaN(fechaEvento.getTime())) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Fecha no permitida</h2>
+        <p class="swal-pro-desc">Seleccione una fecha válida para el evento</p>
+      `,
+      showConfirmButton: true,
+      confirmButtonText: 'Entendido',
+      buttonsStyling: false,
+      customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+    });
+    return false;
+  }
+  if (fechaEvento <= hoy) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Fecha no permitida</h2>
+        <p class="swal-pro-desc">La fecha del evento debe ser posterior a la fecha actual</p>
+      `,
+      showConfirmButton: true,
+      confirmButtonText: 'Entendido',
+      buttonsStyling: false,
+      customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+    });
+    return false;
+  }
+  return true;
+}
+
+// helper: valida que TODAS las cantidades sean > 0
+private validarCantidades(): boolean {
+  const invalida = this.reserva.detalles.some(d => !d.cantpersonas || d.cantpersonas <= 0);
+  if (invalida) {
+    Swal.fire({
+      width: 480,
+      html: `
+        <div class="swal-pro-error"></div>
+        <h2 class="swal-pro-title">Cantidad no admitida</h2>
+        <p class="swal-pro-desc">Todas las cantidades de los menús deben ser al menos 1</p>
+      `,
+      showConfirmButton: true,
+      confirmButtonText: 'Entendido',
+      buttonsStyling: false,
+      customClass: { popup: 'swal-pro', confirmButton: 'swal-pro-confirm', htmlContainer: 'swal-pro-html' }
+    });
+  }
+  return !invalida;
+}
 
   // ================== Métodos para editar los detalles ==================
   // Ej: Cambiar la cantidad en un detalle
@@ -177,8 +237,18 @@ export class EditarReservaComponent implements OnInit {
     // si usas 'precio' para algo adicional, ajústalo
   }
 
+
+
   // ================== Guardar cambios (PUT) ==================
   guardarEdicion() {
+  // 1) Validaciones básicas
+  if (!this.validarFechaEvento()) return;
+  if (!this.validarCantidades()) return;
+
+  // 2) Si cambia la fecha, validar cupo (máx 3 reservas en esa fecha)
+  const fechaCambio = this.reserva.fechaevento !== this.fechaOriginal;
+
+  const continuarGuardado = () => {
     const detalle = this.reserva.detalles.map((d) => ({
       idmenu: d.idmenu,
       cantpersonas: d.cantpersonas,
@@ -189,10 +259,10 @@ export class EditarReservaComponent implements OnInit {
     const body = {
       fechaevento: this.reserva.fechaevento,
       direccionevento: this.reserva.direccionevento,
-      precio: this.reserva.precio, // El precio es calculado con base en los detalles
-      cantpersonas: this.reserva.cantpersonas, // Total de personas
-      total: this.reserva.total, // Total de la reserva
-      detalle, // Detalles de los menús seleccionados
+      precio: this.reserva.precio,
+      cantpersonas: this.reserva.cantpersonas,
+      total: this.reserva.total,
+      detalle,
     };
 
     this.reservasService.editarReserva(this.idreserva, body).subscribe({
@@ -200,10 +270,10 @@ export class EditarReservaComponent implements OnInit {
         Swal.fire({
           width: 480,
           html: `
-        <div class="swal-pro-check"></div>
-        <h2 class="swal-pro-title">Reserva actualizada</h2>
-        <p class="swal-pro-desc">Los cambios se guardaron correctamente</p>
-      `,
+            <div class="swal-pro-check"></div>
+            <h2 class="swal-pro-title">Reserva actualizada</h2>
+            <p class="swal-pro-desc">Los cambios se guardaron correctamente</p>
+          `,
           showConfirmButton: true,
           confirmButtonText: 'Listo',
           showCancelButton: false,
@@ -223,10 +293,10 @@ export class EditarReservaComponent implements OnInit {
         Swal.fire({
           width: 480,
           html: `
-                          <div class="swal-pro-error"></div>
-                          <h2 class="swal-pro-title">Error</h2>
-                          <p class="swal-pro-desc">Ocurrió un error al actualizar la reserva</p>
-                        `,
+            <div class="swal-pro-error"></div>
+            <h2 class="swal-pro-title">Error</h2>
+            <p class="swal-pro-desc">Ocurrió un error al actualizar la reserva</p>
+          `,
           showConfirmButton: true,
           confirmButtonText: 'Entendido',
           buttonsStyling: false,
@@ -238,5 +308,46 @@ export class EditarReservaComponent implements OnInit {
         });
       },
     });
+  };
+
+  if (!fechaCambio) {
+    // Si NO cambió la fecha, no hace falta consultar el cupo
+    continuarGuardado();
+    return;
   }
+
+  // Validar cupo solo si la fecha fue cambiada
+  this.reservasService.countByDate(this.reserva.fechaevento).subscribe({
+    next: ({ count }) => {
+      if (count >= 3) {
+        Swal.fire({
+          width: 480,
+          html: `
+            <div class="swal-pro-error"></div>
+            <h2 class="swal-pro-title">Fecha no disponible</h2>
+            <p class="swal-pro-desc">
+              La fecha seleccionada ya cuenta con ${count} reservas.
+              Por favor elige otra fecha.
+            </p>
+          `,
+          showConfirmButton: true,
+          confirmButtonText: 'Entendido',
+          buttonsStyling: false,
+          customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+        });
+        return; // no guardar
+      }
+      continuarGuardado(); // cupo OK
+    },
+    error: (err) => {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No pude verificar la disponibilidad de la fecha.',
+      });
+    }
+  });
+}
+
 }
