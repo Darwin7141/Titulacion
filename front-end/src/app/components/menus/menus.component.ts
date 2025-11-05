@@ -104,6 +104,29 @@ export class MenusComponent implements OnInit {
     reader.onload = () => this.previewUrl = reader.result;
     reader.readAsDataURL(file);
   }
+
+  onPrecioChange(value: any): void {
+  const num = Number(value);
+  if (Number.isFinite(num) && num < 0) {
+    this.menu.precio = '';        // limpiar el campo
+    this.alertaPrecioNegativo();  // mostrar tu SweetAlert
+  }
+}
+
+  private alertaPrecioNegativo(): void {
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-error"></div>
+      <h2 class="swal-pro-title">Precio no válido</h2>
+      <p class="swal-pro-desc">No se admiten precios negativos. Ingrese un valor mayor a cero.</p>
+    `,
+    showConfirmButton: true,
+    confirmButtonText: 'Entendido',
+    buttonsStyling: false,
+    customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+  });
+}
         
 
          agregar(): void {
@@ -133,18 +156,24 @@ export class MenusComponent implements OnInit {
     }); return;
   }
   const precioNum = Number(this.menu.precio);
-  if (isNaN(precioNum) || !Number.isFinite(precioNum) || precioNum < 0) {
-    Swal.fire({
-      width: 480,
-      html: `
-        <div class="swal-pro-error"></div>
-        <h2 class="swal-pro-title">Precio no válido</h2>
-        <p class="swal-pro-desc">Ingresa un precio válido (número ≥ 0).</p>
-      `,
-      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
-      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
-    }); return;
-  }
+if (isNaN(precioNum) || !Number.isFinite(precioNum)) {
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-error"></div>
+      <h2 class="swal-pro-title">Precio no válido</h2>
+      <p class="swal-pro-desc">Ingresa un precio válido (número).</p>
+    `,
+    showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+    customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+  }); 
+  return;
+}
+if (precioNum < 0) {
+  this.alertaPrecioNegativo(); 
+  return;
+}
+
   if (!this.menu.idservicio) {
     Swal.fire({
       width: 480,
@@ -232,18 +261,24 @@ export class MenusComponent implements OnInit {
     }); return;
   }
   const precioNum = Number(this.menu.precio);
-  if (isNaN(precioNum) || !Number.isFinite(precioNum) || precioNum < 0) {
-    Swal.fire({
-      width: 480,
-      html: `
-        <div class="swal-pro-error"></div>
-        <h2 class="swal-pro-title">Precio no válido</h2>
-        <p class="swal-pro-desc">Ingresa un precio válido (número ≥ 0).</p>
-      `,
-      showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
-      customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
-    }); return;
-  }
+if (isNaN(precioNum) || !Number.isFinite(precioNum)) {
+  Swal.fire({
+    width: 480,
+    html: `
+      <div class="swal-pro-error"></div>
+      <h2 class="swal-pro-title">Precio no válido</h2>
+      <p class="swal-pro-desc">Ingresa un precio válido (número).</p>
+    `,
+    showConfirmButton: true, confirmButtonText: 'Listo', buttonsStyling: false, focusConfirm: true,
+    customClass: { popup:'swal-pro', confirmButton:'swal-pro-confirm', htmlContainer:'swal-pro-html' }
+  }); 
+  return;
+}
+if (precioNum < 0) {
+  this.alertaPrecioNegativo(); 
+  return;
+}
+
   if (!this.menu.idservicio) {
     Swal.fire({
       width: 480,

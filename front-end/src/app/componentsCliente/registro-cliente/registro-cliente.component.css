@@ -1,59 +1,100 @@
-.login-card {
-  position: absolute;
-  top: 80px;            /* justo bajo la navbar */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 360px;
-  z-index: 1000;
+.registro-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Roboto", sans-serif;
+  border-radius: 18px;
 }
 
-.login-card__inner {
+/* Card */
+.registro-panel-content {
   background: #fff;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-.login-card__form .form-group {
-  margin-bottom: 1.25rem;
-}
-
-.login-card__form input {
+  padding: 30px 40px;
+  border-radius: 10px;
   width: 100%;
-  border: none;
-  border-bottom: 2px solid #ccc;
-  padding: .5rem 0;
-  font-size: 1rem;
+  max-width: 640px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  color: #333;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Título */
+.registro-panel-content h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: "Roboto", sans-serif;
+  font-size: 1.75rem;
+  
+  font-weight: 550;
+}
+
+
+
+/* Grid de 2 columnas */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 30px;
+}
+
+/* Cada grupo */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #555;
+}
+.form-group input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
   transition: border-color .3s;
 }
-
-.login-card__form input:focus {
+.form-group input:focus {
   outline: none;
-  border-bottom-color: var(--verde);
+  border-color: var(--verde);
 }
 
-.btn-submit {
-  background: #259e06;
-  color: #fff;
-  border-radius: 6px;
-  padding: .75rem 1.5rem;
+/* Botonera */
+.registro-buttons {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+.btn-cancel,
+.btn-register {
+  padding: 10px 24px;
+  font-weight: 600;
   border: none;
+  border-radius: 10px;
   cursor: pointer;
-  transition: opacity .3s;
+  transition: background .3s, transform .2s;
 }
-
-.btn-submit:disabled { opacity: .6; cursor: not-allowed; }
-.btn-submit:hover:not(:disabled) { opacity: .85; }
-
 .btn-cancel {
-  background: #a09f9f;
-  color: #fff;
-  border-radius: 6px;
-  padding: .75rem 1.5rem;
-  border: none;
-  cursor: pointer;
+  background: #ef4444 !important;
+  color: white !important;
+}
+.btn-cancel:hover {
+  background: #b62f2f !important;
+  transform: translateY(-2px);
+}
+.btn-register {
+  background:  #0ccf36 !important;
+  color: white !important;
+}
+.btn-register:hover {
+  background: #098123 !important;
+  transform: translateY(-2px);
 }
 
-.btn-cancel:hover { background: #606160; }
+.registro-panel-content .form-group .error{
+  color:#d9534f;
+  font-size:.875rem;
+  margin-top:.25rem;
+}

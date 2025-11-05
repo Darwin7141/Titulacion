@@ -1,50 +1,131 @@
-<div class="login-card">
-  <div class="login-card__inner">
-    <h2>¡Bienvenido!</h2>
-    <p>Completa tus datos para crear tu cuenta</p>
+<div class="registro-panel">
+  <div class="registro-panel-content">
+    <h3>Regístrate</h3>
 
-    <form #regForm="ngForm"
-          (ngSubmit)="onSubmit()"
-          class="login-card__form">
-      <div class="form-group">
-        <input name="ci"         [(ngModel)]="registro.ci"         placeholder="Cédula" required />
-      </div>
-      <div class="form-group">
-        <input name="nombre"     [(ngModel)]="registro.nombre"     placeholder="Nombre" required />
-      </div>
-      <div class="form-group">
-        <input name="telefono"   [(ngModel)]="registro.telefono"   placeholder="Teléfono" required />
-      </div>
-      <div class="form-group">
-        <input name="direccion"  [(ngModel)]="registro.direccion"  placeholder="Dirección" required />
-      </div>
-      <div class="form-group">
-        <input type="email"
-               name="correo"
-               [(ngModel)]="registro.correo"
-               placeholder="Correo electrónico"
-               required />
-      </div>
-      <div class="form-group">
-        <input type="password"
-               name="contrasenia"
-               [(ngModel)]="registro.contrasenia"
-               placeholder="Contraseña"
-               required />
-      </div>
+    <form #registroForm="ngForm" (ngSubmit)="onSubmit()" autocomplete="on">
+        <div class="form-grid">
+          <!-- CÉDULA -->
+          <div class="form-group">
+            <label for="ci">Cédula</label>
+            <input
+              id="ci"
+              name="ci"
+              type="text"
+              [(ngModel)]="registro.ci"
+              #ciModel="ngModel"
+              required
+              minlength="10"
+              maxlength="10"
+              pattern="^[0-9]{10}$"
+              placeholder="Ingrese su cédula"
+              (blur)="alSalirCedula(ciModel.value)"
+            />
+            <div class="error" *ngIf="ciModel.invalid && (ciModel.touched || registroForm.submitted)">
+              <ng-container *ngIf="ciModel.errors?.['required']">La cédula es obligatoria</ng-container>
+              <ng-container *ngIf="ciModel.errors?.['pattern'] || ciModel.errors?.['minlength']">Debe tener 10 dígitos</ng-container>
+            </div>
+          </div>
 
-      <div class="login-card__links" style="justify-content: space-between;">
-        <button type="button"
-                class="btn-cancel"
-                (click)="onCancel()">
-          Cancelar
-        </button>
-        <button type="submit"
-                class="btn-submit"
-                [disabled]="regForm.invalid">
-          Registrar
-        </button>
-      </div>
-    </form>
+          <!-- DIRECCIÓN -->
+          <div class="form-group">
+            <label for="direccion">Dirección</label>
+            <input
+              id="direccion"
+              name="direccion"
+              type="text"
+              [(ngModel)]="registro.direccion"
+              #dirModel="ngModel"
+              required
+              placeholder="Ingrese su dirección"
+            />
+          <!--  <div class="error" *ngIf="dirModel.invalid && (dirModel.touched || registroForm.submitted)">
+              La dirección es obligatoria
+            </div>-->
+          </div>
+
+          <!-- NOMBRE -->
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input
+              id="nombre"
+              name="nombre"
+              type="text"
+              [(ngModel)]="registro.nombre"
+              #nombreModel="ngModel"
+              required
+              placeholder="Ingrese su nombre"
+              (blur)="alSalirNombre(nombreModel.value)" 
+            />
+            <div class="error" *ngIf="nombreModel.invalid && (nombreModel.touched || registroForm.submitted)">
+              El nombre es obligatorio
+            </div>
+          </div>
+
+          <!-- CORREO -->
+          <div class="form-group">
+            <label for="correo">Correo Electrónico</label>
+            <input
+              id="correo"
+              name="correo"
+              type="email"
+              [(ngModel)]="registro.correo"
+              #correoModel="ngModel"
+              required
+              email
+              placeholder="Ingrese su correo electrónico"
+              (blur)="alSalirCorreo(correoModel.value)"
+            />
+            <div class="error" *ngIf="correoModel.invalid && (correoModel.touched || registroForm.submitted)">
+              <ng-container *ngIf="correoModel.errors?.['required']">El correo electrónico es obligatorio</ng-container>
+              <ng-container *ngIf="correoModel.errors?.['email']">Formato de correo no válido</ng-container>
+            </div>
+          </div>
+
+          <!-- TELÉFONO -->
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input
+              id="telefono"
+              name="telefono"
+              type="tel"
+              [(ngModel)]="registro.telefono"
+              #telModel="ngModel"
+              required
+              pattern="^[0-9]{7,10}$"
+              placeholder="Ingrese su teléfono"
+              (blur)="alSalirTelefono(telModel.value)"
+            />
+            <div class="error" *ngIf="telModel.invalid && (telModel.touched || registroForm.submitted)">
+              <ng-container *ngIf="telModel.errors?.['required']">El teléfono es obligatorio</ng-container>
+              <ng-container *ngIf="telModel.errors?.['pattern']">Solo dígitos 10 dígitos</ng-container>
+            </div>
+          </div>
+
+          <!-- CONTRASEÑA -->
+          <div class="form-group">
+            <label for="contrasenia">Contraseña</label>
+            <input
+              id="contrasenia"
+              name="contrasenia"
+              type="password"
+              [(ngModel)]="registro.contrasenia"
+              #passModel="ngModel"
+              required
+              minlength="6"
+              placeholder="Ingrese su contraseña"
+              (blur)="alSalirContrasenia(passModel.value)"
+            />
+            <div class="error" *ngIf="passModel.invalid && (passModel.touched || registroForm.submitted)">
+              <ng-container *ngIf="passModel.errors?.['required']">La contraseña es obligatoria</ng-container>
+              <ng-container *ngIf="passModel.errors?.['minlength']">Mínimo 6 caracteres</ng-container>
+            </div>
+          </div>
+        </div>
+
+        <div class="registro-buttons">
+          <button type="button" class="btn-cancel" (click)="cerrar()">Cancelar</button>
+          <button type="submit" class="btn-register" [disabled]="!registroForm.form.valid">Registrar</button>
+        </div>
+      </form>
   </div>
 </div>
